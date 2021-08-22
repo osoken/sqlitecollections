@@ -1,0 +1,431 @@
+from abc import abstractmethod, ABCMeta
+from collections.abc import Hashable
+from pickle import dumps, loads
+from tempfile import NamedTemporaryFile
+from uuid import uuid4
+import sqlite3
+import sys
+
+from typing import cast, Generic, TypeVar, Optional, Callable, Union
+
+if sys.version_info >= (3, 9):
+    from collections.abc import (
+        MutableMapping,
+        Iterator,
+        Mapping,
+        Iterable,
+        Reversible,
+        Tuple,
+    )
+else:
+    from typing import MutableMapping, Iterator, Mapping, Iterable, Tuple
+if sys.version_info >= (3, 8):
+    from typing import Reversible
+
+
+T = TypeVar("T")
+KT = TypeVar("KT")
+VT = TypeVar("VT")
+
+
+class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
+    def __init__(
+        self,
+        connection: Optional[Union[str, sqlite3.Connection]] = None,
+        table_name: Optional[str] = None,
+        serializer: Optional[Callable[[T], bytes]] = None,
+        deserializer: Optional[Callable[[bytes], T]] = None,
+        destruct_table_on_delete: bool = False,
+    ):
+        super(SqliteCollectionBase, self).__init__()
+        self._serializer = (
+            cast(Callable[[T], bytes], dumps) if serializer is None else serializer
+        )
+        self._deserializer = (
+            cast(Callable[[bytes], T], loads) if deserializer is None else deserializer
+        )
+        self._destruct_table_on_delete = destruct_table_on_delete
+        if connection is None:
+            self._connection = sqlite3.connect(NamedTemporaryFile().name)
+        elif isinstance(connection, str):
+            self._connection = sqlite3.connect(connection)
+        elif isinstance(connection, sqlite3.Connection):
+            self._connection = connection
+        else:
+            raise TypeError(
+                f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
+            )
+        self._table_name = (
+            f"{self.container_type_name}_{str(uuid4()).replace('-', '')}"
+            if table_name is None
+            else table_name
+        )
+        self._initialize(commit=True)
+
+    def __del__(self) -> None:
+        if self.destruct_table_on_delete:
+            cur = self.connection.cursor()
+            cur.execute(
+                "DELETE FROM metadata WHERE table_name=? AND container_type=?",
+                (self.table_name, self.container_type_name),
+            )
+            cur.execute(f"DROP TABLE {self.table_name}")
+            self.connection.commit()
+
+    def _initialize(self, commit: bool = False) -> None:
+        self._initialize_metadata_table(commit=commit)
+        self._initialize_table(commit=commit)
+
+    @property
+    def destruct_table_on_delete(self) -> bool:
+        return self._destruct_table_on_delete
+
+    @property
+    def serializer(self) -> Callable[[T], bytes]:
+        return self._serializer
+
+    def serialize(self, x: T) -> bytes:
+        return self.serializer(x)
+
+    @property
+    def deserializer(self) -> Callable[[bytes], T]:
+        return self._deserializer
+
+    def deserialize(self, blob: bytes) -> T:
+        return self.deserializer(blob)
+
+    @property
+    def table_name(self) -> str:
+        return "".join(c for c in self._table_name if c.isalnum() or c == "_")
+
+    @property
+    def connection(self) -> sqlite3.Connection:
+        return self._connection
+
+    @property
+    def container_type_name(self) -> str:
+        return self.__class__.__name__
+
+    @property
+    @abstractmethod
+    def schema_version(self) -> str:
+        ...
+
+    def _is_table_initialized(self) -> bool:
+        try:
+            cur = self._connection.cursor()
+            cur.execute(
+                "SELECT schema_version FROM metadata WHERE table_name=? AND container_type=?",
+                (self.table_name, self.container_type_name),
+            )
+            buf = cur.fetchone()
+            if buf is None:
+                return False
+            version = buf[0]
+            if version != self.schema_version:
+                return False
+            cur.execute(f"SELECT 1 FROM {self.table_name}")
+            return True
+        except sqlite3.OperationalError as _:
+            pass
+        return False
+
+    def _do_tidy_table_metadata(self, commit: bool = False) -> None:
+        cur = self.connection.cursor()
+        cur.execute(
+            "INSERT INTO metadata (table_name, schema_version, container_type) VALUES (?, ?, ?)",
+            (self.table_name, self.schema_version, self.container_type_name),
+        )
+        if commit:
+            self.connection.commit()
+
+    def _initialize_table(self, commit: bool = False) -> None:
+        if not self._is_table_initialized():
+            self._do_create_table()
+            self._do_tidy_table_metadata()
+        if commit:
+            self.connection.commit()
+
+    @abstractmethod
+    def _do_create_table(self, commit: bool = False) -> None:
+        ...
+
+    def _is_metadata_table_initialized(self) -> bool:
+        try:
+            cur = self.connection.cursor()
+            cur.execute("SELECT 1 FROM metadata")
+            return True
+        except sqlite3.OperationalError as _:
+            pass
+        return False
+
+    def _do_initialize_metadata_table(self, commit: bool = False) -> None:
+        cur = self.connection.cursor()
+        cur.execute(
+            """
+            CREATE TABLE metadata (
+                table_name TEXT PRIMARY KEY,
+                schema_version TEXT NOT NULL,
+                container_type TEXT NOT NULL,
+                UNIQUE (table_name, container_type)
+            )
+        """
+        )
+        if commit:
+            self.connection.commit()
+
+    def _initialize_metadata_table(self, commit: bool = False) -> None:
+        if not self._is_metadata_table_initialized():
+            self._do_initialize_metadata_table(commit)
+
+
+class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
+    def __init__(
+        self,
+        connection: Optional[Union[str, sqlite3.Connection]] = None,
+        table_name: Optional[str] = None,
+        serializer: Optional[Callable[[VT], bytes]] = None,
+        deserializer: Optional[Callable[[bytes], VT]] = None,
+        key_serializer: Optional[Callable[[KT], bytes]] = None,
+        key_deserializer: Optional[Callable[[bytes], KT]] = None,
+        destruct_table_on_delete: bool = False,
+        data: Optional[Mapping[KT, VT]] = None,
+        **kwargs: VT,
+    ) -> None:
+        super(_Dict, self).__init__(
+            connection=connection,
+            table_name=table_name,
+            serializer=serializer,
+            deserializer=deserializer,
+            destruct_table_on_delete=destruct_table_on_delete,
+        )
+        self._key_serializer = (
+            cast(Callable[[KT], bytes], self._serializer)
+            if key_serializer is None
+            else key_serializer
+        )
+        self._key_deserializer = (
+            cast(Callable[[bytes], KT], self._deserializer)
+            if key_deserializer is None
+            else key_deserializer
+        )
+        if self._should_rebuild():
+            self._do_rebuild(commit=True)
+        self.update({} if data is None else data, **kwargs)
+
+    @property
+    def key_serializer(self) -> Callable[[KT], bytes]:
+        return self._key_serializer
+
+    @property
+    def key_deserializer(self) -> Callable[[bytes], KT]:
+        return self._key_deserializer
+
+    @property
+    def schema_version(self) -> str:
+        return "0"
+
+    def _do_create_table(self, commit: bool = False) -> None:
+        cur = self.connection.cursor()
+        cur.execute(
+            f"CREATE TABLE {self.table_name} ("
+            "serialized_key BLOB NOT NULL UNIQUE, "
+            "serialized_value BLOB NOT NULL, "
+            "item_order INTEGER PRIMARY KEY)"
+        )
+        if commit:
+            self._connection.commit()
+
+    def _should_rebuild(self) -> bool:
+        cur = self.connection.cursor()
+        cur.execute(
+            f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order LIMIT 1"
+        )
+        res = cur.fetchone()
+        if res is None:
+            return False
+        serialized_key = cast(bytes, res[0])
+        key = self.deserialize_key(serialized_key)
+        return serialized_key != self.serialize_key(key)
+
+    def _do_rebuild(self, commit: bool = False) -> None:
+        cur = self.connection.cursor()
+        last_order = -1
+        while last_order is not None:
+            cur.execute(
+                f"SELECT item_order FROM {self.table_name} WHERE item_order > ? ORDER BY item_order LIMIT 1",
+                (last_order,),
+            )
+            res = cur.fetchone()
+            if res is None:
+                break
+            i = res[0]
+            cur.execute(
+                f"SELECT serialized_key, serialized_value FROM {self.table_name} WHERE item_order=?",
+                (i,),
+            )
+            serialized_key, serialized_value = cur.fetchone()
+            cur.execute(
+                f"UPDATE {self.table_name} SET serialized_key=?, serialized_value=? WHERE item_order=?",
+                (
+                    self.serialize_key(self.deserialize_key(serialized_key)),
+                    self.serialize(self.deserialize(serialized_value)),
+                    i,
+                ),
+            )
+            last_order = i
+        if commit:
+            self.connection.commit()
+
+    def _is_hashable(self, key: KT) -> bool:
+        return isinstance(key, Hashable)
+
+    def _delete_single_record_by_serialized_key(
+        self, cur: sqlite3.Cursor, serialized_key: bytes
+    ) -> None:
+        cur.execute(
+            f"DELETE FROM {self.table_name} WHERE serialized_key=?", (serialized_key,)
+        )
+
+    def _is_serialized_key_in(self, cur: sqlite3.Cursor, serialized_key: bytes) -> bool:
+        cur.execute(
+            f"SELECT 1 FROM {self.table_name} WHERE serialized_key=?", (serialized_key,)
+        )
+        return len(list(cur)) > 0
+
+    def _get_serialized_value_by_serialized_key(
+        self, cur: sqlite3.Cursor, serialized_key: bytes
+    ) -> Union[None, bytes]:
+        cur.execute(
+            f"SELECT serialized_value FROM {self.table_name} WHERE serialized_key=?",
+            (serialized_key,),
+        )
+        res = cur.fetchone()
+        if res is None:
+            return None
+        return cast(bytes, res[0])
+
+    def _get_next_order(self, cur: sqlite3.Cursor) -> int:
+        cur.execute(f"SELECT MAX(item_order) FROM {self.table_name}")
+        res = cur.fetchone()[0]
+        if res is None:
+            return 0
+        return cast(int, res) + 1
+
+    def _get_count(self, cur: sqlite3.Cursor) -> int:
+        cur.execute(f"SELECT COUNT(*) FROM {self.table_name}")
+        res = cur.fetchone()
+        return cast(int, res[0])
+
+    def _get_serialized_keys(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
+        cur.execute(f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order")
+        for res in cur:
+            yield cast(bytes, res[0])
+
+    def _upsert(
+        self,
+        cur: sqlite3.Cursor,
+        serialized_key: bytes,
+        serialized_value: bytes,
+    ) -> None:
+        if self._is_serialized_key_in(cur, serialized_key):
+            cur.execute(
+                f"UPDATE {self.table_name} SET serialized_value=? WHERE serialized_key=?",
+                (serialized_value, serialized_key),
+            )
+        else:
+            item_order = self._get_next_order(cur)
+            cur.execute(
+                f"INSERT INTO {self.table_name} (serialized_key, serialized_value, item_order) VALUES (?, ?, ?)",
+                (serialized_key, serialized_value, item_order),
+            )
+
+    def _get_last_serialized_item(self, cur: sqlite3.Cursor) -> Tuple[bytes, bytes]:
+        cur.execute(
+            f"SELECT serialized_key, serialized_value FROM {self.table_name} ORDER BY item_order DESC LIMIT 1"
+        )
+        return cast(Tuple[bytes, bytes], cur.fetchone())
+
+    def serialize_key(self, key: KT) -> bytes:
+        if not self._is_hashable(key):
+            raise TypeError(f"unhashable type: '{type(key).__name__}'")
+        return self.key_serializer(key)
+
+    def deserialize_key(self, serialized_key: bytes) -> KT:
+        return self.key_deserializer(serialized_key)
+
+    def __delitem__(self, key: KT) -> None:
+        serialized_key = self.serialize_key(key)
+        cur = self.connection.cursor()
+        if not self._is_serialized_key_in(cur, serialized_key):
+            raise KeyError(key)
+        self._delete_single_record_by_serialized_key(cur, serialized_key)
+        self.connection.commit()
+
+    def __getitem__(self, key: KT) -> VT:
+        serialized_key = self.serialize_key(key)
+        cur = self.connection.cursor()
+        serialized_value = self._get_serialized_value_by_serialized_key(
+            cur, serialized_key
+        )
+        if serialized_value is None:
+            raise KeyError(key)
+        return self.deserialize(serialized_value)
+
+    def __iter__(self) -> Iterator[KT]:
+        cur = self.connection.cursor()
+        for serialized_key in self._get_serialized_keys(cur):
+            yield self.deserialize_key(serialized_key)
+
+    def __len__(self) -> int:
+        cur = self.connection.cursor()
+        return self._get_count(cur)
+
+    def __setitem__(self, key: KT, value: VT) -> None:
+        serialized_key = self.serialize_key(key)
+        cur = self.connection.cursor()
+        serialized_value = self.serializer(value)
+        self._upsert(cur, serialized_key, serialized_value)
+        self.connection.commit()
+
+    def copy(self) -> "Dict[KT, VT]":
+        raise NotImplementedError
+
+    @classmethod
+    def fromkeys(cls, iterable: Iterable[KT], value: Optional[VT]) -> "Dict[KT, VT]":
+        raise NotImplementedError
+
+    def popitem(self) -> Tuple[KT, VT]:
+        cur = self.connection.cursor()
+        serialized_item = self._get_last_serialized_item(cur)
+        if serialized_item is None:
+            raise KeyError("popitem(): dictionary is empty")
+        self._delete_single_record_by_serialized_key(cur, serialized_item[0])
+        self.connection.commit()
+        return (
+            self.deserialize_key(serialized_item[0]),
+            self.deserialize(serialized_item[1]),
+        )
+
+
+if sys.version_info >= (3, 8):
+
+    class Dict(_Dict[KT, VT], Reversible[KT]):
+        def _get_reversed_serialized_keys(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
+            cur.execute(
+                f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order DESC"
+            )
+            for res in cur:
+                yield cast(bytes, res[0])
+
+        def reversed_keys(self) -> Iterator[KT]:
+            cur = self.connection.cursor()
+            for serialized_key in self._get_reversed_serialized_keys(cur):
+                yield self.deserialize_key(serialized_key)
+
+        def __reversed__(self) -> Iterator[KT]:
+            return self.reversed_keys()
+
+
+else:
+    Dict = _Dict
