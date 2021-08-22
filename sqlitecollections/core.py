@@ -6,7 +6,7 @@ from uuid import uuid4
 import sqlite3
 import sys
 
-from typing import cast, Generic, TypeVar, Optional, Callable, Union
+from typing import cast, Generic, TypeVar, Optional, Callable, Union, Tuple
 
 if sys.version_info >= (3, 9):
     from collections.abc import (
@@ -15,10 +15,9 @@ if sys.version_info >= (3, 9):
         Mapping,
         Iterable,
         Reversible,
-        Tuple,
     )
 else:
-    from typing import MutableMapping, Iterator, Mapping, Iterable, Tuple
+    from typing import MutableMapping, Iterator, Mapping, Iterable
 if sys.version_info >= (3, 8):
     from typing import Reversible
 
@@ -410,7 +409,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
 
 if sys.version_info >= (3, 8):
 
-    class Dict(_Dict[KT, VT], Reversible[KT]):
+    class _ReversibleDict(_Dict[KT, VT], Reversible[KT]):
         def _get_reversed_serialized_keys(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
             cur.execute(
                 f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order DESC"
@@ -427,5 +426,34 @@ if sys.version_info >= (3, 8):
             return self.reversed_keys()
 
 
+if sys.version_info >= (3, 9):
+
+    class Dict(_ReversibleDict[KT, VT]):
+        def __or__(self, other: Mapping[KT, VT]) -> "Dict[KT, VT]":
+            tmp = Dict(
+                connection=self.connection,
+                serializer=self.serializer,
+                deserializer=self.deserializer,
+                key_serializer=self.key_serializer,
+                key_deserializer=self.key_deserializer,
+                destruct_table_on_delete=self.destruct_table_on_delete,
+                data=self,
+            )
+            tmp |= other
+            return tmp
+
+        def __ior__(self, other: Mapping[KT, VT]) -> "Dict[KT, VT]":
+            self.update(other)
+            return self
+
+
+elif sys.version_info >= (3, 8):
+
+    class Dict(_ReversibleDict[KT, VT]):
+        ...
+
+
 else:
-    Dict = _Dict
+
+    class Dict(_Dict[KT, VT]):
+        ...

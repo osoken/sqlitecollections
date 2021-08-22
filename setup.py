@@ -21,5 +21,5 @@ setup(
     long_description=__long_description__,
     packages=[__package_name__],
     install_requires=[],
-    extras_require={"dev": ["flake8", "pytest", "black", "mypy"]},
+    extras_require={"dev": ["flake8", "pytest", "black", "mypy", "tox"]},
 )
