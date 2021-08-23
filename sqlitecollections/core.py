@@ -1,23 +1,17 @@
-from abc import abstractmethod, ABCMeta
+import sqlite3
+import sys
+from abc import ABCMeta, abstractmethod
 from collections.abc import Hashable
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
+from typing import Callable, Generic, Optional, Tuple, TypeVar, Union, cast
 from uuid import uuid4
-import sqlite3
-import sys
-
-from typing import cast, Generic, TypeVar, Optional, Callable, Union, Tuple
 
 if sys.version_info >= (3, 9):
-    from collections.abc import (
-        MutableMapping,
-        Iterator,
-        Mapping,
-        Iterable,
-        Reversible,
-    )
+    from collections.abc import (Iterable, Iterator, Mapping, MutableMapping,
+                                 Reversible)
 else:
-    from typing import MutableMapping, Iterator, Mapping, Iterable
+    from typing import Iterable, Iterator, Mapping, MutableMapping
 if sys.version_info >= (3, 8):
     from typing import Reversible
 
@@ -37,12 +31,8 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         destruct_table_on_delete: bool = False,
     ):
         super(SqliteCollectionBase, self).__init__()
-        self._serializer = (
-            cast(Callable[[T], bytes], dumps) if serializer is None else serializer
-        )
-        self._deserializer = (
-            cast(Callable[[bytes], T], loads) if deserializer is None else deserializer
-        )
+        self._serializer = cast(Callable[[T], bytes], dumps) if serializer is None else serializer
+        self._deserializer = cast(Callable[[bytes], T], loads) if deserializer is None else deserializer
         self._destruct_table_on_delete = destruct_table_on_delete
         if connection is None:
             self._connection = sqlite3.connect(NamedTemporaryFile().name)
@@ -55,9 +45,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
                 f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
             )
         self._table_name = (
-            f"{self.container_type_name}_{str(uuid4()).replace('-', '')}"
-            if table_name is None
-            else table_name
+            f"{self.container_type_name}_{str(uuid4()).replace('-', '')}" if table_name is None else table_name
         )
         self._initialize(commit=True)
 
@@ -199,14 +187,10 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             destruct_table_on_delete=destruct_table_on_delete,
         )
         self._key_serializer = (
-            cast(Callable[[KT], bytes], self._serializer)
-            if key_serializer is None
-            else key_serializer
+            cast(Callable[[KT], bytes], self._serializer) if key_serializer is None else key_serializer
         )
         self._key_deserializer = (
-            cast(Callable[[bytes], KT], self._deserializer)
-            if key_deserializer is None
-            else key_deserializer
+            cast(Callable[[bytes], KT], self._deserializer) if key_deserializer is None else key_deserializer
         )
         if self._should_rebuild():
             self._do_rebuild(commit=True)
@@ -237,9 +221,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
 
     def _should_rebuild(self) -> bool:
         cur = self.connection.cursor()
-        cur.execute(
-            f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order LIMIT 1"
-        )
+        cur.execute(f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order LIMIT 1")
         res = cur.fetchone()
         if res is None:
             return False
@@ -279,22 +261,14 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def _is_hashable(self, key: KT) -> bool:
         return isinstance(key, Hashable)
 
-    def _delete_single_record_by_serialized_key(
-        self, cur: sqlite3.Cursor, serialized_key: bytes
-    ) -> None:
-        cur.execute(
-            f"DELETE FROM {self.table_name} WHERE serialized_key=?", (serialized_key,)
-        )
+    def _delete_single_record_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> None:
+        cur.execute(f"DELETE FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
 
     def _is_serialized_key_in(self, cur: sqlite3.Cursor, serialized_key: bytes) -> bool:
-        cur.execute(
-            f"SELECT 1 FROM {self.table_name} WHERE serialized_key=?", (serialized_key,)
-        )
+        cur.execute(f"SELECT 1 FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
         return len(list(cur)) > 0
 
-    def _get_serialized_value_by_serialized_key(
-        self, cur: sqlite3.Cursor, serialized_key: bytes
-    ) -> Union[None, bytes]:
+    def _get_serialized_value_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> Union[None, bytes]:
         cur.execute(
             f"SELECT serialized_value FROM {self.table_name} WHERE serialized_key=?",
             (serialized_key,),
@@ -340,9 +314,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             )
 
     def _get_last_serialized_item(self, cur: sqlite3.Cursor) -> Tuple[bytes, bytes]:
-        cur.execute(
-            f"SELECT serialized_key, serialized_value FROM {self.table_name} ORDER BY item_order DESC LIMIT 1"
-        )
+        cur.execute(f"SELECT serialized_key, serialized_value FROM {self.table_name} ORDER BY item_order DESC LIMIT 1")
         return cast(Tuple[bytes, bytes], cur.fetchone())
 
     def serialize_key(self, key: KT) -> bytes:
@@ -364,9 +336,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def __getitem__(self, key: KT) -> VT:
         serialized_key = self.serialize_key(key)
         cur = self.connection.cursor()
-        serialized_value = self._get_serialized_value_by_serialized_key(
-            cur, serialized_key
-        )
+        serialized_value = self._get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             raise KeyError(key)
         return self.deserialize(serialized_value)
@@ -411,9 +381,7 @@ if sys.version_info >= (3, 8):
 
     class _ReversibleDict(_Dict[KT, VT], Reversible[KT]):
         def _get_reversed_serialized_keys(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
-            cur.execute(
-                f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order DESC"
-            )
+            cur.execute(f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order DESC")
             for res in cur:
                 yield cast(bytes, res[0])
 
