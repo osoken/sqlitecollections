@@ -10,8 +10,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 if sys.version_info > (3, 9):
-    from collections.abc import (Callable, ItemsView, Iterator, KeysView,
-                                 ValuesView)
+    from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
 
@@ -60,6 +59,12 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             cur = self.connection.cursor()
             cur.execute(f"CREATE TABLE {self.table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
 
+        def _rebuild_check_with_first_element(self) -> bool:
+            return False
+
+        def _do_rebuild(self, commit: bool = False) -> None:
+            ...
+
     @patch(
         "sqlitecollections.core.uuid4",
         return_value=uuid.UUID("4da95358-64e7-40e7-b888-31e14e1c1d09"),
@@ -84,6 +89,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         self.assertEqual(sut.connection, memory_db)
         self.assertEqual(sut.serializer, dumps)
         self.assertEqual(sut.deserializer, loads)
+        self.assertEqual(sut.destruct_table_on_delete, False)
+        self.assertEqual(sut.rebuild_strategy, core.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT)
         self.assertEqual(
             sut.table_name,
             "ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
@@ -111,11 +118,15 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         sqlite3_connect.return_value = memory_db
         serializer = MagicMock(spec=Callable[[Any], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Any])
+        destruct_table_on_delete = True
+        rebuild_strategy = core.RebuildStrategy.SKIP
         sut = self.ConcreteSqliteCollectionClass(
             connection="connection",
             table_name="tablename",
             serializer=serializer,
             deserializer=deserializer,
+            destruct_table_on_delete=destruct_table_on_delete,
+            rebuild_strategy=rebuild_strategy,
         )
         sqlite3_connect.assert_called_once_with("connection")
         self.assertEqual(sut.connection, memory_db)
@@ -125,6 +136,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             sut.table_name,
             "tablename",
         )
+        self.assertEqual(sut.destruct_table_on_delete, destruct_table_on_delete)
+        self.assertEqual(sut.rebuild_strategy, rebuild_strategy)
         self.assert_sql_result_equals(
             memory_db,
             "SELECT table_name, schema_version, container_type FROM metadata",
@@ -274,6 +287,38 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             [],
         )
 
+    @patch.object(ConcreteSqliteCollectionClass, "_rebuild_check_with_first_element", return_value=True)
+    @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
+    def test_rebuild_check_with_first_element(
+        self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock
+    ) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = self.ConcreteSqliteCollectionClass(
+            connection=memory_db, table_name="items1", rebuild_strategy=core.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT
+        )
+        _rebuild_check_with_first_element.assert_called_once_with()
+        _do_rebuild.assert_called_once_with(commit=True)
+
+    @patch.object(ConcreteSqliteCollectionClass, "_rebuild_check_with_first_element", return_value=True)
+    @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
+    def test_rebuild_always(self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = self.ConcreteSqliteCollectionClass(
+            connection=memory_db, table_name="items1", rebuild_strategy=core.RebuildStrategy.ALWAYS
+        )
+        _rebuild_check_with_first_element.assert_not_called()
+        _do_rebuild.assert_called_once_with(commit=True)
+
+    @patch.object(ConcreteSqliteCollectionClass, "_rebuild_check_with_first_element", return_value=True)
+    @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
+    def test_rebuild_skip(self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = self.ConcreteSqliteCollectionClass(
+            connection=memory_db, table_name="items1", rebuild_strategy=core.RebuildStrategy.SKIP
+        )
+        _rebuild_check_with_first_element.assert_not_called()
+        _do_rebuild.assert_not_called()
+
 
 class DictTestCase(SqlTestCase):
     def assert_dict_state_equals(self, conn: sqlite3.Connection, expected: Any) -> None:
@@ -286,14 +331,11 @@ class DictTestCase(SqlTestCase):
             expected,
         )
 
-    @patch("sqlitecollections.core.Dict._should_rebuild", return_value=False)
+    @patch("sqlitecollections.core.Dict._initialize", return_value=None)
     @patch("sqlitecollections.core.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.core.SqliteCollectionBase.__del__", return_value=None)
     def test_init(
-        self,
-        SqliteCollectionBase_del: MagicMock,
-        SqliteCollectionBase_init: MagicMock,
-        _should_rebuild: MagicMock,
+        self, SqliteCollectionBase_del: MagicMock, SqliteCollectionBase_init: MagicMock, _initialize: MagicMock
     ) -> None:
         memory_db = sqlite3.connect(":memory:")
         table_name = "items"
@@ -302,6 +344,7 @@ class DictTestCase(SqlTestCase):
         key_serializer = MagicMock(spec=Callable[[Hashable], bytes])
         key_deserializer = MagicMock(spec=Callable[[bytes], Hashable])
         destruct_table_on_delete = True
+        rebuild_strategy = core.RebuildStrategy.SKIP
         sut = core.Dict[Hashable, Any](
             connection=memory_db,
             table_name=table_name,
@@ -310,6 +353,7 @@ class DictTestCase(SqlTestCase):
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
             destruct_table_on_delete=destruct_table_on_delete,
+            rebuild_strategy=rebuild_strategy,
         )
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
@@ -317,6 +361,8 @@ class DictTestCase(SqlTestCase):
             serializer=serializer,
             deserializer=deserializer,
             destruct_table_on_delete=destruct_table_on_delete,
+            rebuild_strategy=rebuild_strategy,
+            do_initialize=False,
         )
         self.assertEqual(sut.key_serializer, key_serializer)
         self.assertEqual(sut.key_deserializer, key_deserializer)
@@ -339,6 +385,25 @@ class DictTestCase(SqlTestCase):
             memory_db,
             [],
         )
+
+    def test_rebuild(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict_base.sql", "dict_rebuild.sql")
+
+        def serializer(x: str) -> bytes:
+            return x.upper().encode("utf-8")
+
+        def deserializer(x: bytes) -> str:
+            return str(x)
+
+        sut = core.Dict[str, str](
+            connection=memory_db,
+            table_name="items",
+            serializer=serializer,
+            deserializer=deserializer,
+            rebuild_strategy=core.RebuildStrategy.ALWAYS,
+        )
+        self.assert_dict_state_equals(memory_db, [(b"A", b"B", 0)])
 
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")
