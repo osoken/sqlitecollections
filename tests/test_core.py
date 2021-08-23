@@ -1,17 +1,17 @@
-from collections.abc import Hashable
-from unittest import TestCase
-from unittest.mock import patch, MagicMock
-from typing import Any
-import sys
-import pickle
-import sqlite3
-import re
 import os
+import pickle
+import re
+import sqlite3
+import sys
 import uuid
-
+from collections.abc import Hashable
+from typing import Any
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 if sys.version_info > (3, 9):
-    from collections.abc import ItemsView, KeysView, ValuesView, Iterator, Callable
+    from collections.abc import (Callable, ItemsView, Iterator, KeysView,
+                                 ValuesView)
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
 
@@ -36,9 +36,7 @@ class SqlAwareMagicMock(MagicMock):
 class SqlTestCase(TestCase):
     import sqlite3
 
-    def assert_sql_result_equals(
-        self, conn: sqlite3.Connection, sql: str, expected: Any
-    ) -> None:
+    def assert_sql_result_equals(self, conn: sqlite3.Connection, sql: str, expected: Any) -> None:
         cur = conn.cursor()
         cur.execute(sql)
         return self.assertEqual(list(cur), expected)
@@ -60,9 +58,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
         def _do_create_table(self, commit: bool = False) -> None:
             cur = self.connection.cursor()
-            cur.execute(
-                f"CREATE TABLE {self.table_name} (idx INTEGER AUTO INCREMENT, value BLOB)"
-            )
+            cur.execute(f"CREATE TABLE {self.table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
 
     @patch(
         "sqlitecollections.core.uuid4",
@@ -172,12 +168,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
     def test_init_same_container_twice(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items"
-        )
-        sut2 = self.ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items"
-        )
+        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
+        sut2 = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
         self.assert_sql_result_equals(
             memory_db,
             "SELECT table_name, schema_version, container_type FROM metadata",
@@ -197,12 +189,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
     def test_init_different_containers(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items1"
-        )
-        sut2 = self.ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items2"
-        )
+        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1")
+        sut2 = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2")
         self.assert_sql_result_equals(
             memory_db,
             "SELECT table_name, schema_version, container_type FROM metadata",
@@ -497,9 +485,7 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(memory_db, [])
         self.get_fixture(memory_db, "dict_clear.sql")
         sut = core.Dict(connection=memory_db, table_name="items")
-        self.assert_dict_state_equals(
-            memory_db, [(pickle.dumps("a"), pickle.dumps(4), 0)]
-        )
+        self.assert_dict_state_equals(memory_db, [(pickle.dumps("a"), pickle.dumps(4), 0)])
         sut.clear()
         self.assert_dict_state_equals(memory_db, [])
 
@@ -603,9 +589,7 @@ class DictTestCase(SqlTestCase):
             self.assertEqual(actual, expected)
             self.assert_dict_state_equals(memory_db, [])
 
-            with self.assertRaisesRegex(
-                KeyError, r"'popitem\(\): dictionary is empty'"
-            ):
+            with self.assertRaisesRegex(KeyError, r"'popitem\(\): dictionary is empty'"):
                 _ = sut.popitem()
         else:
             expected = ("b", 2)
@@ -623,9 +607,7 @@ class DictTestCase(SqlTestCase):
             self.assertEqual(actual, expected)
             self.assert_dict_state_equals(memory_db, [])
 
-            with self.assertRaisesRegex(
-                KeyError, r"'popitem\(\): dictionary is empty'"
-            ):
+            with self.assertRaisesRegex(KeyError, r"'popitem\(\): dictionary is empty'"):
                 _ = sut.popitem()
 
     def test_reversed(self) -> None:
@@ -634,7 +616,7 @@ class DictTestCase(SqlTestCase):
         sut = core.Dict[Hashable, Any](connection=memory_db, table_name="items")
         if sys.version_info < (3, 8):
             with self.assertRaisesRegex(TypeError, "'Dict' object is not reversible"):
-                _ = reversed(sut)
+                _ = reversed(sut)  # type: ignore
         else:
             actual = reversed(sut)
             self.assertIsInstance(actual, Iterator)
