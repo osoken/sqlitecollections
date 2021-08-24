@@ -492,9 +492,9 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         if data is not None:
             self.update(data)
 
-    def __contains__(self, value: T) -> bool:
+    def __contains__(self, value: object) -> bool:
         cur = self.connection.cursor()
-        serialized_value = self.serialize(value)
+        serialized_value = self.serialize(cast(T, value))
         return self._is_serialized_value_in(cur, serialized_value)
 
     def __iter__(self) -> Iterator[T]:
