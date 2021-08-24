@@ -1,17 +1,26 @@
+import collections
 import sqlite3
 import sys
 from abc import ABCMeta, abstractmethod
 from collections.abc import Hashable
 from enum import Enum
 from pickle import dumps, loads
+from sqlite3.dbapi2 import Cursor
 from tempfile import NamedTemporaryFile
 from typing import Callable, Generic, Optional, Tuple, TypeVar, Union, cast
 from uuid import uuid4
 
 if sys.version_info >= (3, 9):
-    from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Reversible
+    from collections.abc import (
+        Iterable,
+        Iterator,
+        Mapping,
+        MutableMapping,
+        MutableSet,
+        Reversible,
+    )
 else:
-    from typing import Iterable, Iterator, Mapping, MutableMapping
+    from typing import Iterable, Iterator, Mapping, MutableMapping, MutableSet
 if sys.version_info >= (3, 8):
     from typing import Reversible
 
@@ -458,3 +467,116 @@ else:
 
     class Dict(_Dict[KT, VT]):
         ...
+
+
+class Set(SqliteCollectionBase[T], MutableSet[T]):
+    def __init__(
+        self,
+        connection: Optional[Union[str, sqlite3.Connection]] = None,
+        table_name: Optional[str] = None,
+        serializer: Optional[Callable[[T], bytes]] = None,
+        deserializer: Optional[Callable[[bytes], T]] = None,
+        destruct_table_on_delete: bool = False,
+        rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
+        data: Optional[Iterable[T]] = None,
+    ) -> None:
+        super(Set, self).__init__(
+            connection=connection,
+            table_name=table_name,
+            serializer=serializer,
+            deserializer=deserializer,
+            destruct_table_on_delete=destruct_table_on_delete,
+            rebuild_strategy=rebuild_strategy,
+            do_initialize=True,
+        )
+        if data is not None:
+            self.update(data)
+
+    def __contains__(self, value: T) -> bool:
+        cur = self.connection.cursor()
+        serialized_value = self.serialize(value)
+        return self._is_serialized_value_in(cur, serialized_value)
+
+    def __iter__(self) -> Iterator[T]:
+        return super().__iter__()
+
+    def __len__(self) -> int:
+        cur = self.connection.cursor()
+        return self._get_count(cur)
+
+    def _do_create_table(self, commit: bool = False) -> None:
+        cur = self.connection.cursor()
+        cur.execute(f"CREATE TABLE {self.table_name} (serialized_value BLOB PRIMARY KEY)")
+        if commit:
+            self.connection.commit()
+
+    def _do_rebuild(self, commit: bool = False) -> None:
+        cur = self.connection.cursor()
+        backup_table_name = f'bk_{self.container_type_name}_{str(uuid4()).replace("-", "")}'
+        cur.execute(f"CREATE TABLE {backup_table_name} AS SELECT * FROM {self.table_name}")
+        cur.execute(f"DELETE FROM {self.table_name}")
+        iter_old_records = self.connection.cursor()
+        iter_old_records.execute(f"SELECT serialized_value FROM {backup_table_name}")
+        delete_old_records = self.connection.cursor()
+        insert_new_records = self.connection.cursor()
+        for d in iter_old_records:
+            insert_new_records.execute(
+                f"INSERT INTO {self.table_name} (serialized_value) VALUES (?)",
+                (self.serialize(self.deserialize(d[0])),),
+            )
+            delete_old_records.execute(f"DELETE FROM {backup_table_name} WHERE serialized_value = ?", d)
+        cur.execute(f"DROP TABLE {backup_table_name}")
+        if commit:
+            self.connection.commit()
+
+    def _rebuild_check_with_first_element(self) -> bool:
+        cur = self.connection.cursor()
+        cur.execute(f"SELECT serialized_value FROM {self.table_name} LIMIT 1")
+        res = cur.fetchone()
+        if res is None:
+            return False
+        serialized_value = cast(bytes, res[0])
+        value = self.deserialize(serialized_value)
+        return serialized_value != self.serialize(value)
+
+    def update(self, *others: Iterable[T]) -> None:
+        for container in others:
+            for d in container:
+                self.add(d)
+
+    def serialize(self, value: T) -> bytes:
+        if not self._is_hashable(value):
+            raise TypeError(f"unhashable type: '{type(value).__name__}'")
+        return self.serializer(value)
+
+    def add(self, value: T) -> None:
+        serialized_value = self.serialize(value)
+        cur = self.connection.cursor()
+        self._upsert(cur, serialized_value)
+        self.connection.commit()
+
+    def _upsert(self, cur: sqlite3.Cursor, serialized_value: bytes) -> None:
+        if not self._is_serialized_value_in(cur, serialized_value):
+            cur.execute(
+                f"INSERT INTO {self.table_name} (serialized_value) VALUES (?)",
+                (serialized_value,),
+            )
+
+    def _is_serialized_value_in(self, cur: sqlite3.Cursor, serialized_value: bytes) -> bool:
+        cur.execute(f"SELECT 1 FROM {self.table_name} WHERE serialized_value=?", (serialized_value,))
+        return len(list(cur)) > 0
+
+    def discard(self, value: T) -> None:
+        return super().discard(value)
+
+    @property
+    def schema_version(self) -> str:
+        return "0"
+
+    def _is_hashable(self, value: T) -> bool:
+        return isinstance(value, Hashable)
+
+    def _get_count(self, cur: sqlite3.Cursor) -> int:
+        cur.execute(f"SELECT COUNT(*) FROM {self.table_name}")
+        res = cur.fetchone()
+        return cast(int, res[0])

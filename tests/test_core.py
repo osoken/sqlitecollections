@@ -809,3 +809,145 @@ class DictTestCase(SqlTestCase):
                     (pickle.dumps("e"), pickle.dumps(10), 2),
                 ],
             )
+
+
+class SetTestCase(SqlTestCase):
+    def assert_sql_result_equals(self, conn: sqlite3.Connection, sql: str, expected: Any) -> None:
+        cur = conn.cursor()
+        cur.execute(sql)
+        return self.assertEqual(sorted(cur), sorted(expected))
+
+    def assert_db_state_equals(self, conn: sqlite3.Connection, expected: Any) -> None:
+        return self.assert_sql_result_equals(
+            conn,
+            "SELECT serialized_value FROM items",
+            expected,
+        )
+
+    @patch("sqlitecollections.core.SqliteCollectionBase.__init__", return_value=None)
+    @patch("sqlitecollections.core.SqliteCollectionBase.__del__", return_value=None)
+    def test_init(self, SqliteCollectionBase_del: MagicMock, SqliteCollectionBase_init: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        table_name = "items"
+        serializer = MagicMock(spec=Callable[[Hashable], bytes])
+        deserializer = MagicMock(spec=Callable[[bytes], Hashable])
+        destruct_table_on_delete = True
+        rebuild_strategy = core.RebuildStrategy.SKIP
+        sut = core.Set[Hashable](
+            connection=memory_db,
+            table_name=table_name,
+            serializer=serializer,
+            deserializer=deserializer,
+            destruct_table_on_delete=destruct_table_on_delete,
+            rebuild_strategy=rebuild_strategy,
+        )
+        SqliteCollectionBase_init.assert_called_once_with(
+            connection=memory_db,
+            table_name=table_name,
+            serializer=serializer,
+            deserializer=deserializer,
+            destruct_table_on_delete=destruct_table_on_delete,
+            rebuild_strategy=rebuild_strategy,
+            do_initialize=True,
+        )
+
+    def test_initialize(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assert_sql_result_equals(
+            memory_db,
+            "SELECT table_name, schema_version, container_type FROM metadata",
+            [
+                (
+                    "items",
+                    sut.schema_version,
+                    sut.container_type_name,
+                ),
+            ],
+        )
+        self.assert_db_state_equals(
+            memory_db,
+            [],
+        )
+
+    def test_rebuild(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_rebuild.sql")
+
+        def serializer(x: str) -> bytes:
+            return x.upper().encode("utf-8")
+
+        def deserializer(x: bytes) -> str:
+            return str(x)
+
+        sut = core.Set[str](
+            connection=memory_db,
+            table_name="items",
+            serializer=serializer,
+            deserializer=deserializer,
+            rebuild_strategy=core.RebuildStrategy.ALWAYS,
+        )
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (b"A",),
+                (b"B",),
+                (b"C",),
+                (b"D",),
+                (b"E",),
+                (b"F",),
+                (b"G",),
+                (b"H",),
+            ],
+        )
+
+    def test_init_with_initial_data(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = core.Set[Hashable](
+            connection=memory_db,
+            table_name="items",
+            data=["a", "b", "a", "a", "aa", b"bb"],
+        )
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("aa"),),
+                (pickle.dumps(b"bb"),),
+            ],
+        )
+
+    def test_len(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        expected = 0
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+        self.get_fixture(memory_db, "set_len.sql")
+        expected = 2
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+    def test_contains(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_contains.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assertTrue("a" in sut)
+        self.assertTrue(b"a" in sut)
+        self.assertTrue(None in sut)
+        self.assertTrue(0 in sut)
+        self.assertFalse(100 in sut)
+        self.assertTrue(((0, 1), "a") in sut)
+        with self.assertRaisesRegex(TypeError, r"unhashable type:"):
+            _ = [0, 1] in sut  # type: ignore
+
+        self.assertFalse("a" not in sut)
+        self.assertFalse(b"a" not in sut)
+        self.assertFalse(None not in sut)
+        self.assertFalse(0 not in sut)
+        self.assertFalse(((0, 1), "a") not in sut)
+        self.assertTrue(100 not in sut)
+        with self.assertRaisesRegex(TypeError, r"unhashable type:"):
+            _ = [0, 1] not in sut  # type: ignore
