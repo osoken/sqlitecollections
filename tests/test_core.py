@@ -951,3 +951,27 @@ class SetTestCase(SqlTestCase):
         self.assertTrue(100 not in sut)
         with self.assertRaisesRegex(TypeError, r"unhashable type:"):
             _ = [0, 1] not in sut  # type: ignore
+
+    def test_iter(self) -> None:
+        from typing import Sequence
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = iter(sut)
+        expected: Sequence[Hashable] = []
+        self.assertEqual(list(actual), expected)
+        self.get_fixture(memory_db, "set_iter.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = iter(sut)
+        expected = sorted(["a", "b", "c"])
+        self.assertEqual(sorted(list(actual)), expected)
+
+    def test_isdisjoint(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_isdisjoint.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assertFalse(sut.isdisjoint({"a", "b"}))
+        self.assertTrue(sut.isdisjoint({1, 2, 3}))
+        self.assertTrue(sut.isdisjoint({}))
+        self.assertFalse(sut.isdisjoint(sut))

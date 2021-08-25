@@ -498,7 +498,14 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return self._is_serialized_value_in(cur, serialized_value)
 
     def __iter__(self) -> Iterator[T]:
-        return super().__iter__()
+        cur = self.connection.cursor()
+        for d in self._get_serialized_values(cur):
+            yield self.deserialize(d)
+
+    def _get_serialized_values(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
+        cur.execute(f"SELECT serialized_value FROM {self.table_name}")
+        for d in cur:
+            yield cast(bytes, d[0])
 
     def __len__(self) -> int:
         cur = self.connection.cursor()
