@@ -975,3 +975,22 @@ class SetTestCase(SqlTestCase):
         self.assertTrue(sut.isdisjoint({1, 2, 3}))
         self.assertTrue(sut.isdisjoint({}))
         self.assertFalse(sut.isdisjoint(sut))
+
+    def test_issubset(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_issubset.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assertFalse(sut.issubset({"a"}))
+        self.assertTrue(sut.issubset({"a", "b", "c", "d"}))
+        self.assertTrue(sut.issubset(sut))
+
+    def test_intersection(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_intersection.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = sut.intersection([1, 2, 3])
+        self.assert_sql_result_equals(memory_db, f"SELECT serialized_value FROM {actual.table_name}", [])
+        actual = sut.intersection(["a", "b"], ["b"])
+        self.assert_sql_result_equals(
+            memory_db, f"SELECT serialized_value FROM {actual.table_name}", [(pickle.dumps("b"),)]
+        )

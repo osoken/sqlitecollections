@@ -587,3 +587,27 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         cur.execute(f"SELECT COUNT(*) FROM {self.table_name}")
         res = cur.fetchone()
         return cast(int, res[0])
+
+    def issubset(self, other: Iterable[T]) -> bool:
+        return len(self) == len(self.intersection(other))
+
+    def _intersection_single(self, other: Iterable[T]) -> "Set[T]":
+        res = Set[T](
+            connection=self.connection,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+            destruct_table_on_delete=True,
+            rebuild_strategy=RebuildStrategy.SKIP,
+        )
+        for d in other:
+            if d in self:
+                res.add(d)
+        return res
+
+    def intersection(self, *others: Iterable[T]) -> "Set[T]":
+        res = self
+        for other in others:
+            res = res._intersection_single(other)
+        res._rebuild_strategy = self._rebuild_strategy
+        res._destruct_table_on_delete = self._destruct_table_on_delete
+        return res
