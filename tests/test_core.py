@@ -994,3 +994,19 @@ class SetTestCase(SqlTestCase):
         self.assert_sql_result_equals(
             memory_db, f"SELECT serialized_value FROM {actual.table_name}", [(pickle.dumps("b"),)]
         )
+
+    def test_le(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_le.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assertFalse(sut <= {"a"})
+        self.assertTrue(sut <= {"a", "b", "c", "d"})
+        self.assertTrue(sut <= sut)
+
+    def test_lt(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_le.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assertFalse(sut < {"a"})
+        self.assertTrue(sut < {"a", "b", "c", "d"})
+        self.assertFalse(sut < sut)
