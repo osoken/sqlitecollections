@@ -605,9 +605,60 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return res
 
     def intersection(self, *others: Iterable[T]) -> "Set[T]":
-        res = self
+        res = Set[T](
+            connection=self.connection,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+            rebuild_strategy=RebuildStrategy.SKIP,
+            destruct_table_on_delete=True,
+            data=self,
+        )
         for other in others:
-            res = res._intersection_single(other)
-        res._rebuild_strategy = self._rebuild_strategy
-        res._destruct_table_on_delete = self._destruct_table_on_delete
+            res.intersection_update(other)
         return res
+
+    def intersection_update(self, *others: Iterable[T]) -> None:
+        for other in others:
+            self._intersection_update_single(other)
+        self.connection.commit()
+
+    def _intersection_update_single(self, other: Iterable[T]) -> None:
+        buf = Set[T](
+            connection=self.connection,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+            destruct_table_on_delete=True,
+            rebuild_strategy=RebuildStrategy.SKIP,
+            data=other,
+        )
+        cur = self.connection.cursor()
+        cur.execute(
+            f"DELETE FROM {self.table_name} WHERE NOT EXISTS (SELECT serialized_value FROM {buf.table_name} WHERE {self.table_name}.serialized_value = {buf.table_name}.serialized_value)"
+        )
+
+    def issuperset(self, other: Iterable[T]) -> bool:
+        for d in other:
+            if not d in self:
+                return False
+        return True
+
+    def union(self, *others: Iterable[T]) -> "Set[T]":
+        res = Set[T](
+            connection=self.connection,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+            rebuild_strategy=RebuildStrategy.SKIP,
+            destruct_table_on_delete=True,
+            data=self,
+        )
+        for other in others:
+            res.union_update(other)
+        return res
+
+    def union_update(self, *others: Iterable[T]) -> None:
+        for other in others:
+            self._union_update_single(other)
+
+    def _union_update_single(self, other: Iterable[T]) -> None:
+        for d in other:
+            self.add(d)

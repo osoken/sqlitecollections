@@ -48,6 +48,9 @@ class SqlTestCase(TestCase):
                 cursor.executescript(fin.read())
         conn.commit()
 
+    def assert_metadata_state_equals(self, conn: sqlite3.Connection, expected: Any) -> None:
+        self.assert_sql_result_equals(conn, "SELECT table_name, schema_version, container_type FROM metadata", expected)
+
 
 class SqliteCollectionsBaseTestCase(SqlTestCase):
     class ConcreteSqliteCollectionClass(core.SqliteCollectionBase[Any]):
@@ -95,9 +98,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             sut.table_name,
             "ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
         )
-        self.assert_sql_result_equals(
+        self.assert_metadata_state_equals(
             memory_db,
-            "SELECT table_name, schema_version, container_type FROM metadata",
             [
                 (
                     "ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
@@ -138,9 +140,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         )
         self.assertEqual(sut.destruct_table_on_delete, destruct_table_on_delete)
         self.assertEqual(sut.rebuild_strategy, rebuild_strategy)
-        self.assert_sql_result_equals(
+        self.assert_metadata_state_equals(
             memory_db,
-            "SELECT table_name, schema_version, container_type FROM metadata",
             [
                 (
                     "tablename",
@@ -162,9 +163,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     def test_init_with_connection(self, uuid4: MagicMock) -> None:
         memory_db = sqlite3.connect(":memory:")
         sut = self.ConcreteSqliteCollectionClass(connection=memory_db)
-        self.assert_sql_result_equals(
+        self.assert_metadata_state_equals(
             memory_db,
-            "SELECT table_name, schema_version, container_type FROM metadata",
             [
                 (
                     "ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
@@ -183,9 +183,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         memory_db = sqlite3.connect(":memory:")
         sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
         sut2 = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
-        self.assert_sql_result_equals(
+        self.assert_metadata_state_equals(
             memory_db,
-            "SELECT table_name, schema_version, container_type FROM metadata",
             [
                 (
                     "items",
@@ -204,9 +203,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         memory_db = sqlite3.connect(":memory:")
         sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1")
         sut2 = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2")
-        self.assert_sql_result_equals(
+        self.assert_metadata_state_equals(
             memory_db,
-            "SELECT table_name, schema_version, container_type FROM metadata",
             [
                 (
                     "items1",
@@ -239,9 +237,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         sut2 = self.ConcreteSqliteCollectionClass(
             connection=memory_db, table_name="items2", destruct_table_on_delete=False
         )
-        self.assert_sql_result_equals(
+        self.assert_metadata_state_equals(
             memory_db,
-            "SELECT table_name, schema_version, container_type FROM metadata",
             [
                 (
                     "items1",
@@ -824,6 +821,9 @@ class SetTestCase(SqlTestCase):
             expected,
         )
 
+    def assert_items_table_only(self, conn: sqlite3.Connection) -> None:
+        return self.assert_metadata_state_equals(conn, [("items", "0", "Set")])
+
     @patch("sqlitecollections.core.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.core.SqliteCollectionBase.__del__", return_value=None)
     def test_init(self, SqliteCollectionBase_del: MagicMock, SqliteCollectionBase_init: MagicMock) -> None:
@@ -854,17 +854,7 @@ class SetTestCase(SqlTestCase):
     def test_initialize(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         sut = core.Set[Hashable](connection=memory_db, table_name="items")
-        self.assert_sql_result_equals(
-            memory_db,
-            "SELECT table_name, schema_version, container_type FROM metadata",
-            [
-                (
-                    "items",
-                    sut.schema_version,
-                    sut.container_type_name,
-                ),
-            ],
-        )
+        self.assert_items_table_only(memory_db)
         self.assert_db_state_equals(
             memory_db,
             [],
@@ -966,6 +956,7 @@ class SetTestCase(SqlTestCase):
         actual = iter(sut)
         expected = sorted(["a", "b", "c"])
         self.assertEqual(sorted(list(actual)), expected)
+        self.assert_items_table_only(memory_db)
 
     def test_isdisjoint(self) -> None:
         memory_db = sqlite3.connect(":memory:")
@@ -975,6 +966,7 @@ class SetTestCase(SqlTestCase):
         self.assertTrue(sut.isdisjoint({1, 2, 3}))
         self.assertTrue(sut.isdisjoint({}))
         self.assertFalse(sut.isdisjoint(sut))
+        self.assert_items_table_only(memory_db)
 
     def test_issubset(self) -> None:
         memory_db = sqlite3.connect(":memory:")
@@ -983,6 +975,29 @@ class SetTestCase(SqlTestCase):
         self.assertFalse(sut.issubset({"a"}))
         self.assertTrue(sut.issubset({"a", "b", "c", "d"}))
         self.assertTrue(sut.issubset(sut))
+        self.assert_items_table_only(memory_db)
+
+    def test_intersection_update(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_intersection_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.intersection_update([1, 2, 3])
+        self.assert_db_state_equals(memory_db, [])
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_intersection_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.intersection_update(["a", "b"], ["b"])
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("b"),)])
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_intersection_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.intersection_update(sut)
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),)])
+        self.assert_items_table_only(memory_db)
 
     def test_intersection(self) -> None:
         memory_db = sqlite3.connect(":memory:")
@@ -994,6 +1009,8 @@ class SetTestCase(SqlTestCase):
         self.assert_sql_result_equals(
             memory_db, f"SELECT serialized_value FROM {actual.table_name}", [(pickle.dumps("b"),)]
         )
+        del actual
+        self.assert_items_table_only(memory_db)
 
     def test_le(self) -> None:
         memory_db = sqlite3.connect(":memory:")
@@ -1002,11 +1019,104 @@ class SetTestCase(SqlTestCase):
         self.assertFalse(sut <= {"a"})
         self.assertTrue(sut <= {"a", "b", "c", "d"})
         self.assertTrue(sut <= sut)
+        self.assert_items_table_only(memory_db)
 
     def test_lt(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_le.sql")
+        self.get_fixture(memory_db, "set_base.sql", "set_lt.sql")
         sut = core.Set[Hashable](connection=memory_db, table_name="items")
         self.assertFalse(sut < {"a"})
         self.assertTrue(sut < {"a", "b", "c", "d"})
         self.assertFalse(sut < sut)
+        self.assert_items_table_only(memory_db)
+
+    def test_issuperset(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_issuperset.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assertTrue(sut.issuperset({"a"}))
+        self.assertFalse(sut.issuperset({"a", "b", "c", "d"}))
+        self.assertFalse(sut.issuperset([1]))
+        self.assertTrue(sut.issuperset(sut))
+        self.assert_items_table_only(memory_db)
+
+    def test_union(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_union.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = sut.union([1, 2, 3])
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+                (pickle.dumps(1),),
+                (pickle.dumps(2),),
+                (pickle.dumps(3),),
+            ],
+        )
+
+        actual = sut.union(["a", "b"], ["b"])
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_union_update(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_union_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.union_update([1, 2, 3])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+                (pickle.dumps(1),),
+                (pickle.dumps(2),),
+                (pickle.dumps(3),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_union_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.union_update(["a", "b"], ["b"])
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),)])
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_union_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.union_update(sut)
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),)])
+        self.assert_items_table_only(memory_db)
+
+    def test_ge(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_ge.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assertTrue(sut >= {"a"})
+        self.assertFalse(sut >= {"a", "b", "c", "d"})
+        self.assertTrue(sut >= sut)
+        self.assert_items_table_only(memory_db)
+
+    def test_gt(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_gt.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assertTrue(sut > {"a"})
+        self.assertFalse(sut > {"a", "b", "c", "d"})
+        self.assertFalse(sut > sut)
+        self.assert_items_table_only(memory_db)
