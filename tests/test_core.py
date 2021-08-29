@@ -1154,3 +1154,104 @@ class SetTestCase(SqlTestCase):
         )
         del actual
         self.assert_items_table_only(memory_db)
+
+    def test_and(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_and.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = sut & {1, 2, 3}
+
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut & {"a", "b"} & {"b"}
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("b"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_difference(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_difference.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = sut.difference([1, 2, 3])
+
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut.difference(["a", "b"], {"b"})
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("c"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_copy(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_copy.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = sut.copy()
+
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_difference_update(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_difference_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.difference_update([1, 2, 3])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_difference_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.difference_update(["a", "b"], ["b"])
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("c"),)])
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_difference_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.difference_update(sut)
+        self.assert_db_state_equals(memory_db, [])
+        self.assert_items_table_only(memory_db)

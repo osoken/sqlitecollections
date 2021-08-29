@@ -7,7 +7,17 @@ from enum import Enum
 from pickle import dumps, loads
 from sqlite3.dbapi2 import Cursor
 from tempfile import NamedTemporaryFile
-from typing import AbstractSet, Callable, Generic, Optional, Tuple, TypeVar, Union, cast
+from typing import (
+    AbstractSet,
+    Any,
+    Callable,
+    Generic,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 from uuid import uuid4
 
 if sys.version_info >= (3, 9):
@@ -29,7 +39,6 @@ T = TypeVar("T")
 KT = TypeVar("KT")
 VT = TypeVar("VT")
 _T = TypeVar("_T")
-_T_co = TypeVar("_T_co")
 
 
 class RebuildStrategy(Enum):
@@ -571,6 +580,9 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
                 (serialized_value,),
             )
 
+    def _delete_by_serialized_value(self, cur: sqlite3.Cursor, serialized_value: bytes) -> None:
+        cur.execute(f"DELETE FROM {self.table_name} WHERE serialized_value = ?", (serialized_value,))
+
     def _is_serialized_value_in(self, cur: sqlite3.Cursor, serialized_value: bytes) -> bool:
         cur.execute(f"SELECT 1 FROM {self.table_name} WHERE serialized_value=?", (serialized_value,))
         return len(list(cur)) > 0
@@ -607,16 +619,8 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return res
 
     def intersection(self, *others: Iterable[T]) -> "Set[T]":
-        res = Set[T](
-            connection=self.connection,
-            serializer=self.serializer,
-            deserializer=self.deserializer,
-            rebuild_strategy=RebuildStrategy.SKIP,
-            destruct_table_on_delete=True,
-            data=self,
-        )
-        for other in others:
-            res.intersection_update(other)
+        res = self.copy()
+        res.intersection_update(*others)
         return res
 
     def intersection_update(self, *others: Iterable[T]) -> None:
@@ -625,14 +629,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         self.connection.commit()
 
     def _intersection_update_single(self, other: Iterable[T]) -> None:
-        buf = Set[T](
-            connection=self.connection,
-            serializer=self.serializer,
-            deserializer=self.deserializer,
-            destruct_table_on_delete=True,
-            rebuild_strategy=RebuildStrategy.SKIP,
-            data=other,
-        )
+        buf = self._create_volatile_copy(other)
         cur = self.connection.cursor()
         cur.execute(
             f"DELETE FROM {self.table_name} WHERE NOT EXISTS (SELECT serialized_value FROM {buf.table_name} WHERE {self.table_name}.serialized_value = {buf.table_name}.serialized_value)"
@@ -645,16 +642,8 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return True
 
     def union(self, *others: Iterable[T]) -> "Set[T]":
-        res = Set[T](
-            connection=self.connection,
-            serializer=self.serializer,
-            deserializer=self.deserializer,
-            rebuild_strategy=RebuildStrategy.SKIP,
-            destruct_table_on_delete=True,
-            data=self,
-        )
-        for other in others:
-            res.union_update(other)
+        res = self.copy()
+        res.union_update(*others)
         return res
 
     def union_update(self, *others: Iterable[T]) -> None:
@@ -671,3 +660,34 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
 
     def __or__(self, s: AbstractSet[_T]) -> "Set[T]":
         return self.union(cast(Iterable[T], s))
+
+    def __and__(self, s: AbstractSet[Any]) -> "Set[T]":
+        return self.intersection(cast(Iterable[T], s))
+
+    def difference(self, *others: Iterable[T]) -> "Set[T]":
+        res = self.copy()
+        res.difference_update(*others)
+        return res
+
+    def difference_update(self, *others: Iterable[T]) -> None:
+        cur = self.connection.cursor()
+        for other in others:
+            self._difference_update_single(cur, other)
+        self.connection.commit()
+
+    def _difference_update_single(self, cur: sqlite3.Cursor, other: Iterable[T]) -> None:
+        for d in other:
+            self._delete_by_serialized_value(cur, self.serialize(d))
+
+    def _create_volatile_copy(self, data: Optional[Iterable[T]] = None) -> "Set[T]":
+        return Set[T](
+            connection=self.connection,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+            rebuild_strategy=RebuildStrategy.SKIP,
+            destruct_table_on_delete=True,
+            data=data if data is not None else self,
+        )
+
+    def copy(self) -> "Set[T]":
+        return self._create_volatile_copy()
