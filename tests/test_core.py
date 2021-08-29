@@ -1385,3 +1385,153 @@ class SetTestCase(SqlTestCase):
         )
         del actual
         self.assert_items_table_only(memory_db)
+
+    def test_ixor(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_ixor.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut ^= {1, 2, 3}
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+                (pickle.dumps(1),),
+                (pickle.dumps(2),),
+                (pickle.dumps(3),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_ixor.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut ^= {"b", "d"}
+        self.assert_db_state_equals(
+            memory_db,
+            [(pickle.dumps("a"),), (pickle.dumps("c"),), (pickle.dumps("d"),)],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_ixor.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut ^= sut
+        self.assert_db_state_equals(memory_db, [])
+        self.assert_items_table_only(memory_db)
+
+    def test_ior(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_ior.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut |= {1, 2, 3}
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+                (pickle.dumps(1),),
+                (pickle.dumps(2),),
+                (pickle.dumps(3),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_ior.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut |= {"b", "d"}
+        self.assert_db_state_equals(
+            memory_db,
+            [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),), (pickle.dumps("d"),)],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_ior.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut |= sut
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+    def test_iand(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_iand.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut &= {1, 2, 3}
+        self.assert_db_state_equals(
+            memory_db,
+            [],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_iand.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut &= {"b", "d"}
+        self.assert_db_state_equals(
+            memory_db,
+            [(pickle.dumps("b"),)],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_iand.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut &= sut
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+    def test_isub(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_isub.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut -= {1, 2, 3}
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_isub.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut -= {"b", "d"}
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_isub.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut -= sut
+        self.assert_db_state_equals(
+            memory_db,
+            [],
+        )
+        self.assert_items_table_only(memory_db)

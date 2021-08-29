@@ -39,6 +39,7 @@ T = TypeVar("T")
 KT = TypeVar("KT")
 VT = TypeVar("VT")
 _T = TypeVar("_T")
+_S = TypeVar("_S")
 
 
 class RebuildStrategy(Enum):
@@ -717,3 +718,19 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
 
     def __xor__(self, s: AbstractSet[_T]) -> "Set[T]":
         return self.symmetric_difference(cast(Iterable[T], s))
+
+    def __ixor__(self, s: AbstractSet[_S]) -> "Set[Union[_T, T]]":
+        self.symmetric_difference_update(cast(Iterable[T], s))
+        return cast(Set[Union[_T, T]], self)
+
+    def __isub__(self, s: AbstractSet[Any]) -> "Set[T]":
+        self.difference_update(cast(Iterable[T], s))
+        return self
+
+    def __iand__(self, s: AbstractSet[Any]) -> "Set[T]":
+        self.intersection_update(cast(Iterable[T], s))
+        return self
+
+    def __ior__(self, s: AbstractSet[_S]) -> "Set[Union[_T, T]]":
+        self.update(cast(Iterable[T], s))
+        return cast(Set[Union[_T, T]], self)
