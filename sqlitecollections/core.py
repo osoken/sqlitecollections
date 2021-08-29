@@ -691,3 +691,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
 
     def copy(self) -> "Set[T]":
         return self._create_volatile_copy()
+
+    def __sub__(self, s: AbstractSet[Any]) -> "Set[T]":
+        return self.difference(cast(Iterable[T], s))
