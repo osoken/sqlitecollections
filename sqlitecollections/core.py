@@ -574,6 +574,14 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         self._upsert(cur, serialized_value)
         self.connection.commit()
 
+    def clear(self) -> None:
+        cur = self.connection.cursor()
+        self._delete_all(cur)
+        self.connection.commit()
+
+    def _delete_all(self, cur: sqlite3.Cursor) -> None:
+        cur.execute(f"DELETE FROM {self.table_name}")
+
     def _upsert(self, cur: sqlite3.Cursor, serialized_value: bytes) -> None:
         if not self._is_serialized_value_in(cur, serialized_value):
             cur.execute(

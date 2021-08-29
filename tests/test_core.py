@@ -1602,3 +1602,35 @@ class SetTestCase(SqlTestCase):
             sut.pop()
 
         self.assert_db_state_equals(memory_db, [])
+
+    def test_clear(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(
+            memory_db,
+            [],
+        )
+        sut.clear()
+        self.assert_db_state_equals(
+            memory_db,
+            [],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_clear.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+            ],
+        )
+        sut.clear()
+        self.assert_db_state_equals(
+            memory_db,
+            [],
+        )
+        self.assert_items_table_only(memory_db)
