@@ -1575,3 +1575,30 @@ class SetTestCase(SqlTestCase):
             ],
         )
         self.assert_items_table_only(memory_db)
+
+    def test_pop(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_pop.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        if sys.version_info >= (3, 9):
+            expected: set[Hashable] = {"a", "b", "c"}
+        else:
+            from typing import Set
+
+            expected: Set[Hashable] = {"a", "b", "c"}
+        actual = sut.pop()
+        expected.remove(actual)
+        self.assert_db_state_equals(memory_db, [(pickle.dumps(d),) for d in expected])
+        self.assert_items_table_only(memory_db)
+        actual = sut.pop()
+        expected.remove(actual)
+        self.assert_db_state_equals(memory_db, [(pickle.dumps(d),) for d in expected])
+        self.assert_items_table_only(memory_db)
+        actual = sut.pop()
+        expected.remove(actual)
+        self.assert_db_state_equals(memory_db, [(pickle.dumps(d),) for d in expected])
+        self.assert_items_table_only(memory_db)
+        with self.assertRaisesRegex(KeyError, "'pop from an empty set'"):
+            sut.pop()
+
+        self.assert_db_state_equals(memory_db, [])

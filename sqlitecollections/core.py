@@ -593,13 +593,29 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         self._delete_by_serialized_value(cur, self.serialize(value))
         self.connection.commit()
 
-    def remove(self, value: _T) -> None:
+    def remove(self, value: T) -> None:
         cur = self.connection.cursor()
         serialized_value = self.serialize(value)
         if not self._is_serialized_value_in(cur, serialized_value):
             raise KeyError(value)
         self._delete_by_serialized_value(cur, serialized_value)
         self.connection.commit()
+
+    def pop(self) -> T:
+        cur = self.connection.cursor()
+        serialized_value = self._get_one_serialized_value(cur)
+        if serialized_value is None:
+            raise KeyError("'pop from an empty set'")
+        self._delete_by_serialized_value(cur, serialized_value)
+        self.connection.commit()
+        return self.deserialize(serialized_value)
+
+    def _get_one_serialized_value(self, cur: sqlite3.Cursor) -> Union[None, bytes]:
+        cur.execute(f"SELECT serialized_value FROM {self.table_name} LIMIT 1")
+        res = cur.fetchone()
+        if res is None:
+            return None
+        return cast(bytes, res[0])
 
     @property
     def schema_version(self) -> str:
