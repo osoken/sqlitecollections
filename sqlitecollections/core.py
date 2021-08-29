@@ -7,7 +7,7 @@ from enum import Enum
 from pickle import dumps, loads
 from sqlite3.dbapi2 import Cursor
 from tempfile import NamedTemporaryFile
-from typing import Callable, Generic, Optional, Tuple, TypeVar, Union, cast
+from typing import AbstractSet, Callable, Generic, Optional, Tuple, TypeVar, Union, cast
 from uuid import uuid4
 
 if sys.version_info >= (3, 9):
@@ -28,6 +28,8 @@ if sys.version_info >= (3, 8):
 T = TypeVar("T")
 KT = TypeVar("KT")
 VT = TypeVar("VT")
+_T = TypeVar("_T")
+_T_co = TypeVar("_T_co")
 
 
 class RebuildStrategy(Enum):
@@ -667,5 +669,5 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def _from_iterable(cls, *args: T) -> "Set[T]":
         raise NotImplementedError
 
-    def __or__(self, other: Iterable[T]) -> "Set[T]":
-        return self.union(other)
+    def __or__(self, s: AbstractSet[_T]) -> "Set[T]":
+        return self.union(cast(Iterable[T], s))
