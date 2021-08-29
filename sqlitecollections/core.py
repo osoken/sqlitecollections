@@ -694,3 +694,26 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
 
     def __sub__(self, s: AbstractSet[Any]) -> "Set[T]":
         return self.difference(cast(Iterable[T], s))
+
+    def symmetric_difference(self, *others: Iterable[T]) -> "Set[T]":
+        res = self.copy()
+        res.symmetric_difference_update(*others)
+        return res
+
+    def symmetric_difference_update(self, *others: Iterable[T]) -> None:
+        cur = self.connection.cursor()
+        for other in others:
+            self._symmetric_difference_update_single(cur, other)
+        self.connection.commit()
+
+    def _symmetric_difference_update_single(self, cur: sqlite3.Cursor, other: Iterable[T]) -> None:
+        buf = self._create_volatile_copy(other)
+        iter_cursor = buf.connection.cursor()
+        for serialized_value in buf._get_serialized_values(iter_cursor):
+            if self._is_serialized_value_in(cur, serialized_value):
+                self._delete_by_serialized_value(cur, serialized_value)
+            else:
+                self._upsert(cur, serialized_value)
+
+    def __xor__(self, s: AbstractSet[_T]) -> "Set[T]":
+        return self.symmetric_difference(cast(Iterable[T], s))

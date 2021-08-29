@@ -1284,3 +1284,104 @@ class SetTestCase(SqlTestCase):
         )
         del actual
         self.assert_items_table_only(memory_db)
+
+    def test_symmetric_difference(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_symmetric_difference.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = sut.symmetric_difference([1, 2, 3])
+
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+                (pickle.dumps(1),),
+                (pickle.dumps(2),),
+                (pickle.dumps(3),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut.symmetric_difference(["a", "b"], {"b"})
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_symmetric_difference_update(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_symmetric_difference_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.symmetric_difference_update([1, 2, 3])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+                (pickle.dumps(1),),
+                (pickle.dumps(2),),
+                (pickle.dumps(3),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_symmetric_difference_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.symmetric_difference_update(["a", "b"], ["b"])
+        self.assert_db_state_equals(
+            memory_db,
+            [(pickle.dumps("b"),), (pickle.dumps("c"),)],
+        )
+        self.assert_items_table_only(memory_db)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_symmetric_difference_update.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.symmetric_difference_update(sut)
+        self.assert_db_state_equals(memory_db, [])
+        self.assert_items_table_only(memory_db)
+
+    def test_xor(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_xor.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = sut ^ {1, 2, 3}
+
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+                (pickle.dumps(1),),
+                (pickle.dumps(2),),
+                (pickle.dumps(3),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut ^ {"a", "b"} ^ {"b"}
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
