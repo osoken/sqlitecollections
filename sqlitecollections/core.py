@@ -589,7 +589,17 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return len(list(cur)) > 0
 
     def discard(self, value: T) -> None:
-        return super().discard(value)
+        cur = self.connection.cursor()
+        self._delete_by_serialized_value(cur, self.serialize(value))
+        self.connection.commit()
+
+    def remove(self, value: _T) -> None:
+        cur = self.connection.cursor()
+        serialized_value = self.serialize(value)
+        if not self._is_serialized_value_in(cur, serialized_value):
+            raise KeyError(value)
+        self._delete_by_serialized_value(cur, serialized_value)
+        self.connection.commit()
 
     @property
     def schema_version(self) -> str:

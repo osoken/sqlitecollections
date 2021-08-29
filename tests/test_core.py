@@ -1535,3 +1535,43 @@ class SetTestCase(SqlTestCase):
             [],
         )
         self.assert_items_table_only(memory_db)
+
+    def test_remove(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_remove.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.remove("a")
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+
+        with self.assertRaisesRegex(KeyError, "1"):
+            sut.remove(1)
+
+    def test_discard(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_discard.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        sut.discard("a")
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
+        sut.discard(1)
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        self.assert_items_table_only(memory_db)
