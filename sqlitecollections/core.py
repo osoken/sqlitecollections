@@ -662,3 +662,10 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def _union_update_single(self, other: Iterable[T]) -> None:
         for d in other:
             self.add(d)
+
+    @classmethod
+    def _from_iterable(cls, *args: T) -> "Set[T]":
+        raise NotImplementedError
+
+    def __or__(self, other: Iterable[T]) -> "Set[T]":
+        return self.union(other)

@@ -1120,3 +1120,37 @@ class SetTestCase(SqlTestCase):
         self.assertFalse(sut > {"a", "b", "c", "d"})
         self.assertFalse(sut > sut)
         self.assert_items_table_only(memory_db)
+
+    def test_or(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "set_base.sql", "set_or.sql")
+        sut = core.Set[Hashable](connection=memory_db, table_name="items")
+        actual = sut | [1, 2, 3]
+
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+                (pickle.dumps(1),),
+                (pickle.dumps(2),),
+                (pickle.dumps(3),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut | ["a", "b"] | ["b"]
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"),),
+                (pickle.dumps("b"),),
+                (pickle.dumps("c"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
