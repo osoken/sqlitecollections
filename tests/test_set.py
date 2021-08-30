@@ -71,7 +71,7 @@ class SetTestCase(SqlTestCase):
 
     def test_rebuild(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_rebuild.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/rebuild.sql")
 
         def serializer(x: str) -> bytes:
             return x.upper().encode("utf-8")
@@ -119,19 +119,19 @@ class SetTestCase(SqlTestCase):
 
     def test_len(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql")
+        self.get_fixture(memory_db, "set/base.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         expected = 0
         actual = len(sut)
         self.assertEqual(actual, expected)
-        self.get_fixture(memory_db, "set_len.sql")
+        self.get_fixture(memory_db, "set/len.sql")
         expected = 2
         actual = len(sut)
         self.assertEqual(actual, expected)
 
     def test_contains(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_contains.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/contains.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assertTrue("a" in sut)
         self.assertTrue(b"a" in sut)
@@ -155,12 +155,12 @@ class SetTestCase(SqlTestCase):
         from typing import Sequence
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql")
+        self.get_fixture(memory_db, "set/base.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = iter(sut)
         expected: Sequence[Hashable] = []
         self.assertEqual(list(actual), expected)
-        self.get_fixture(memory_db, "set_iter.sql")
+        self.get_fixture(memory_db, "set/iter.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = iter(sut)
         expected = sorted(["a", "b", "c"])
@@ -169,7 +169,7 @@ class SetTestCase(SqlTestCase):
 
     def test_isdisjoint(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_isdisjoint.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/isdisjoint.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assertFalse(sut.isdisjoint({"a", "b"}))
         self.assertTrue(sut.isdisjoint({1, 2, 3}))
@@ -179,7 +179,7 @@ class SetTestCase(SqlTestCase):
 
     def test_issubset(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_issubset.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/issubset.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assertFalse(sut.issubset({"a"}))
         self.assertTrue(sut.issubset({"a", "b", "c", "d"}))
@@ -188,21 +188,21 @@ class SetTestCase(SqlTestCase):
 
     def test_intersection_update(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_intersection_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/intersection_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.intersection_update([1, 2, 3])
         self.assert_db_state_equals(memory_db, [])
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_intersection_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/intersection_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.intersection_update(["a", "b"], ["b"])
         self.assert_db_state_equals(memory_db, [(pickle.dumps("b"),)])
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_intersection_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/intersection_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.intersection_update(sut)
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),)])
@@ -210,7 +210,7 @@ class SetTestCase(SqlTestCase):
 
     def test_intersection(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_intersection.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/intersection.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut.intersection([1, 2, 3])
         self.assert_sql_result_equals(memory_db, f"SELECT serialized_value FROM {actual.table_name}", [])
@@ -223,7 +223,7 @@ class SetTestCase(SqlTestCase):
 
     def test_le(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_le.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/le.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assertFalse(sut <= {"a"})
         self.assertTrue(sut <= {"a", "b", "c", "d"})
@@ -232,7 +232,7 @@ class SetTestCase(SqlTestCase):
 
     def test_lt(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_lt.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/lt.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assertFalse(sut < {"a"})
         self.assertTrue(sut < {"a", "b", "c", "d"})
@@ -241,7 +241,7 @@ class SetTestCase(SqlTestCase):
 
     def test_issuperset(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_issuperset.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/issuperset.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assertTrue(sut.issuperset({"a"}))
         self.assertFalse(sut.issuperset({"a", "b", "c", "d"}))
@@ -251,7 +251,7 @@ class SetTestCase(SqlTestCase):
 
     def test_union(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_union.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/union.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut.union([1, 2, 3])
         self.assert_sql_result_equals(
@@ -282,7 +282,7 @@ class SetTestCase(SqlTestCase):
 
     def test_update(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.update([1, 2, 3])
         self.assert_db_state_equals(
@@ -299,14 +299,14 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.update(["a", "b"], ["b"])
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),)])
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.update(sut)
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),)])
@@ -314,7 +314,7 @@ class SetTestCase(SqlTestCase):
 
     def test_ge(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_ge.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/ge.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assertTrue(sut >= {"a"})
         self.assertFalse(sut >= {"a", "b", "c", "d"})
@@ -323,7 +323,7 @@ class SetTestCase(SqlTestCase):
 
     def test_gt(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_gt.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/gt.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assertTrue(sut > {"a"})
         self.assertFalse(sut > {"a", "b", "c", "d"})
@@ -332,7 +332,7 @@ class SetTestCase(SqlTestCase):
 
     def test_or(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_or.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/or.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut | {1, 2, 3}
 
@@ -366,7 +366,7 @@ class SetTestCase(SqlTestCase):
 
     def test_and(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_and.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/and.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut & {1, 2, 3}
 
@@ -391,7 +391,7 @@ class SetTestCase(SqlTestCase):
 
     def test_difference(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_difference.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/difference.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut.difference([1, 2, 3])
 
@@ -420,7 +420,7 @@ class SetTestCase(SqlTestCase):
 
     def test_copy(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_copy.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/copy.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut.copy()
 
@@ -438,7 +438,7 @@ class SetTestCase(SqlTestCase):
 
     def test_difference_update(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_difference_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/difference_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.difference_update([1, 2, 3])
         self.assert_db_state_equals(
@@ -452,14 +452,14 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_difference_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/difference_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.difference_update(["a", "b"], ["b"])
         self.assert_db_state_equals(memory_db, [(pickle.dumps("c"),)])
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_difference_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/difference_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.difference_update(sut)
         self.assert_db_state_equals(memory_db, [])
@@ -467,7 +467,7 @@ class SetTestCase(SqlTestCase):
 
     def test_sub(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_sub.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/sub.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut - {1, 2, 3}
 
@@ -496,7 +496,7 @@ class SetTestCase(SqlTestCase):
 
     def test_symmetric_difference(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_symmetric_difference.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/symmetric_difference.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut.symmetric_difference([1, 2, 3])
 
@@ -529,7 +529,7 @@ class SetTestCase(SqlTestCase):
 
     def test_symmetric_difference_update(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_symmetric_difference_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/symmetric_difference_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.symmetric_difference_update([1, 2, 3])
         self.assert_db_state_equals(
@@ -546,7 +546,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_symmetric_difference_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/symmetric_difference_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.symmetric_difference_update(["a", "b"], ["b"])
         self.assert_db_state_equals(
@@ -556,7 +556,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_symmetric_difference_update.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/symmetric_difference_update.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.symmetric_difference_update(sut)
         self.assert_db_state_equals(memory_db, [])
@@ -564,7 +564,7 @@ class SetTestCase(SqlTestCase):
 
     def test_xor(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_xor.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/xor.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         actual = sut ^ {1, 2, 3}
 
@@ -597,7 +597,7 @@ class SetTestCase(SqlTestCase):
 
     def test_ixor(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_ixor.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/ixor.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut ^= {1, 2, 3}
         self.assert_db_state_equals(
@@ -614,7 +614,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_ixor.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/ixor.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut ^= {"b", "d"}
         self.assert_db_state_equals(
@@ -624,7 +624,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_ixor.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/ixor.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut ^= sut
         self.assert_db_state_equals(memory_db, [])
@@ -632,7 +632,7 @@ class SetTestCase(SqlTestCase):
 
     def test_ior(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_ior.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/ior.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut |= {1, 2, 3}
         self.assert_db_state_equals(
@@ -649,7 +649,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_ior.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/ior.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut |= {"b", "d"}
         self.assert_db_state_equals(
@@ -659,7 +659,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_ior.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/ior.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut |= sut
         self.assert_db_state_equals(
@@ -674,7 +674,7 @@ class SetTestCase(SqlTestCase):
 
     def test_iand(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_iand.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/iand.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut &= {1, 2, 3}
         self.assert_db_state_equals(
@@ -684,7 +684,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_iand.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/iand.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut &= {"b", "d"}
         self.assert_db_state_equals(
@@ -694,7 +694,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_iand.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/iand.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut &= sut
         self.assert_db_state_equals(
@@ -709,7 +709,7 @@ class SetTestCase(SqlTestCase):
 
     def test_isub(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_isub.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/isub.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut -= {1, 2, 3}
         self.assert_db_state_equals(
@@ -723,7 +723,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_isub.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/isub.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut -= {"b", "d"}
         self.assert_db_state_equals(
@@ -736,7 +736,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_isub.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/isub.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut -= sut
         self.assert_db_state_equals(
@@ -747,7 +747,7 @@ class SetTestCase(SqlTestCase):
 
     def test_remove(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_remove.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/remove.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.remove("a")
         self.assert_db_state_equals(
@@ -764,7 +764,7 @@ class SetTestCase(SqlTestCase):
 
     def test_discard(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_discard.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/discard.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         sut.discard("a")
         self.assert_db_state_equals(
@@ -787,7 +787,7 @@ class SetTestCase(SqlTestCase):
 
     def test_pop(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_pop.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/pop.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         if sys.version_info >= (3, 9):
             expected: set[Hashable] = {"a", "b", "c"}
@@ -814,7 +814,7 @@ class SetTestCase(SqlTestCase):
 
     def test_clear(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql")
+        self.get_fixture(memory_db, "set/base.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assert_db_state_equals(
             memory_db,
@@ -828,7 +828,7 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_clear.sql")
+        self.get_fixture(memory_db, "set/base.sql", "set/clear.sql")
         sut = Set[Hashable](connection=memory_db, table_name="items")
         self.assert_db_state_equals(
             memory_db,
