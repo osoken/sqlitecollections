@@ -92,7 +92,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         self.assertEqual(sut.connection, memory_db)
         self.assertEqual(sut.serializer, dumps)
         self.assertEqual(sut.deserializer, loads)
-        self.assertEqual(sut.destruct_table_on_delete, False)
+        self.assertEqual(sut.persist, True)
         self.assertEqual(sut.rebuild_strategy, core.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT)
         self.assertEqual(
             sut.table_name,
@@ -120,14 +120,14 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         sqlite3_connect.return_value = memory_db
         serializer = MagicMock(spec=Callable[[Any], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Any])
-        destruct_table_on_delete = True
+        persist = False
         rebuild_strategy = core.RebuildStrategy.SKIP
         sut = self.ConcreteSqliteCollectionClass(
             connection="connection",
             table_name="tablename",
             serializer=serializer,
             deserializer=deserializer,
-            destruct_table_on_delete=destruct_table_on_delete,
+            persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
         sqlite3_connect.assert_called_once_with("connection")
@@ -138,7 +138,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             sut.table_name,
             "tablename",
         )
-        self.assertEqual(sut.destruct_table_on_delete, destruct_table_on_delete)
+        self.assertEqual(sut.persist, persist)
         self.assertEqual(sut.rebuild_strategy, rebuild_strategy)
         self.assert_metadata_state_equals(
             memory_db,
@@ -232,10 +232,10 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     def test_destruct_container(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         sut = self.ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items1", destruct_table_on_delete=True
+            connection=memory_db, table_name="items1", persist=False
         )
         sut2 = self.ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items2", destruct_table_on_delete=False
+            connection=memory_db, table_name="items2", persist=True
         )
         self.assert_metadata_state_equals(
             memory_db,
@@ -340,7 +340,7 @@ class DictTestCase(SqlTestCase):
         deserializer = MagicMock(spec=Callable[[bytes], Any])
         key_serializer = MagicMock(spec=Callable[[Hashable], bytes])
         key_deserializer = MagicMock(spec=Callable[[bytes], Hashable])
-        destruct_table_on_delete = True
+        persist = False
         rebuild_strategy = core.RebuildStrategy.SKIP
         sut = core.Dict[Hashable, Any](
             connection=memory_db,
@@ -349,7 +349,7 @@ class DictTestCase(SqlTestCase):
             deserializer=deserializer,
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
-            destruct_table_on_delete=destruct_table_on_delete,
+            persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
         SqliteCollectionBase_init.assert_called_once_with(
@@ -357,7 +357,7 @@ class DictTestCase(SqlTestCase):
             table_name=table_name,
             serializer=serializer,
             deserializer=deserializer,
-            destruct_table_on_delete=destruct_table_on_delete,
+            persist=persist,
             rebuild_strategy=rebuild_strategy,
             do_initialize=False,
         )
@@ -831,14 +831,14 @@ class SetTestCase(SqlTestCase):
         table_name = "items"
         serializer = MagicMock(spec=Callable[[Hashable], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Hashable])
-        destruct_table_on_delete = True
+        persist = False
         rebuild_strategy = core.RebuildStrategy.SKIP
         sut = core.Set[Hashable](
             connection=memory_db,
             table_name=table_name,
             serializer=serializer,
             deserializer=deserializer,
-            destruct_table_on_delete=destruct_table_on_delete,
+            persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
         SqliteCollectionBase_init.assert_called_once_with(
@@ -846,7 +846,7 @@ class SetTestCase(SqlTestCase):
             table_name=table_name,
             serializer=serializer,
             deserializer=deserializer,
-            destruct_table_on_delete=destruct_table_on_delete,
+            persist=persist,
             rebuild_strategy=rebuild_strategy,
             do_initialize=True,
         )
