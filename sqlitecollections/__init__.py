@@ -6,6 +6,8 @@ __email__ = "osoken.devel@outlook.jp"
 __package_name__ = "sqlitecollections"
 
 
-from .core import Dict, Set
+from .base import RebuildStrategy
+from .dict import Dict
+from .set import Set
 
-__all__ = ["Dict", "Set"]
+__all__ = ["Dict", "Set", "RebuildStrategy"]
