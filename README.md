@@ -10,13 +10,22 @@ $ pip install git+ssh://git@github.com/osoken/sqlitecollections.git
 
 ## Development
 
+To run tests, type checking and linting locally, we use `tox`.
+It will run `pytest`, `mypy` and `black` on _python 3.6_, _3.7_, _3.8_ and _3.9_.
+Install them via the following commands:
+
 ```
 $ git clone git@github.com:osoken/sqlitecollections.git
 $ cd sqlitecollections
 $ python -m venv .venv
 $ source ./.venv/bin/activate
 $ pip install -e .[dev]
-$ pytest -sv; mypy --strict sqlitecollections; mypy --strict tests
+```
+
+then, run tests:
+
+```
+$ tox
 ```
 
 ## Compatibility policy
