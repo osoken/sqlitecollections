@@ -558,11 +558,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         value = self.deserialize(serialized_value)
         return serialized_value != self.serialize(value)
 
-    def update(self, *others: Iterable[T]) -> None:
-        for container in others:
-            for d in container:
-                self.add(d)
-
     def serialize(self, value: T) -> bytes:
         if not self._is_hashable(value):
             raise TypeError(f"unhashable type: '{type(value).__name__}'")
@@ -672,16 +667,18 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
 
     def union(self, *others: Iterable[T]) -> "Set[T]":
         res = self.copy()
-        res.union_update(*others)
+        res.update(*others)
         return res
 
-    def union_update(self, *others: Iterable[T]) -> None:
+    def update(self, *others: Iterable[T]) -> None:
+        cur = self.connection.cursor()
         for other in others:
-            self._union_update_single(other)
+            self._union_update_single(cur, other)
+        self.connection.commit()
 
-    def _union_update_single(self, other: Iterable[T]) -> None:
+    def _union_update_single(self, cur: sqlite3.Cursor, other: Iterable[T]) -> None:
         for d in other:
-            self.add(d)
+            self._upsert(cur, self.serialize(d))
 
     @classmethod
     def _from_iterable(cls, *args: T) -> "Set[T]":
