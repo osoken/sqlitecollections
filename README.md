@@ -10,13 +10,22 @@ $ pip install git+ssh://git@github.com/osoken/sqlitecollections.git
 
 ## Development
 
+To run tests, type checking and linting locally, we use `tox`.
+It will run `pytest`, `mypy` and `black` on _python 3.6_, _3.7_, _3.8_ and _3.9_.
+Install them via the following commands:
+
 ```
 $ git clone git@github.com:osoken/sqlitecollections.git
 $ cd sqlitecollections
 $ python -m venv .venv
 $ source ./.venv/bin/activate
 $ pip install -e .[dev]
-$ pytest -sv; mypy --strict sqlitecollections; mypy --strict tests
+```
+
+then, run tests:
+
+```
+$ tox
 ```
 
 ## Compatibility policy
@@ -39,4 +48,4 @@ print(x["a"])  # now, we get ["b"]
 ```
 
 - `Dict`'s item order is guaranteed to be insertion order not only for python 3.7 and upper but for all versions.
-- `Dict`'s `fromkeys` class method and `copy` method are not implemented.
+- `fromkeys` class method is not provided.
