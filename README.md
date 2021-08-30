@@ -39,4 +39,4 @@ print(x["a"])  # now, we get ["b"]
 ```
 
 - `Dict`'s item order is guaranteed to be insertion order not only for python 3.7 and upper but for all versions.
-- `Dict`'s `fromkeys` class method and `copy` method are not implemented.
+- `fromkeys` class method is not provided.
