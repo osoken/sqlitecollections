@@ -231,12 +231,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
     def test_destruct_container(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items1", persist=False
-        )
-        sut2 = self.ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items2", persist=True
-        )
+        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1", persist=False)
+        sut2 = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2", persist=True)
         self.assert_metadata_state_equals(
             memory_db,
             [
@@ -1071,11 +1067,11 @@ class SetTestCase(SqlTestCase):
         del actual
         self.assert_items_table_only(memory_db)
 
-    def test_union_update(self) -> None:
+    def test_update(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_union_update.sql")
+        self.get_fixture(memory_db, "set_base.sql", "set_update.sql")
         sut = core.Set[Hashable](connection=memory_db, table_name="items")
-        sut.union_update([1, 2, 3])
+        sut.update([1, 2, 3])
         self.assert_db_state_equals(
             memory_db,
             [
@@ -1090,16 +1086,16 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_union_update.sql")
+        self.get_fixture(memory_db, "set_base.sql", "set_update.sql")
         sut = core.Set[Hashable](connection=memory_db, table_name="items")
-        sut.union_update(["a", "b"], ["b"])
+        sut.update(["a", "b"], ["b"])
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),)])
         self.assert_items_table_only(memory_db)
 
         memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set_base.sql", "set_union_update.sql")
+        self.get_fixture(memory_db, "set_base.sql", "set_update.sql")
         sut = core.Set[Hashable](connection=memory_db, table_name="items")
-        sut.union_update(sut)
+        sut.update(sut)
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"),), (pickle.dumps("b"),), (pickle.dumps("c"),)])
         self.assert_items_table_only(memory_db)
 
