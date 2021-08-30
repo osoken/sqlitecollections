@@ -314,6 +314,9 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
 
 class DictTestCase(SqlTestCase):
+    def assert_items_table_only(self, conn: sqlite3.Connection) -> None:
+        return self.assert_metadata_state_equals(conn, [("items", "0", "Dict")])
+
     def assert_dict_state_equals(self, conn: sqlite3.Connection, expected: Any) -> None:
         return self.assert_sql_result_equals(
             conn,
@@ -400,21 +403,12 @@ class DictTestCase(SqlTestCase):
 
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = core.Dict[Hashable, Any](
-            connection=memory_db,
-            table_name="items",
-            data={"a": 1, "b": 2},
-            a=4,
-            c=None,
-            d=[1, 2],
-        )
+        sut = core.Dict[Hashable, Any](connection=memory_db, table_name="items", data={"a": 1, "b": 2})
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
+                (pickle.dumps("a"), pickle.dumps(1), 0),
                 (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("c"), pickle.dumps(None), 2),
-                (pickle.dumps("d"), pickle.dumps([1, 2]), 3),
             ],
         )
 
@@ -802,6 +796,23 @@ class DictTestCase(SqlTestCase):
                     (pickle.dumps("e"), pickle.dumps(10), 2),
                 ],
             )
+
+    def test_copy(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict_base.sql", "dict_copy.sql")
+        sut = core.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        actual = sut.copy()
+
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_key, serialized_value, item_order FROM {actual.table_name}",
+            [
+                (pickle.dumps("a"), pickle.dumps(4), 0),
+                (pickle.dumps("b"), pickle.dumps(2), 1),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
 
 
 class SetTestCase(SqlTestCase):

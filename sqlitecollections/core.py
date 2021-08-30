@@ -230,7 +230,6 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         persist: bool = True,
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
         data: Optional[Mapping[KT, VT]] = None,
-        **kwargs: VT,
     ) -> None:
         super(_Dict, self).__init__(
             connection=connection,
@@ -248,7 +247,8 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             cast(Callable[[bytes], KT], self.deserializer) if key_deserializer is None else key_deserializer
         )
         self._initialize(commit=True)
-        self.update({} if data is None else data, **kwargs)
+        if data is not None:
+            self.update(data)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:
@@ -411,8 +411,24 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         self._upsert(cur, serialized_key, serialized_value)
         self.connection.commit()
 
+    def _create_volatile_copy(
+        self,
+        data: Optional[Mapping[KT, VT]] = None,
+    ) -> "Dict[KT, VT]":
+
+        return Dict[KT, VT](
+            connection=self.connection,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+            key_serializer=self.key_serializer,
+            key_deserializer=self.key_deserializer,
+            rebuild_strategy=RebuildStrategy.SKIP,
+            persist=False,
+            data=(self if data is None else data),
+        )
+
     def copy(self) -> "Dict[KT, VT]":
-        raise NotImplementedError
+        return self._create_volatile_copy()
 
     @classmethod
     def fromkeys(cls, iterable: Iterable[KT], value: Optional[VT]) -> "Dict[KT, VT]":
