@@ -55,14 +55,14 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         table_name: Optional[str] = None,
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
-        destruct_table_on_delete: bool = False,
+        persist: bool = True,
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
         do_initialize: bool = True,
     ):
         super(SqliteCollectionBase, self).__init__()
         self._serializer = cast(Callable[[T], bytes], dumps) if serializer is None else serializer
         self._deserializer = cast(Callable[[bytes], T], loads) if deserializer is None else deserializer
-        self._destruct_table_on_delete = destruct_table_on_delete
+        self._persist = persist
         self._rebuild_strategy = rebuild_strategy
         if connection is None:
             self._connection = sqlite3.connect(NamedTemporaryFile().name)
@@ -81,7 +81,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             self._initialize(commit=True)
 
     def __del__(self) -> None:
-        if self.destruct_table_on_delete:
+        if not self.persist:
             cur = self.connection.cursor()
             cur.execute(
                 "DELETE FROM metadata WHERE table_name=? AND container_type=?",
@@ -116,8 +116,8 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         return self._rebuild_strategy
 
     @property
-    def destruct_table_on_delete(self) -> bool:
-        return self._destruct_table_on_delete
+    def persist(self) -> bool:
+        return self._persist
 
     @property
     def serializer(self) -> Callable[[T], bytes]:
@@ -227,7 +227,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         deserializer: Optional[Callable[[bytes], VT]] = None,
         key_serializer: Optional[Callable[[KT], bytes]] = None,
         key_deserializer: Optional[Callable[[bytes], KT]] = None,
-        destruct_table_on_delete: bool = False,
+        persist: bool = True,
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
         data: Optional[Mapping[KT, VT]] = None,
         **kwargs: VT,
@@ -237,7 +237,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             table_name=table_name,
             serializer=serializer,
             deserializer=deserializer,
-            destruct_table_on_delete=destruct_table_on_delete,
+            persist=persist,
             rebuild_strategy=rebuild_strategy,
             do_initialize=False,
         )
@@ -458,7 +458,7 @@ if sys.version_info >= (3, 9):
                 deserializer=self.deserializer,
                 key_serializer=self.key_serializer,
                 key_deserializer=self.key_deserializer,
-                destruct_table_on_delete=self.destruct_table_on_delete,
+                persist=self.persist,
                 data=self,
             )
             tmp |= other
@@ -488,7 +488,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         table_name: Optional[str] = None,
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
-        destruct_table_on_delete: bool = False,
+        persist: bool = True,
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
         data: Optional[Iterable[T]] = None,
     ) -> None:
@@ -497,7 +497,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             table_name=table_name,
             serializer=serializer,
             deserializer=deserializer,
-            destruct_table_on_delete=destruct_table_on_delete,
+            persist=persist,
             rebuild_strategy=rebuild_strategy,
             do_initialize=True,
         )
@@ -641,13 +641,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return len(self) == len(self.intersection(other))
 
     def _intersection_single(self, other: Iterable[T]) -> "Set[T]":
-        res = Set[T](
-            connection=self.connection,
-            serializer=self.serializer,
-            deserializer=self.deserializer,
-            destruct_table_on_delete=True,
-            rebuild_strategy=RebuildStrategy.SKIP,
-        )
+        res = self._create_volatile_copy([])
         for d in other:
             if d in self:
                 res.add(d)
@@ -720,7 +714,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             serializer=self.serializer,
             deserializer=self.deserializer,
             rebuild_strategy=RebuildStrategy.SKIP,
-            destruct_table_on_delete=True,
+            persist=False,
             data=data if data is not None else self,
         )
 
