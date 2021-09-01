@@ -1,17 +1,17 @@
 import sqlite3
 import sys
-from typing import Optional, Union, cast
+from typing import Optional, Union, cast, overload
 
 if sys.version_info > (3, 9):
-    from collections.abc import Callable, Iterable
+    from collections.abc import Callable, Iterable, MutableSequence
 else:
-    from typing import Callable, Iterable
+    from typing import Callable, Iterable, MutableSequence
 
 from . import RebuildStrategy
 from .base import SqliteCollectionBase, T
 
 
-class List(SqliteCollectionBase[T]):
+class List(SqliteCollectionBase[T], MutableSequence[T]):
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
@@ -70,3 +70,26 @@ class List(SqliteCollectionBase[T]):
     @property
     def schema_version(self) -> str:
         return "0"
+
+    def __delitem__(self, i: Union[int, slice]) -> None:
+        raise NotImplementedError
+
+    @overload
+    def __getitem__(self, i: int) -> T:
+        ...
+
+    @overload
+    def __getitem__(self, i: slice) -> "List[T]":
+        ...
+
+    def __getitem__(self, i: Union[int, slice]) -> "Union[T, List[T]]":
+        raise NotImplementedError
+
+    def __setitem__(self, i: Union[int, slice], v: Union[T, Iterable[T]]) -> None:
+        raise NotImplementedError
+
+    def __len__(self) -> int:
+        raise NotImplementedError
+
+    def insert(self, i: int, v: T) -> None:
+        raise NotImplementedError
