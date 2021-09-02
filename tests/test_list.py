@@ -7,22 +7,25 @@ from unittest.mock import MagicMock, patch
 from sqlitecollections import List, RebuildStrategy
 
 if sys.version_info > (3, 9):
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
 else:
-    from typing import Callable
+    from typing import Callable, Sequence
 
-from typing import Any
+from typing import Any, Tuple
 
 from test_base import SqlTestCase
 
 
 class ListTestCase(SqlTestCase):
-    def assert_db_state_equals(self, conn: sqlite3.Connection, expected: Any) -> None:
+    def assert_db_state_equals(self, conn: sqlite3.Connection, expected: Any, table_name: str = "items") -> None:
         return self.assert_sql_result_equals(
             conn,
-            "SELECT serialized_value, item_index FROM items ORDER BY item_index",
+            f"SELECT serialized_value, item_index FROM {table_name} ORDER BY item_index",
             expected,
         )
+
+    def assert_items_table_only(self, conn: sqlite3.Connection) -> None:
+        return self.assert_metadata_state_equals(conn, [("items", "0", "List")])
 
     @patch("sqlitecollections.List._initialize", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
@@ -126,6 +129,31 @@ class ListTestCase(SqlTestCase):
 
         with self.assertRaisesRegex(IndexError, "list index out of range"):
             _ = sut[-4]
+
+    def test_getitem_slice(self) -> None:
+        from itertools import product
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/getitem_slice.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        expected_array = [chr(i) for i in range(ord("a"), ord("z") + 1)]
+
+        def generate_expectation(s: slice) -> Sequence[Tuple[bytes, int]]:
+            return [(pickle.dumps(c), i) for i, c in enumerate(expected_array[s])]
+
+        for si in product(
+            (None, -100, -20, 0, 20, 100), (None, -100, -20, 0, 20, 100), (None, -100, -20, -10, 10, 20, 100)
+        ):
+            s = slice(*si)
+            actual = sut[s]
+            expected = generate_expectation(s)
+            self.assert_db_state_equals(
+                memory_db,
+                expected,
+                actual.table_name,
+            )
+        del actual
+        self.assert_items_table_only(memory_db)
 
     def test_contains(self) -> None:
         memory_db = sqlite3.connect(":memory:")

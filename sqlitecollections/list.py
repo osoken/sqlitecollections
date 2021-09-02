@@ -3,9 +3,9 @@ import sys
 from typing import Optional, Union, cast, overload
 
 if sys.version_info > (3, 9):
-    from collections.abc import Callable, Iterable, MutableSequence
+    from collections.abc import Callable, Iterable, Iterator, MutableSequence
 else:
-    from typing import Callable, Iterable, MutableSequence
+    from typing import Callable, Iterable, MutableSequence, Iterator
 
 from . import RebuildStrategy
 from .base import SqliteCollectionBase, T
@@ -105,13 +105,38 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         ...
 
     def __getitem__(self, i: Union[int, slice]) -> "Union[T, List[T]]":
+        cur = self.connection.cursor()
         if isinstance(i, int):
-            cur = self.connection.cursor()
             serialized_value = self._get_serialized_value_by_index(cur, i)
             if serialized_value is None:
                 raise IndexError("list index out of range")
             return self.deserialize(serialized_value)
-        raise NotImplementedError
+        l = self._get_count(cur)
+        buf = self._create_volatile_copy([])
+        bufcur = buf.connection.cursor()
+        for next_idx, idx in enumerate(_generate_indices_from_slice(l, i)):
+            buf._add_record_by_serialized_value_and_index(
+                bufcur, cast(bytes, self._get_serialized_value_by_index(cur, idx)), next_idx
+            )
+        buf.connection.commit()
+        return buf
+
+    def _add_record_by_serialized_value_and_index(
+        self, cur: sqlite3.Cursor, serialized_value: bytes, index: int
+    ) -> None:
+        cur.execute(
+            f"INSERT INTO {self.table_name} (serialized_value, item_index) VALUES (?, ?)", (serialized_value, index)
+        )
+
+    def _create_volatile_copy(self, data: Optional[Iterable[T]]) -> "List[T]":
+        return List[T](
+            connection=self.connection,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+            rebuild_strategy=RebuildStrategy.SKIP,
+            persist=False,
+            data=(self if data is None else data),
+        )
 
     def __setitem__(self, i: Union[int, slice], v: Union[T, Iterable[T]]) -> None:
         raise NotImplementedError
@@ -122,8 +147,23 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
     def insert(self, i: int, v: T) -> None:
         raise NotImplementedError
 
-    def __contains__(self, x: T) -> bool:
+    def __contains__(self, x: object) -> bool:
         cur = self.connection.cursor()
-        serialized_value = self.serialize(x)
+        serialized_value = self.serialize(cast(T, x))
         index = self._get_index_by_serialized_value(cur, serialized_value)
         return index != -1
+
+
+def _generate_indices_from_slice(l: int, s: slice) -> Iterator[int]:
+    step = 1 if s.step is None else s.step
+    if step == 0:
+        raise ValueError("slice step cannot be zero")
+    if step > 0:
+        step = step
+        start = min(max(0 if s.start is None else (s.start if s.start >= 0 else l + s.start), 0), l)
+        stop = min(max(l if s.stop is None else (s.stop if s.stop >= 0 else l + s.stop), 0), l)
+    else:
+        step = step
+        start = min(max(l - 1 if s.start is None else (s.start if s.start >= 0 else l + s.start), -1), l - 1)
+        stop = min(max(-1 if s.stop is None else (s.stop if s.stop >= 0 else l + s.stop), -1), l)
+    yield from range(start, stop, step)
