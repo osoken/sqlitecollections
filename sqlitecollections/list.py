@@ -75,6 +75,13 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         cur.execute(f"SELECT COUNT(*) FROM {self.table_name}")
         return cast(int, cur.fetchone()[0])
 
+    def _get_index_by_serialized_value(self, cur: sqlite3.Cursor, serialized_value: bytes) -> int:
+        cur.execute(f"SELECT item_index FROM {self.table_name} WHERE serialized_value = ? LIMIT 1", (serialized_value,))
+        res = cur.fetchone()
+        if res is None:
+            return -1
+        return cast(int, res[0])
+
     def _get_serialized_value_by_index(self, cur: sqlite3.Cursor, index: int) -> Union[None, bytes]:
         if index < 0:
             l = self._get_count(cur)
@@ -114,3 +121,9 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
 
     def insert(self, i: int, v: T) -> None:
         raise NotImplementedError
+
+    def __contains__(self, x: T) -> bool:
+        cur = self.connection.cursor()
+        serialized_value = self.serialize(x)
+        index = self._get_index_by_serialized_value(cur, serialized_value)
+        return index != -1

@@ -126,3 +126,23 @@ class ListTestCase(SqlTestCase):
 
         with self.assertRaisesRegex(IndexError, "list index out of range"):
             _ = sut[-4]
+
+    def test_contains(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/contains.sql")
+        sut = List[Any](connection=memory_db, table_name="items")
+        self.assertTrue("a" in sut)
+        self.assertTrue(b"a" in sut)
+        self.assertTrue(None in sut)
+        self.assertTrue(0 in sut)
+        self.assertFalse(100 in sut)
+        self.assertTrue(((0, 1), "a") in sut)
+        self.assertFalse([0, 1] in sut)
+
+        self.assertFalse("a" not in sut)
+        self.assertFalse(b"a" not in sut)
+        self.assertFalse(None not in sut)
+        self.assertFalse(0 not in sut)
+        self.assertFalse(((0, 1), "a") not in sut)
+        self.assertTrue(100 not in sut)
+        self.assertTrue([0, 1] not in sut)
