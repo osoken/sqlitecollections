@@ -94,3 +94,22 @@ class ListTestCase(SqlTestCase):
                 (b"H", 7),
             ],
         )
+
+    def test_getitem_int(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/getitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        expected = "a"
+        actual = sut[0]
+        self.assertEqual(actual, expected)
+
+        expected = "b"
+        actual = sut[1]
+        self.assertEqual(actual, expected)
+
+        expected = "c"
+        actual = sut[2]
+        self.assertEqual(actual, expected)
+
+        with self.assertRaisesRegex(IndexError, "list index out of range"):
+            _ = sut[3]

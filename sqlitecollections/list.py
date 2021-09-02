@@ -71,6 +71,13 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
     def schema_version(self) -> str:
         return "0"
 
+    def _get_serialized_value_by_index(self, cur: sqlite3.Cursor, index: int) -> Union[None, bytes]:
+        cur.execute(f"SELECT serialized_value FROM {self.table_name} WHERE item_index = ?", (index,))
+        res = cur.fetchone()
+        if res is None:
+            return None
+        return cast(bytes, res[0])
+
     def __delitem__(self, i: Union[int, slice]) -> None:
         raise NotImplementedError
 
@@ -83,6 +90,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         ...
 
     def __getitem__(self, i: Union[int, slice]) -> "Union[T, List[T]]":
+        if isinstance(i, int):
+            cur = self.connection.cursor()
+            serialized_value = self._get_serialized_value_by_index(cur, i)
+            if serialized_value is None:
+                raise IndexError("list index out of range")
+            return self.deserialize(serialized_value)
         raise NotImplementedError
 
     def __setitem__(self, i: Union[int, slice], v: Union[T, Iterable[T]]) -> None:
