@@ -142,16 +142,22 @@ class ListTestCase(SqlTestCase):
             return [(pickle.dumps(c), i) for i, c in enumerate(expected_array[s])]
 
         for si in product(
-            (None, -100, -20, 0, 20, 100), (None, -100, -20, 0, 20, 100), (None, -100, -20, -10, 10, 20, 100)
+            (None, -100, -26, -25, -20, 0, 20, 25, 26, 100),
+            (None, -100, -26, -25, -20, 0, 20, 25, 26, 100),
+            (None, -100, -26, -25, -20, 0, -10, 10, 20, 25, 26, 100),
         ):
             s = slice(*si)
-            actual = sut[s]
-            expected = generate_expectation(s)
-            self.assert_db_state_equals(
-                memory_db,
-                expected,
-                actual.table_name,
-            )
+            if si[-1] == 0:
+                with self.assertRaisesRegex(ValueError, "slice step cannot be zero"):
+                    _ = sut[s]
+            else:
+                actual = sut[s]
+                expected = generate_expectation(s)
+                self.assert_db_state_equals(
+                    memory_db,
+                    expected,
+                    actual.table_name,
+                )
         del actual
         self.assert_items_table_only(memory_db)
 
