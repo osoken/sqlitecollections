@@ -71,8 +71,16 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
     def schema_version(self) -> str:
         return "0"
 
+    def _get_count(self, cur: sqlite3.Cursor) -> int:
+        cur.execute(f"SELECT COUNT(*) FROM {self.table_name}")
+        return cast(int, cur.fetchone()[0])
+
     def _get_serialized_value_by_index(self, cur: sqlite3.Cursor, index: int) -> Union[None, bytes]:
-        cur.execute(f"SELECT serialized_value FROM {self.table_name} WHERE item_index = ?", (index,))
+        if index < 0:
+            l = self._get_count(cur)
+            cur.execute(f"SELECT serialized_value FROM {self.table_name} WHERE item_index = ?", (l + index,))
+        else:
+            cur.execute(f"SELECT serialized_value FROM {self.table_name} WHERE item_index = ?", (index,))
         res = cur.fetchone()
         if res is None:
             return None

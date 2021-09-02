@@ -113,3 +113,16 @@ class ListTestCase(SqlTestCase):
 
         with self.assertRaisesRegex(IndexError, "list index out of range"):
             _ = sut[3]
+
+        expected = "c"
+        actual = sut[-1]
+        self.assertEqual(actual, expected)
+        expected = "b"
+        actual = sut[-2]
+        self.assertEqual(actual, expected)
+        expected = "a"
+        actual = sut[-3]
+        self.assertEqual(actual, expected)
+
+        with self.assertRaisesRegex(IndexError, "list index out of range"):
+            _ = sut[-4]
