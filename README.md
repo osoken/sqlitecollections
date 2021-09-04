@@ -32,12 +32,16 @@ $ tox
 
 We aim to implement containers that are as compatible as possible with the built-in containers, but we have a few implementations that intentionally behave differently.
 
+- Normal behavior will be compatible, but in case of errors it may be different.
+- The constructor arguments are not compatible, as they require arguments specific to this package's container, such as sqlite3 DB file paths and serialization methods.
+- `Dict`'s item order is guaranteed to be insertion order not only for python 3.7 and upper but for all versions.
+- `Dict.fromkeys` class method is not provided.
 - Any member in the container cannot be mutated directly. If you want to mutate any member, mutate it via temporary variable then write it back.
 
 ```python
 from sqlitecollections import Dict
 
-x = Dict(a=[]) # create {"a": []}
+x = Dict(data={"a": []}) # create {"a": []}
 x["a"].append("b")  # try to mutate the empty list
 print(x["a"])  # not ["b"] but []
 
@@ -46,6 +50,3 @@ temp.append("b")  # mutate the temporary variable
 x["a"] = temp  # then, write it back
 print(x["a"])  # now, we get ["b"]
 ```
-
-- `Dict`'s item order is guaranteed to be insertion order not only for python 3.7 and upper but for all versions.
-- `fromkeys` class method is not provided.
