@@ -339,3 +339,25 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         res = self.copy()
         res += x
         return res
+
+    def __imul__(self, i: int) -> "List[T]":
+        if not isinstance(i, int):
+            raise TypeError(f"can't multiply sequence by non-int of type '{type(i).__name__}'")
+        if i <= 0:
+            self.clear()
+            return self
+        if i == 1:
+            return self
+        cur = self.connection.cursor()
+        original_length = self._get_max_index_plus_one(cur)
+        for m in range(1, i):
+            for j in range(original_length):
+                serialized_value = cast(bytes, self._get_serialized_value_by_index(cur, j))
+                self._add_record_by_serialized_value_and_index(cur, serialized_value, m * original_length + j)
+        self.connection.commit()
+        return self
+
+    def __mul__(self, i: int) -> "List[T]":
+        res = self.copy()
+        res *= i
+        return res
