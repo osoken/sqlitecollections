@@ -89,6 +89,8 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             rebuild_strategy=rebuild_strategy,
             do_initialize=True,
         )
+        if data is not None:
+            self.extend(data)
 
     def _do_create_table(self, commit: bool = False) -> None:
         cur = self.connection.cursor()
@@ -242,7 +244,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             f"INSERT INTO {self.table_name} (serialized_value, item_index) VALUES (?, ?)", (serialized_value, index)
         )
 
-    def _create_volatile_copy(self, data: Optional[Iterable[T]]) -> "List[T]":
+    def _create_volatile_copy(self, data: Optional[Iterable[T]] = None) -> "List[T]":
         return List[T](
             connection=self.connection,
             serializer=self.serializer,
@@ -251,6 +253,9 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             persist=False,
             data=(self if data is None else data),
         )
+
+    def copy(self) -> "List[T]":
+        return self._create_volatile_copy()
 
     def __setitem__(self, i: Union[int, slice], v: Union[T, Iterable[T]]) -> None:
         cur = self.connection.cursor()
