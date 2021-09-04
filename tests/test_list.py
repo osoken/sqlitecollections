@@ -716,3 +716,35 @@ class ListTestCase(SqlTestCase):
 
         with self.assertRaisesRegex(IndexError, "pop index out of range"):
             _ = sut.pop(-3)
+
+    def test_remove(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/remove.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+
+        with self.assertRaisesRegex(ValueError, "'z' is not in list"):
+            _ = sut.remove('z')
+
+        sut.remove("a")
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("b"), 0),
+                (pickle.dumps("c"), 1),
+                (pickle.dumps("a"), 2),
+                (pickle.dumps("b"), 3),
+                (pickle.dumps("c"), 4),
+            ],
+        )
+        sut.remove("a")
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("b"), 0),
+                (pickle.dumps("c"), 1),
+                (pickle.dumps("b"), 2),
+                (pickle.dumps("c"), 3),
+            ],
+        )
+        with self.assertRaisesRegex(ValueError, "'a' is not in list"):
+            _ = sut.remove('a')
