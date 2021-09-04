@@ -330,3 +330,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             self._add_record_by_serialized_value_and_index(cur, self.serialize(v), idx)
             idx += 1
         self.connection.commit()
+
+    def __iadd__(self, x: Iterable[T]) -> "List[T]":
+        self.extend(x)
+        return self
+
+    def __add__(self, x: Iterable[T]) -> "List[T]":
+        res = self.copy()
+        res += x
+        return res
