@@ -1,17 +1,18 @@
 import pickle
 import sqlite3
 import sys
+from itertools import product
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from sqlitecollections import List, RebuildStrategy
 
 if sys.version_info > (3, 9):
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Iterable, Sequence
 else:
-    from typing import Callable, Sequence
+    from typing import Callable, Sequence, Iterable
 
-from typing import Any, Tuple
+from typing import Any, Tuple, Union
 
 from test_base import SqlTestCase
 
@@ -131,7 +132,6 @@ class ListTestCase(SqlTestCase):
             _ = sut[-4]
 
     def test_getitem_slice(self) -> None:
-        from itertools import product
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/getitem_slice.sql")
@@ -144,7 +144,7 @@ class ListTestCase(SqlTestCase):
         for si in product(
             (None, -100, -26, -25, -20, 0, 20, 25, 26, 100),
             (None, -100, -26, -25, -20, 0, 20, 25, 26, 100),
-            (None, -100, -26, -25, -20, 0, -10, 10, 20, 25, 26, 100),
+            (None, -100, -26, -25, -20, -10, 0, 10, 20, 25, 26, 100),
         ):
             s = slice(*si)
             if si[-1] == 0:
@@ -180,3 +180,196 @@ class ListTestCase(SqlTestCase):
         self.assertFalse(((0, 1), "a") not in sut)
         self.assertTrue(100 not in sut)
         self.assertTrue([0, 1] not in sut)
+
+    def test_setitem_int(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/setitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut[0] = "A"
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut[-1] = "C"
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("C"), 2)])
+        with self.assertRaisesRegex(IndexError, "list assignment index out of range"):
+            sut[100] = "Z"
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("C"), 2)])
+        with self.assertRaisesRegex(IndexError, "list assignment index out of range"):
+            sut[-100] = "z"
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("C"), 2)])
+
+    def test_setitem_slice(self) -> None:
+        def generate_expectation(s: slice, t: Iterable[str]) -> Union[Exception, Sequence[Tuple[bytes, int]]]:
+            a = ["a", "b", "c", "d", "e", "f", "g"]
+            try:
+                a[s] = t
+            except Exception as e:
+                return e
+            return [(pickle.dumps(c), i) for i, c in enumerate(a)]
+
+        def generate_new_value(length: int) -> Iterable[str]:
+            t = [chr(ord("A") + i) for i in range(length)]
+            return iter(t)
+
+        for start, stop, step, length in product(
+            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
+            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
+            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
+            (0, 1, 2, 4, 10),
+        ):
+            memory_db = sqlite3.connect(":memory:")
+            self.get_fixture(memory_db, "list/base.sql", "list/setitem_slice.sql")
+            sut = List[str](connection=memory_db, table_name="items")
+            s = slice(start, stop, step)
+            expected = generate_expectation(s, generate_new_value(length))
+            if isinstance(expected, Exception):
+                with self.assertRaisesRegex(type(expected), str(expected)):
+                    sut[s] = generate_new_value(length)
+            else:
+                sut[s] = generate_new_value(length)
+                self.assert_db_state_equals(
+                    memory_db,
+                    expected,
+                )
+
+    def test_delitem_int(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        del sut[0]
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("b"), 0), (pickle.dumps("c"), 1)])
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        del sut[1]
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("c"), 1)])
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        del sut[2]
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1)])
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        with self.assertRaisesRegex(IndexError, "list index out of range"):
+            _ = sut[3]
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        del sut[-3]
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("b"), 0), (pickle.dumps("c"), 1)])
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        del sut[-2]
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("c"), 1)])
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        del sut[-1]
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1)])
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        with self.assertRaisesRegex(IndexError, "list index out of range"):
+            _ = sut[-4]
+
+    def test_delitem_slice(self) -> None:
+        def generate_expectation(s: slice) -> Union[Exception, Sequence[Tuple[bytes, int]]]:
+            a = ["a", "b", "c", "d", "e", "f", "g"]
+            try:
+                del a[s]
+            except Exception as e:
+                return e
+            return [(pickle.dumps(c), i) for i, c in enumerate(a)]
+
+        for start, stop, step in product(
+            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
+            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
+            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
+        ):
+            memory_db = sqlite3.connect(":memory:")
+            self.get_fixture(memory_db, "list/base.sql", "list/delitem_slice.sql")
+            sut = List[str](connection=memory_db, table_name="items")
+            s = slice(start, stop, step)
+            expected = generate_expectation(s)
+            if isinstance(expected, Exception):
+                with self.assertRaisesRegex(type(expected), str(expected)):
+                    del sut[s]
+            else:
+                del sut[s]
+                self.assert_db_state_equals(
+                    memory_db,
+                    expected,
+                )
+
+    def test_insert(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut.insert(0, "z")
+        self.assert_db_state_equals(
+            memory_db, [(pickle.dumps("z"), 0), (pickle.dumps("a"), 1), (pickle.dumps("b"), 2), (pickle.dumps("c"), 3)]
+        )
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut.insert(2, "z")
+        self.assert_db_state_equals(
+            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("z"), 2), (pickle.dumps("c"), 3)]
+        )
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut.insert(3, "z")
+        self.assert_db_state_equals(
+            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2), (pickle.dumps("z"), 3)]
+        )
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut.insert(300000, "z")
+        self.assert_db_state_equals(
+            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2), (pickle.dumps("z"), 3)]
+        )
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut.insert(-3, "z")
+        self.assert_db_state_equals(
+            memory_db, [(pickle.dumps("z"), 0), (pickle.dumps("a"), 1), (pickle.dumps("b"), 2), (pickle.dumps("c"), 3)]
+        )
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut.insert(-1, "z")
+        self.assert_db_state_equals(
+            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("z"), 2), (pickle.dumps("c"), 3)]
+        )
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut.insert(-3000, "z")
+        self.assert_db_state_equals(
+            memory_db, [(pickle.dumps("z"), 0), (pickle.dumps("a"), 1), (pickle.dumps("b"), 2), (pickle.dumps("c"), 3)]
+        )

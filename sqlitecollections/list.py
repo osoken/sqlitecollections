@@ -1,6 +1,7 @@
 import sqlite3
 import sys
-from typing import Optional, Union, cast, overload
+from itertools import count, repeat
+from typing import Any, Optional, Union, cast, overload
 
 if sys.version_info > (3, 9):
     from collections.abc import Callable, Iterable, Iterator, MutableSequence
@@ -9,6 +10,63 @@ else:
 
 from . import RebuildStrategy
 from .base import SqliteCollectionBase, T
+
+
+def _generate_indices_from_slice(l: int, s: slice) -> Iterator[int]:
+    step = 1 if s.step is None else s.step
+    if step == 0:
+        raise ValueError("slice step cannot be zero")
+    if step > 0:
+        step = step
+        start = min(max(0 if s.start is None else (s.start if s.start >= 0 else l + s.start), 0), l)
+        stop = min(max(l if s.stop is None else (s.stop if s.stop >= 0 else l + s.stop), 0), l)
+    else:
+        step = step
+        start = min(max(l - 1 if s.start is None else (s.start if s.start >= 0 else l + s.start), -1), l - 1)
+        stop = min(max(-1 if s.stop is None else (s.stop if s.stop >= 0 else l + s.stop), -1), l)
+    yield from range(start, stop, step)
+
+
+class NoMoreElements(Exception):
+    ...
+
+
+class DifferentLengthDetected(Exception):
+    def __init__(self, length1: int, length2: int) -> None:
+        self.length1 = length1
+        self.length2 = length2
+
+
+def _consume_one_or_raise_no_more_elements(iter: Iterable[Any]) -> Any:
+    for d in iter:
+        return d
+    raise NoMoreElements()
+
+
+def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]):
+    element_count = 0
+    while True:
+        iter1_is_active = True
+        try:
+            next1 = _consume_one_or_raise_no_more_elements(iter1)
+        except NoMoreElements:
+            iter1_is_active = False
+
+        iter2_is_active = True
+        try:
+            next2 = _consume_one_or_raise_no_more_elements(iter2)
+        except NoMoreElements:
+            iter2_is_active = False
+
+        if iter1_is_active and iter2_is_active:
+            yield (next1, next2)
+            element_count += 1
+        elif not iter1_is_active and not iter2_is_active:
+            break
+        else:
+            iter1_unused_count = sum(d[0] for d in zip(repeat(1), iter1)) + int(iter1_is_active)
+            iter2_unused_count = sum(d[0] for d in zip(repeat(1), iter2)) + int(iter2_is_active)
+            raise DifferentLengthDetected(element_count + iter1_unused_count, element_count + iter2_unused_count)
 
 
 class List(SqliteCollectionBase[T], MutableSequence[T]):
@@ -71,9 +129,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
     def schema_version(self) -> str:
         return "0"
 
-    def _get_count(self, cur: sqlite3.Cursor) -> int:
-        cur.execute(f"SELECT COUNT(*) FROM {self.table_name}")
-        return cast(int, cur.fetchone()[0])
+    def _get_max_index_plus_one(self, cur: sqlite3.Cursor) -> int:
+        cur.execute(f"SELECT MAX(item_index) FROM {self.table_name}")
+        res = cur.fetchone()
+        if res[0] is None:
+            return 0
+        return cast(int, res[0]) + 1
 
     def _get_index_by_serialized_value(self, cur: sqlite3.Cursor, serialized_value: bytes) -> int:
         cur.execute(f"SELECT item_index FROM {self.table_name} WHERE serialized_value = ? LIMIT 1", (serialized_value,))
@@ -84,7 +145,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
 
     def _get_serialized_value_by_index(self, cur: sqlite3.Cursor, index: int) -> Union[None, bytes]:
         if index < 0:
-            l = self._get_count(cur)
+            l = self._get_max_index_plus_one(cur)
             cur.execute(f"SELECT serialized_value FROM {self.table_name} WHERE item_index = ?", (l + index,))
         else:
             cur.execute(f"SELECT serialized_value FROM {self.table_name} WHERE item_index = ?", (index,))
@@ -93,8 +154,49 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             return None
         return cast(bytes, res[0])
 
+    def _tidy_indices(self, cur: sqlite3.Cursor, start: int = 0):
+        cur.execute(f"SELECT item_index FROM {self.table_name} WHERE item_index >= ? ORDER BY item_index", (start,))
+        reindexing_cursor = self.connection.cursor()
+        for idx, d in zip(count(start), cur):
+            idx_ = cast(int, d[0])
+            if idx != idx_:
+                reindexing_cursor.execute(
+                    f"UPDATE {self.table_name} SET item_index = ? WHERE item_index = ?", (idx, idx_)
+                )
+
+    def _delete_record_by_index(
+        self, cur: sqlite3.Cursor, index: int, length: Optional[int] = None
+    ) -> Union[None, int]:
+        _index = index
+        if _index < 0:
+            _length = length
+            if _length is None:
+                _length = self._get_max_index_plus_one(cur)
+            _index = _length + _index
+        cur.execute(f"SELECT 1 FROM {self.table_name} WHERE item_index = ?", (_index,))
+        if cur.fetchone() is None:
+            return None
+        cur.execute(f"DELETE FROM {self.table_name} WHERE item_index = ?", (_index,))
+        return _index
+
     def __delitem__(self, i: Union[int, slice]) -> None:
-        raise NotImplementedError
+        cur = self.connection.cursor()
+        if isinstance(i, int):
+            deleted_index = self._delete_record_by_index(cur, i)
+            if deleted_index is None:
+                raise IndexError("list assignment index out of range")
+            self._tidy_indices(cur, deleted_index)
+            self.connection.commit()
+            return
+        reindexing_offset = None
+        l = self._get_max_index_plus_one(cur)
+        for idx in _generate_indices_from_slice(l, i):
+            self._delete_record_by_index(cur, idx, l)
+            if reindexing_offset is None or idx < reindexing_offset:
+                reindexing_offset = idx
+        if reindexing_offset is not None:
+            self._tidy_indices(cur, reindexing_offset)
+        self.connection.commit()
 
     @overload
     def __getitem__(self, i: int) -> T:
@@ -111,7 +213,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             if serialized_value is None:
                 raise IndexError("list index out of range")
             return self.deserialize(serialized_value)
-        l = self._get_count(cur)
+        l = self._get_max_index_plus_one(cur)
         buf = self._create_volatile_copy([])
         bufcur = buf.connection.cursor()
         for next_idx, idx in enumerate(_generate_indices_from_slice(l, i)):
@@ -120,6 +222,18 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             )
         buf.connection.commit()
         return buf
+
+    def _set_serialized_value_by_index(self, cur: sqlite3.Cursor, serialized_value: bytes, index: int) -> bool:
+        _index = index
+        l = self._get_max_index_plus_one(cur)
+        if _index < 0:
+            _index = l + index
+        if _index < 0 or l <= _index:
+            return False
+        cur.execute(
+            f"UPDATE {self.table_name} SET serialized_value = ? WHERE item_index = ?", (serialized_value, _index)
+        )
+        return True
 
     def _add_record_by_serialized_value_and_index(
         self, cur: sqlite3.Cursor, serialized_value: bytes, index: int
@@ -139,31 +253,52 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         )
 
     def __setitem__(self, i: Union[int, slice], v: Union[T, Iterable[T]]) -> None:
-        raise NotImplementedError
+        cur = self.connection.cursor()
+        if isinstance(i, int):
+            if not self._set_serialized_value_by_index(cur, self.serialize(v), i):
+                raise IndexError("list assignment index out of range")
+            self.connection.commit()
+            return
+        l = self._get_max_index_plus_one(cur)
+        if i.step is None or i.step == 1:
+            offset = min(max(0 if i.start is None else (i.start if i.start >= 0 else l + i.start), 0), l)
+            del self[i]
+            for idx, d in enumerate(v):
+                self.insert(offset + idx, d)
+            self.connection.commit()
+        else:
+            try:
+                for idx, d in _strict_zip(_generate_indices_from_slice(l, i), v):
+                    self._set_serialized_value_by_index(cur, self.serialize(d), idx)
+            except DifferentLengthDetected as e:
+                raise ValueError(
+                    f"attempt to assign sequence of size {e.length2} to extended slice of size {e.length1}"
+                )
+            self.connection.commit()
+        return
 
     def __len__(self) -> int:
         raise NotImplementedError
 
     def insert(self, i: int, v: T) -> None:
-        raise NotImplementedError
+        cur = self.connection.cursor()
+        index_ = i
+        length = self._get_max_index_plus_one(cur)
+        if index_ < 0:
+            index_ = length + index_
+        index_ = max(0, min(length, index_))
+        self._increment_indices(cur, index_)
+        self._add_record_by_serialized_value_and_index(cur, self.serialize(v), index_)
+        self.connection.commit()
+
+    def _increment_indices(self, cur: sqlite3.Cursor, start: int) -> None:
+        idx = self._get_max_index_plus_one(cur) - 1
+        while idx >= start:
+            cur.execute(f"UPDATE {self.table_name} SET item_index = ? WHERE item_index = ?", (idx + 1, idx))
+            idx -= 1
 
     def __contains__(self, x: object) -> bool:
         cur = self.connection.cursor()
         serialized_value = self.serialize(cast(T, x))
         index = self._get_index_by_serialized_value(cur, serialized_value)
         return index != -1
-
-
-def _generate_indices_from_slice(l: int, s: slice) -> Iterator[int]:
-    step = 1 if s.step is None else s.step
-    if step == 0:
-        raise ValueError("slice step cannot be zero")
-    if step > 0:
-        step = step
-        start = min(max(0 if s.start is None else (s.start if s.start >= 0 else l + s.start), 0), l)
-        stop = min(max(l if s.stop is None else (s.stop if s.stop >= 0 else l + s.stop), 0), l)
-    else:
-        step = step
-        start = min(max(l - 1 if s.start is None else (s.start if s.start >= 0 else l + s.start), -1), l - 1)
-        stop = min(max(-1 if s.stop is None else (s.stop if s.stop >= 0 else l + s.stop), -1), l)
-    yield from range(start, stop, step)
