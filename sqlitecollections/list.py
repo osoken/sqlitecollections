@@ -285,7 +285,8 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         return
 
     def __len__(self) -> int:
-        raise NotImplementedError
+        cur = self.connection.cursor()
+        return self._get_max_index_plus_one(cur)
 
     def insert(self, i: int, v: T) -> None:
         cur = self.connection.cursor()

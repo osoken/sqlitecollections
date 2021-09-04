@@ -587,3 +587,18 @@ class ListTestCase(SqlTestCase):
 
         with self.assertRaisesRegex(TypeError, "can't multiply sequence by non-int of type 'float'"):
             _ = sut * 1.2  # type: ignore
+
+    def test_len(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        expected = 0
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/len.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        expected = 3
+        actual = len(sut)
+        self.assertEqual(actual, expected)
