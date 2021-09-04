@@ -362,3 +362,33 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         res = self.copy()
         res *= i
         return res
+
+    def index(self, value: Any, start: int = 0, stop: int = 0) -> int:
+        cur = self.connection.cursor()
+        length = None
+        start_ = start
+        if start_ < 0:
+            length = self._get_max_index_plus_one(cur)
+            start_ = length + start_
+        stop_ = stop
+        if stop_ <= 0:
+            if length is None:
+                length = self._get_max_index_plus_one(cur)
+            stop_ = length + stop_
+        serialized_value = self.serialize(cast(T, value))
+        res = self._find_serialized_value_in_range(cur, serialized_value, start_, stop_)
+        if res is None:
+            raise ValueError(f"'{value}' is not in list")
+        return res
+
+    def _find_serialized_value_in_range(
+        self, cur: sqlite3.Cursor, serialized_value: bytes, normalized_start: int, normalized_stop: int
+    ) -> Union[None, int]:
+        cur.execute(
+            f"SELECT item_index FROM {self.table_name} WHERE serialized_value = ? AND item_index >= ? AND item_index < ?",
+            (serialized_value, normalized_start, normalized_stop),
+        )
+        res = cur.fetchone()
+        if res is None:
+            return None
+        return cast(int, res[0])

@@ -602,3 +602,41 @@ class ListTestCase(SqlTestCase):
         expected = 3
         actual = len(sut)
         self.assertEqual(actual, expected)
+
+    def test_index(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        with self.assertRaisesRegex(ValueError, "'z' is not in list"):
+            sut.index("z")
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/index.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        expected = 0
+        actual = sut.index("a")
+        self.assertEqual(actual, expected)
+        expected = 1
+        actual = sut.index("b")
+        self.assertEqual(actual, expected)
+        expected = 2
+        actual = sut.index("c")
+        self.assertEqual(actual, expected)
+        with self.assertRaisesRegex(ValueError, "'z' is not in list"):
+            sut.index("z")
+        with self.assertRaisesRegex(ValueError, "'a' is not in list"):
+            sut.index("a", 1, 3)
+        expected = 3
+        actual = sut.index("a", 1)
+        self.assertEqual(actual, expected)
+        expected = 6
+        actual = sut.index("a", 4)
+        self.assertEqual(actual, expected)
+        expected = 3
+        actual = sut.index("a", 1, 4)
+        self.assertEqual(actual, expected)
+        with self.assertRaisesRegex(ValueError, "'a' is not in list"):
+            sut.index("a", 7, 0)
+        expected = 8
+        actual = sut.index("c", 6)
+        self.assertEqual(actual, expected)
