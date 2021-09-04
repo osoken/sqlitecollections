@@ -425,15 +425,15 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         key_ = (lambda x: x) if key is None else key
         cur = self.connection.cursor()
         buf = [(key_(self.deserialize(v)), i) for i, v in enumerate(self._iter_serialized_value(cur))]
-        buf.sort(key=lambda x: x[0], reverse=reverse)
+        buf.sort(key=lambda x: x[0], reverse=reverse)  # type: ignore
         self._remap_index(cur, [i[1] for i in buf])
         self.connection.commit()
 
-    def _remap_index(self, cur: sqlite3.Cursor, indices_map: list) -> None:
+    def _remap_index(self, cur: sqlite3.Cursor, indices_map: Iterable[int]) -> None:
         l = self._get_max_index_plus_one(cur)
         cur.execute(f"UPDATE {self.table_name} SET item_index = item_index - ?", (l,))
         cur.execute(
-            f"UPDATE {self.table_name} SET item_index = CASE item_index {' '.join(['WHEN ? THEN ?' for _ in indices_map])} END",
+            f"UPDATE {self.table_name} SET item_index = CASE item_index {' '.join(['WHEN ? THEN ?' for _ in range(l)])} END",
             sum(((j - l, i) for i, j in enumerate(indices_map)), tuple()),
         )
 
