@@ -199,7 +199,7 @@ class ListTestCase(SqlTestCase):
 
     def test_setitem_slice(self) -> None:
         def generate_expectation(s: slice, t: Iterable[str]) -> Union[Exception, Sequence[Tuple[bytes, int]]]:
-            a = ["a", "b", "c", "d", "e", "f", "g"]
+            a = ["a", "b", "c", "d", "e"]
             try:
                 a[s] = t
             except Exception as e:
@@ -211,14 +211,14 @@ class ListTestCase(SqlTestCase):
             return iter(t)
 
         for start, stop, step, length in product(
-            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
-            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
-            (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
-            (0, 1, 2, 4, 10),
+            (None, -10, -5, -2, -1, 0, 1, 2, 5, 10),
+            (None, -10, -5, -2, -1, 0, 1, 2, 5, 10),
+            (None, -10, -5, -2, -1, 0, 1, 2, 5, 10),
+            (0, 1, 2, 3, 6),
         ):
             memory_db = sqlite3.connect(":memory:")
             self.get_fixture(memory_db, "list/base.sql", "list/setitem_slice.sql")
-            sut = List[str](connection=memory_db, table_name="items")
+            sut = List[Any](connection=memory_db, table_name="items")
             s = slice(start, stop, step)
             expected = generate_expectation(s, generate_new_value(length))
             if isinstance(expected, Exception):
@@ -230,6 +230,11 @@ class ListTestCase(SqlTestCase):
                     memory_db,
                     expected,
                 )
+        with self.assertRaisesRegex(TypeError, "must assign iterable to extended slice"):
+            memory_db = sqlite3.connect(":memory:")
+            self.get_fixture(memory_db, "list/base.sql", "list/setitem_slice.sql")
+            sut = List[Any](connection=memory_db, table_name="items")
+            sut[::] = 1
 
     def test_delitem_int(self) -> None:
         memory_db = sqlite3.connect(":memory:")
@@ -373,3 +378,13 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db, [(pickle.dumps("z"), 0), (pickle.dumps("a"), 1), (pickle.dumps("b"), 2), (pickle.dumps("c"), 3)]
         )
+
+    def test_append(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [])
+        sut.append("a")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0)])
+        sut.append("z")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("z"), 1)])

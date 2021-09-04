@@ -1,7 +1,7 @@
 import sqlite3
 import sys
 from itertools import count, repeat
-from typing import Any, Optional, Union, cast, overload
+from typing import Any, Optional, Tuple, Union, cast, overload
 
 if sys.version_info > (3, 9):
     from collections.abc import Callable, Iterable, Iterator, MutableSequence
@@ -43,7 +43,7 @@ def _consume_one_or_raise_no_more_elements(iter: Iterable[Any]) -> Any:
     raise NoMoreElements()
 
 
-def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]):
+def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]) -> Iterable[Tuple[Any, Any]]:
     element_count = 0
     while True:
         iter1_is_active = True
@@ -154,7 +154,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             return None
         return cast(bytes, res[0])
 
-    def _tidy_indices(self, cur: sqlite3.Cursor, start: int = 0):
+    def _tidy_indices(self, cur: sqlite3.Cursor, start: int = 0) -> None:
         cur.execute(f"SELECT item_index FROM {self.table_name} WHERE item_index >= ? ORDER BY item_index", (start,))
         reindexing_cursor = self.connection.cursor()
         for idx, d in zip(count(start), cur):
@@ -255,10 +255,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
     def __setitem__(self, i: Union[int, slice], v: Union[T, Iterable[T]]) -> None:
         cur = self.connection.cursor()
         if isinstance(i, int):
-            if not self._set_serialized_value_by_index(cur, self.serialize(v), i):
+            if not self._set_serialized_value_by_index(cur, self.serialize(cast(T, v)), i):
                 raise IndexError("list assignment index out of range")
             self.connection.commit()
             return
+        if not isinstance(v, Iterable):
+            raise TypeError("must assign iterable to extended slice")
         l = self._get_max_index_plus_one(cur)
         if i.step is None or i.step == 1:
             offset = min(max(0 if i.start is None else (i.start if i.start >= 0 else l + i.start), 0), l)
@@ -302,3 +304,8 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         serialized_value = self.serialize(cast(T, x))
         index = self._get_index_by_serialized_value(cur, serialized_value)
         return index != -1
+
+    def append(self, value: T) -> None:
+        cur = self.connection.cursor()
+        length = self._get_max_index_plus_one(cur)
+        self._add_record_by_serialized_value_and_index(cur, self.serialize(value), length)
