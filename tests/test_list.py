@@ -420,3 +420,23 @@ class ListTestCase(SqlTestCase):
         )
         del actual
         self.assert_items_table_only(memory_db)
+
+    def test_extend(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        sut.extend(["a", "b", "c"])
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+
+        sut.extend(["a", "b", "c"])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"), 0),
+                (pickle.dumps("b"), 1),
+                (pickle.dumps("c"), 2),
+                (pickle.dumps("a"), 3),
+                (pickle.dumps("b"), 4),
+                (pickle.dumps("c"), 5),
+            ],
+        )

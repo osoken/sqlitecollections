@@ -322,3 +322,11 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         cur = self.connection.cursor()
         self._delete_all(cur)
         self.connection.commit()
+
+    def extend(self, values: Iterable[T]) -> None:
+        cur = self.connection.cursor()
+        idx = self._get_max_index_plus_one(cur)
+        for v in values:
+            self._add_record_by_serialized_value_and_index(cur, self.serialize(v), idx)
+            idx += 1
+        self.connection.commit()
