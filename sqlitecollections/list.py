@@ -393,7 +393,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             return None
         return cast(int, res[0])
 
-    def _count_serialized_value(self, cur: sqlite3.Cursor, serialized_value: bytes) -> Union[None, int]:
+    def _count_serialized_value(self, cur: sqlite3.Cursor, serialized_value: bytes) -> int:
         cur.execute(
             f"SELECT COUNT(*) FROM {self.table_name} WHERE serialized_value = ?",
             (serialized_value,),
@@ -404,3 +404,19 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
     def count(self, value: Any) -> int:
         cur = self.connection.cursor()
         return self._count_serialized_value(cur, self.serialize(cast(T, value)))
+
+    def pop(self, index: int = -1) -> T:
+        cur = self.connection.cursor()
+        length = self._get_max_index_plus_one(cur)
+        if length == 0:
+            raise IndexError("pop from empty list")
+        index_ = index
+        if index_ < 0:
+            index_ = length + index_
+        if index_ < 0 or length <= index_:
+            raise IndexError("pop index out of range")
+        serialized_value = cast(bytes, self._get_serialized_value_by_index(cur, index_))
+        self._delete_record_by_index(cur, index_)
+        self._tidy_indices(cur, index_)
+        self.connection.commit()
+        return self.deserialize(serialized_value)
