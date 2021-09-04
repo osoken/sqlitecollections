@@ -748,3 +748,35 @@ class ListTestCase(SqlTestCase):
         )
         with self.assertRaisesRegex(ValueError, "'a' is not in list"):
             sut.remove('a')
+
+    def test_reverse(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/reverse.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"), 0),
+                (pickle.dumps("b"), 1),
+                (pickle.dumps("c"), 2),
+            ],
+        )
+        sut.reverse()
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("c"), 0),
+                (pickle.dumps("b"), 1),
+                (pickle.dumps("a"), 2),
+            ],
+        )
+        sut.reverse()
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"), 0),
+                (pickle.dumps("b"), 1),
+                (pickle.dumps("c"), 2),
+            ],
+        )
