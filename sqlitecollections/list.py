@@ -376,12 +376,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
                 length = self._get_max_index_plus_one(cur)
             stop_ = length + stop_
         serialized_value = self.serialize(cast(T, value))
-        res = self._find_serialized_value_in_range(cur, serialized_value, start_, stop_)
+        res = self._get_index_by_serialized_value_in_range(cur, serialized_value, start_, stop_)
         if res is None:
             raise ValueError(f"'{value}' is not in list")
         return res
 
-    def _find_serialized_value_in_range(
+    def _get_index_by_serialized_value_in_range(
         self, cur: sqlite3.Cursor, serialized_value: bytes, normalized_start: int, normalized_stop: int
     ) -> Union[None, int]:
         cur.execute(
@@ -392,3 +392,15 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         if res is None:
             return None
         return cast(int, res[0])
+
+    def _count_serialized_value(self, cur: sqlite3.Cursor, serialized_value: bytes) -> Union[None, int]:
+        cur.execute(
+            f"SELECT COUNT(*) FROM {self.table_name} WHERE serialized_value = ?",
+            (serialized_value,),
+        )
+        res = cur.fetchone()
+        return cast(int, res[0])
+
+    def count(self, value: Any) -> int:
+        cur = self.connection.cursor()
+        return self._count_serialized_value(cur, self.serialize(cast(T, value)))

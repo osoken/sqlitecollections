@@ -640,3 +640,26 @@ class ListTestCase(SqlTestCase):
         expected = 8
         actual = sut.index("c", 6)
         self.assertEqual(actual, expected)
+
+    def test_count(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        expected = 0
+        actual = sut.count("z")
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/count.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        expected = 0
+        actual = sut.count("z")
+        self.assertEqual(actual, expected)
+        expected = 1
+        actual = sut.count("a")
+        self.assertEqual(actual, expected)
+        expected = 2
+        actual = sut.count("b")
+        self.assertEqual(actual, expected)
+        expected = 3
+        actual = sut.count("c")
+        self.assertEqual(actual, expected)
