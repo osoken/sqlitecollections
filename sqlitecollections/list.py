@@ -420,3 +420,24 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         self._tidy_indices(cur, index_)
         self.connection.commit()
         return self.deserialize(serialized_value)
+
+    def sort(self, reverse: bool = False, key: Optional[Callable[[T], Any]] = None) -> None:
+        key_ = (lambda x: x) if key is None else key
+        cur = self.connection.cursor()
+        buf = [(key_(self.deserialize(v)), i) for i, v in enumerate(self._iter_serialized_value(cur))]
+        buf.sort(key=lambda x: x[0], reverse=reverse)
+        self._remap_index(cur, [i[1] for i in buf])
+        self.connection.commit()
+
+    def _remap_index(self, cur: sqlite3.Cursor, indices_map: list) -> None:
+        l = self._get_max_index_plus_one(cur)
+        cur.execute(f"UPDATE {self.table_name} SET item_index = item_index - ?", (l,))
+        cur.execute(
+            f"UPDATE {self.table_name} SET item_index = CASE item_index {' '.join(['WHEN ? THEN ?' for _ in indices_map])} END",
+            sum(((j - l, i) for i, j in enumerate(indices_map)), tuple()),
+        )
+
+    def _iter_serialized_value(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
+        cur.execute(f"SELECT serialized_value FROM {self.table_name} ORDER BY item_index")
+        for d in cur:
+            yield cast(bytes, d[0])
