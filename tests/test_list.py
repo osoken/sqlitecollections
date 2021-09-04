@@ -723,7 +723,7 @@ class ListTestCase(SqlTestCase):
         sut = List[str](connection=memory_db, table_name="items")
 
         with self.assertRaisesRegex(ValueError, "'z' is not in list"):
-            _ = sut.remove('z')
+            sut.remove('z')
 
         sut.remove("a")
         self.assert_db_state_equals(
@@ -747,4 +747,4 @@ class ListTestCase(SqlTestCase):
             ],
         )
         with self.assertRaisesRegex(ValueError, "'a' is not in list"):
-            _ = sut.remove('a')
+            sut.remove('a')
