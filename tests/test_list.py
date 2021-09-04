@@ -388,3 +388,17 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0)])
         sut.append("z")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("z"), 1)])
+
+    def test_clear(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        sut.clear()
+        self.assert_db_state_equals(memory_db, [])
+
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/clear.sql")
+        sut = List[str](connection=memory_db, table_name="items")
+        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        sut.clear()
+        self.assert_db_state_equals(memory_db, [])

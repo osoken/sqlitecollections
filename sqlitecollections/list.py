@@ -309,3 +309,11 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         cur = self.connection.cursor()
         length = self._get_max_index_plus_one(cur)
         self._add_record_by_serialized_value_and_index(cur, self.serialize(value), length)
+
+    def _delete_all(self, cur: sqlite3.Cursor) -> None:
+        cur.execute(f"DELETE FROM {self.table_name}")
+
+    def clear(self) -> None:
+        cur = self.connection.cursor()
+        self._delete_all(cur)
+        self.connection.commit()
