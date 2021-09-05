@@ -1,0 +1,24 @@
+site_name: sqlitecollections
+site_description: Python collections that are backended by sqlite3 DB and are compatible with the built-in collections
+
+
+theme:
+  name: 'material'
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+      primary: 'light blue'
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+      primary: 'indigo'
+repo_name: osoken/sqlitecollections
+repo_url: https://github.com/osoken/sqlitecollections
+plugins:
+  - search
+  - mkdocstrings
