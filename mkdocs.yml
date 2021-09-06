@@ -21,4 +21,3 @@ repo_name: osoken/sqlitecollections
 repo_url: https://github.com/osoken/sqlitecollections
 plugins:
   - search
-  - mkdocstrings

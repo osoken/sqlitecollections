@@ -22,6 +22,6 @@ setup(
     install_requires=[],
     extras_require={
         "dev": ["flake8", "pytest", "black", "mypy", "tox", "isort"],
-        "docs": ["mkdocs", "mkdocs-material", "mkdocstrings"],
+        "docs": ["mkdocs", "mkdocs-material"],
     },
 )
