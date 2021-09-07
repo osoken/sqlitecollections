@@ -1,0 +1,5 @@
+# Install
+
+```
+pip install sqlitecollections
+```
