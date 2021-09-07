@@ -5,7 +5,7 @@ Python collections that are backended by sqlite3 DB and are compatible with the 
 ## Installation
 
 ```
-$ pip install git+ssh://git@github.com/osoken/sqlitecollections.git
+$ pip install sqlitecollections
 ```
 
 ## Development
