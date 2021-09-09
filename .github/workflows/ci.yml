@@ -52,4 +52,4 @@ jobs:
       - name: Install tox
         run: pip install tox
       - name: Run test
-        run: tox -e py$(echo ${{ matrix.python-version }} | sed -e 's/.//')
+        run: tox -e py$(echo ${{ matrix.python-version }} | sed 's/\.//')
