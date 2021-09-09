@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  lint_and_tests:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,10 +18,21 @@ jobs:
       - name: set up python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.8
 
       - name: install
-        run: pip install -e .[dev]
+        run: pip install tox
 
-      - name: lint_and_test
-        run: tox -e lint,py39
+      - name: lint check
+        run: tox -e lint-check
+
+      - name: format and commit if needed
+        if: failure()
+        run: |
+          tox -e lint
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout $GITHUB_HEAD_REF
+          git commit -am "fixup: Format with black and isort"
+          git push
