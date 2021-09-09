@@ -37,3 +37,19 @@ jobs:
           git checkout $GITHUB_HEAD_REF
           git commit -am "fixup: Format with black and isort"
           git push
+  test-linux:
+    name: test python {{ matrix.python-version }} on linux
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install tox
+        run: pip install tox
+      - name: Run test
+        run: tox -e py$(echo ${{ matrix.python }} | sed -e 's/.//')
