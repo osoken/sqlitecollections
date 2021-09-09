@@ -38,8 +38,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         data: Optional[Mapping[KT, VT]] = None,
     ) -> None:
         super(_Dict, self).__init__(
-            connection=connection,
-            table_name=table_name,
+            connection=connection, table_name=table_name,
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
