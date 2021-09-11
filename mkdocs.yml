@@ -21,7 +21,11 @@ repo_name: osoken/sqlitecollections
 repo_url: https://github.com/osoken/sqlitecollections
 plugins:
   - search
+  - macros:
+      module_name: docs/main
 markdown_extensions:
-  - pymdownx.highlight:
-      linenums: true
-  - pymdownx.superfences
+- pymdownx.highlight:
+    linenums: false
+- pymdownx.superfences
+- mdx_include:
+    base_path: docs
