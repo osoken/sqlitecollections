@@ -1,16 +1,13 @@
 # sqlitecollections
 
-`sqlitecollections` is a sort of containers that are backended by sqlite3 DB and are compatible with corresponding built-in collections.
-Since containers consume disk space instead of RAM, they can handle large amounts of data even in environments with limited RAM.
-Migrating from existing code using the built-in container is as simple as importing the library and changing the constructor.
+`sqlitecollections` is a sort of containers that are backended by sqlite3 DB and are compatible with corresponding built-in collections. Since containers consume disk space instead of RAM, they can handle large amounts of data even in environments with limited RAM. Migrating from existing code using the built-in container is as simple as importing the library and changing the constructor.
 
-The elements of the container are automatically serialized and stored in the sqlite3 database, and are automatically read from the sqlite3 database and deserialized when accessed.
-Current version supports List (mutable sequence), Dict (mutable mapping) and Set (mutable set) and almost all methods are compatible with list, dict and set respectively.
+The elements of the container are automatically serialized and stored in the sqlite3 database, and are automatically read from the sqlite3 database and deserialized when accessed. Current version supports List (mutable sequence), Dict (mutable mapping) and Set (mutable set) and almost all methods are compatible with list, dict and set respectively.
 
 ## Installation
 
-```
-$ pip install sqlitecollections
+```shell
+pip install sqlitecollections
 ```
 
 ## Example
@@ -58,7 +55,7 @@ print(list(s.intersection(["Alice", "Carol"])))
 #> ['Alice', 'Carol']
 ```
 
-The database is updated with each operation, so even if you exit from the python process at this point, the database will still be in the same state and the next time we use the same file, we will be able to use the container from the last time we terminated.
+The database is updated with each operation, so even if we exit from the python process at this point, the database will still be in the same state and the next time we use the same file, we will be able to use the container from the last time we terminated.
 
 ```python
 import sqlite3
