@@ -116,6 +116,17 @@ class SetTestCase(SqlTestCase):
                 (pickle.dumps(b"bb"),),
             ],
         )
+        sut = Set[Hashable](
+            connection=memory_db,
+            table_name="items",
+            data=["a"],
+        )
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("a"),),
+            ],
+        )
 
     def test_len(self) -> None:
         memory_db = sqlite3.connect(":memory:")

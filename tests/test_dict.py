@@ -105,12 +105,20 @@ class DictTestCase(SqlTestCase):
 
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items", data={"a": 1, "b": 2})
+        sut = Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("a", 1), ("b", 2)))
         self.assert_dict_state_equals(
             memory_db,
             [
                 (pickle.dumps("a"), pickle.dumps(1), 0),
                 (pickle.dumps("b"), pickle.dumps(2), 1),
+            ],
+        )
+        sut = Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("c", 3), ("d", 4)))
+        self.assert_dict_state_equals(
+            memory_db,
+            [
+                (pickle.dumps("c"), pickle.dumps(3), 0),
+                (pickle.dumps("d"), pickle.dumps(4), 1),
             ],
         )
 

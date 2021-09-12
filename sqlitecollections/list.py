@@ -90,6 +90,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             do_initialize=True,
         )
         if data is not None:
+            self.clear()
             self.extend(data)
 
     def _do_create_table(self, commit: bool = False) -> None:

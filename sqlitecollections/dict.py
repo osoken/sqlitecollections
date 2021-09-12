@@ -35,7 +35,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         key_deserializer: Optional[Callable[[bytes], KT]] = None,
         persist: bool = True,
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
-        data: Optional[Mapping[KT, VT]] = None,
+        data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
     ) -> None:
         super(_Dict, self).__init__(
             connection=connection,
@@ -54,6 +54,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         )
         self._initialize(commit=True)
         if data is not None:
+            self.clear()
             self.update(data)
 
     @property
