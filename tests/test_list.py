@@ -69,6 +69,13 @@ class ListTestCase(SqlTestCase):
         )
         self.assert_db_state_equals(memory_db, [])
 
+    def test_init_with_initial_data(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = List[Any](connection=memory_db, table_name="items", data=[0])
+        self.assert_db_state_equals(memory_db, [(pickle.dumps(0), 0)])
+        sut = List[Any](connection=memory_db, table_name="items", data=[1])
+        self.assert_db_state_equals(memory_db, [(pickle.dumps(1), 0)])
+
     def test_rebuild(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/rebuild.sql")

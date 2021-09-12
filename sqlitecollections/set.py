@@ -34,6 +34,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             do_initialize=True,
         )
         if data is not None:
+            self.clear()
             self.update(data)
 
     def __contains__(self, value: object) -> bool:
