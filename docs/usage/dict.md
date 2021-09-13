@@ -22,7 +22,7 @@ Constructor.
 - `key_deserializer`: `Callable[[bytes], KT]`, optional, default=`None`; Function to deserialize key. If `None`, `deserializer` is used.
 - `persist`: `bool`, optional, default=`True`; If `True`, table won't be deleted even when the object is deleted. If `False`, the table is deleted when this object is deleted.
 - `rebuild_strategy`: `RebuildStrategy`, optional, default=`RebuildStrategy.CHECK_WITH_FIRST_ELEMENT`; Rebuild strategy.
-- `data`: `Mapping[KT, VT]`, optional, defualt=`None`; Initial data.
+- `data`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`, optional, defualt=`None`; Initial data.
 
 ---
 
@@ -226,5 +226,19 @@ If `key` is in the dictionary, return its value. If not, insert `key` with a val
 ### Return value:
 
 `VT`: Item of the dictionary with key `key` if `key` is in the dictionary, `default` otherwise.
+
+---
+
+## `update([other])`
+
+Update the dictionary with the key-value pairs from `other`, overwriting existing keys.
+
+### Arguments:
+
+- `other`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`, optional; Key-value pairs to be added
+
+### Return value:
+
+`None`
 
 ---
