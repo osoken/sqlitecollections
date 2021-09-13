@@ -116,3 +116,26 @@ Return an iterator over the keys of `d`
 `Iterator[KT]`: an iterator over the keys of `d`
 
 ---
+
+## `clear()`
+
+Remove all items from the dictionary
+
+### Return value:
+
+`None`
+
+---
+
+## `copy()`
+
+Return a copy of the dictionary.
+The actual behavior is to create a table with a unique table name and copy the current key and value to that table.
+Therefore, unlike the built-in dict copy, the behavior is similar to deep copy.
+Be aware that the copied dictionary is volatile.
+
+### Return value:
+
+`Dict[KT, VT]`: A volatile copy of the dictionary.
+
+---
