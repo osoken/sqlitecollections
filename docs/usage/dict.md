@@ -71,8 +71,24 @@ Delete `d[key]`.
 
 ### Arguments:
 
-- `key`: `KT`: Key to be deleted
+- `key`: `KT`; Key to be deleted
 
 ### Return value:
 
 `None`
+
+---
+
+## `key in d`
+
+Return whether if `key` is in `d`
+
+### Arguments:
+
+- `key`: `KT`; Key to be checked
+
+### Return value:
+
+`bool`: `True` if `key` is in `d` and `False` otherwise.
+
+---
