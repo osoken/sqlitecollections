@@ -39,10 +39,11 @@ Return the number of items in `d: Dict[KT, VT]`
 ## `d[key]`
 
 Get item of `d` with key `key`.
+Raises a `KeyError` if `key` is not in the map.
 
 ### Arguments:
 
-- `key`: `KT`; Return the item of `d` with key `key`. Raises a `KeyError` if `key` is not in the map
+- `key`: `KT`; Key to retrieve corresponding value
 
 ### Return value:
 
@@ -139,3 +140,16 @@ Be aware that the copied dictionary is volatile.
 `Dict[KT, VT]`: A volatile copy of the dictionary.
 
 ---
+
+## `get(key[, default])`
+
+Return the value for `key` if `key` is in the dictionary, else `default`. If `default` is not given, it defaults to `None`, so that this method never raises a `KeyError`.
+
+### Arguments:
+
+- `key`: `KT`; Key to retrieve corresponding value if exists.
+- `default`: `VT`, optional, default=`None`; Default value in case that `key` is not in the dictionary
+
+### Return value:
+
+`VT`: Item of the dictionary with key `key` if `key` is in the dictionary, `default` otherwise.
