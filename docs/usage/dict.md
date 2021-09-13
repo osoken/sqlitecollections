@@ -24,6 +24,8 @@ Constructor.
 - `rebuild_strategy`: `RebuildStrategy`, optional, default=`RebuildStrategy.CHECK_WITH_FIRST_ELEMENT`; Rebuild strategy.
 - `data`: `Mapping[KT, VT]`, optional, defualt=`None`; Initial data.
 
+---
+
 ## `len(d)`
 
 Return the number of items in `d: Dict[KT, VT]`
@@ -31,6 +33,8 @@ Return the number of items in `d: Dict[KT, VT]`
 ### Return value:
 
 `int`: The number of items in `d`
+
+---
 
 ## `d[key]`
 
@@ -44,6 +48,8 @@ Get item of `d` with key `key`.
 
 `VT`: Item of `d` with key `key`
 
+---
+
 ## `d[key] = value`
 
 Set `d[key]` to `value`.
@@ -52,6 +58,20 @@ Set `d[key]` to `value`.
 
 - `key`: `KT`; Key to be set
 - `value`: `VT`; Value to be set
+
+### Return value:
+
+`None`
+
+---
+
+## `del d[key]`
+
+Delete `d[key]`.
+
+### Arguments:
+
+- `key`: `KT`: Key to be deleted
 
 ### Return value:
 
