@@ -104,3 +104,15 @@ Return whether if `key` is not in `d`
 ### Return value:
 
 `bool`: `True` if `key` is not in `d` and `False` otherwise.
+
+---
+
+## `iter(d)`
+
+Return an iterator over the keys of `d`
+
+### Return value:
+
+`Iterator[KT]`: an iterator over the keys of `d`
+
+---
