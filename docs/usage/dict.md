@@ -153,3 +153,15 @@ Return the value for `key` if `key` is in the dictionary, else `default`. If `de
 ### Return value:
 
 `VT`: Item of the dictionary with key `key` if `key` is in the dictionary, `default` otherwise.
+
+---
+
+## `items()`
+
+Return a new view of the dictionary’s items (key-value pairs).
+
+### Return value:
+
+`ItemsView`: View object of the dictionary's items
+
+---
