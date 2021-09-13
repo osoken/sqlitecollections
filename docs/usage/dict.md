@@ -201,3 +201,15 @@ If the dictionary is empty, raises a `KeyError`.
 `Tuple[KT, VT]`: Key-value pair that were last inserted into the dictionary
 
 ---
+
+## `reversed(d)`
+
+Return a reverse iterator over the keys of the dictionary.
+
+(provided only python version 3.8 and above)
+
+### Return value:
+
+`Iterator[KT]`: Reverse iterator over the keys of the dictionary
+
+---
