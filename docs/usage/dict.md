@@ -92,3 +92,15 @@ Return whether if `key` is in `d`
 `bool`: `True` if `key` is in `d` and `False` otherwise.
 
 ---
+
+## `key not in d`
+
+Return whether if `key` is not in `d`
+
+### Arguments:
+
+- `key`: `KT`; Key to be checked
+
+### Return value:
+
+`bool`: `True` if `key` is not in `d` and `False` otherwise.
