@@ -252,3 +252,37 @@ Return a new view of the dictionary's values.
 `ValuesView`: View object of the dictionary's values
 
 ---
+
+## `d | other`
+
+Create a new dictionary with the merged keys and values of `d` and `other`, which must both be dictionaries.
+The values of `other` take priority when `d` and `other` share keys.
+The return value is volatile by default.
+
+(provided only python version 3.9 and above)
+
+### Arguments:
+
+- `other`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`; Key-value pairs to be merged
+
+### Return value:
+
+`Dict[KT, VT]`: A new volatile dictionary object.
+
+---
+
+## `d |= other`
+
+Update the dictionary `d` with keys and values from `other`.
+
+(provided only python version 3.9 and above)
+
+### Arguments:
+
+- `other`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`; Key-value pairs to be merged
+
+### Return value:
+
+`Dict[KT, VT]`: The dictionary object.
+
+---
