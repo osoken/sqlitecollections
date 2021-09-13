@@ -130,7 +130,7 @@ Remove all items from the dictionary
 ## `copy()`
 
 Return a copy of the dictionary.
-The actual behavior is to create a table with a unique table name and copy the current key and value to that table.
+The actual behavior is to create a table with a unique table name and copy the keys and the values to the new table.
 Therefore, unlike the built-in dict copy, the behavior is similar to deep copy.
 Be aware that the copied dictionary is volatile.
 
