@@ -175,3 +175,29 @@ Return a new view of the dictionary's keys.
 `KeysView`: View object of the dictionary's keys
 
 ---
+
+## `pop(key[, default])`
+
+If `key` is in the dictionary, remove it and return its value, else return `default`. If `default` is not given and `key` is not in the dictionary, a `KeyError` is raised.
+
+### Arguments:
+
+- `key`: `KT`; Key to retrieve corresponding value if exists.
+- `default`: `VT`, optional, default=`None`; Default value in case that `key` is not in the dictionary
+
+### Return value:
+
+`VT`: Item of the dictionary with key `key` if `key` is in the dictionary, `default` otherwise.
+
+---
+
+## `popitem()`
+
+Remove and return a key-value pair from the dictionary. Pairs are returned in LIFO order.
+If the dictionary is empty, raises a `KeyError`.
+
+### Return value:
+
+`Tuple[KT, VT]`: Key-value pair that were last inserted into the dictionary
+
+---
