@@ -242,3 +242,13 @@ Update the dictionary with the key-value pairs from `other`, overwriting existin
 `None`
 
 ---
+
+## `values()`
+
+Return a new view of the dictionary's values.
+
+### Return value:
+
+`ValuesView`: View object of the dictionary's values
+
+---
