@@ -213,3 +213,18 @@ Return a reverse iterator over the keys of the dictionary.
 `Iterator[KT]`: Reverse iterator over the keys of the dictionary
 
 ---
+
+## `setdefault(key[, default])`
+
+If `key` is in the dictionary, return its value. If not, insert `key` with a value of `default` and return `default`.
+
+### Arguments:
+
+- `key`: `KT`; Key to retrieve or set the value
+- `default`: `VT`, optional, default=`None`; Value to be set if `key` is not in the dictionary
+
+### Return value:
+
+`VT`: Item of the dictionary with key `key` if `key` is in the dictionary, `default` otherwise.
+
+---
