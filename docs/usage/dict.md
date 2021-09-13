@@ -165,3 +165,13 @@ Return a new view of the dictionary’s items (key-value pairs).
 `ItemsView`: View object of the dictionary's items
 
 ---
+
+## `keys()`
+
+Return a new view of the dictionary's keys.
+
+### Return value:
+
+`KeysView`: View object of the dictionary's keys
+
+---
