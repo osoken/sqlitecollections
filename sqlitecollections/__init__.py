@@ -1,4 +1,4 @@
-__version__ = "0.5.0"
+__version__ = "0.5.2"
 __author__ = "osoken"
 __description__ = "Python collections that are backended by sqlite3 DB and are compatible with the built-in collections"
 __long_description__ = __description__
