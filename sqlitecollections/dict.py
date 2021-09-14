@@ -4,14 +4,7 @@ from collections.abc import Hashable
 from typing import Callable, Generic, Optional, Tuple, TypeVar, Union, cast
 
 if sys.version_info >= (3, 9):
-    from collections.abc import (
-        Iterable,
-        Iterator,
-        Mapping,
-        MutableMapping,
-        MutableSet,
-        Reversible,
-    )
+    from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Reversible
 else:
     from typing import Iterable, Iterator, Mapping, MutableMapping
 if sys.version_info >= (3, 8):
