@@ -1,17 +1,11 @@
 import sqlite3
 import sys
 from collections.abc import Hashable
-from typing import Callable, Generic, Optional, Tuple, TypeVar, Union, cast
+from itertools import chain
+from typing import Callable, Generic, Optional, Tuple, TypeVar, Union, cast, overload
 
 if sys.version_info >= (3, 9):
-    from collections.abc import (
-        Iterable,
-        Iterator,
-        Mapping,
-        MutableMapping,
-        MutableSet,
-        Reversible,
-    )
+    from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Reversible
 else:
     from typing import Iterable, Iterator, Mapping, MutableMapping
 if sys.version_info >= (3, 8):
@@ -252,6 +246,24 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             self.deserialize_key(serialized_item[0]),
             self.deserialize(serialized_item[1]),
         )
+
+    @overload
+    def update(self, __other: Mapping[KT, VT], **kwargs: VT) -> None:
+        ...
+
+    @overload
+    def update(self, __other: Iterable[Tuple[KT, VT]], **kwargs: VT) -> None:
+        ...
+
+    @overload
+    def update(self, **kwargs: VT) -> None:
+        ...
+
+    def update(self, __other: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: VT) -> None:
+        cur = self.connection.cursor()
+        for k, v in chain(dict({} if __other is None else __other).items(), cast(Mapping[KT, VT], kwargs).items()):
+            self._upsert(cur, self.serialize_key(k), self.serialize(v))
+        self.connection.commit()
 
 
 if sys.version_info >= (3, 8):
