@@ -119,6 +119,9 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def _delete_single_record_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> None:
         cur.execute(f"DELETE FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
 
+    def _delete_all_records(self, cur: sqlite3.Cursor) -> None:
+        cur.execute(f"DELETE FROM {self.table_name}")
+
     def _is_serialized_key_in(self, cur: sqlite3.Cursor, serialized_key: bytes) -> bool:
         cur.execute(f"SELECT 1 FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
         return len(list(cur)) > 0
@@ -263,6 +266,11 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         cur = self.connection.cursor()
         for k, v in chain(dict({} if __other is None else __other).items(), cast(Mapping[KT, VT], kwargs).items()):
             self._upsert(cur, self.serialize_key(k), self.serialize(v))
+        self.connection.commit()
+
+    def clear(self) -> None:
+        cur = self.connection.cursor()
+        self._delete_all_records(cur)
         self.connection.commit()
 
 
