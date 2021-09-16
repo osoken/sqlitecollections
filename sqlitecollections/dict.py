@@ -113,7 +113,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         if commit:
             self.connection.commit()
 
-    def _is_hashable(self, key: KT) -> bool:
+    def _is_hashable(self, key: object) -> bool:
         return isinstance(key, Hashable)
 
     def _delete_single_record_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> None:
@@ -272,6 +272,11 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         cur = self.connection.cursor()
         self._delete_all_records(cur)
         self.connection.commit()
+
+    def __contains__(self, o: object) -> bool:
+        if not self._is_hashable(o):
+            raise TypeError(f"unhashable type: {type(o).__name__}")
+        return self._is_serialized_key_in(self.connection.cursor(), self.serialize_key(cast(KT, o)))
 
 
 if sys.version_info >= (3, 8):
