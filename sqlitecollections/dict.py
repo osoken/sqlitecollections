@@ -278,6 +278,22 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             raise TypeError(f"unhashable type: {type(o).__name__}")
         return self._is_serialized_key_in(self.connection.cursor(), self.serialize_key(cast(KT, o)))
 
+    @overload
+    def get(self, key: KT) -> Union[VT, None]:
+        ...
+
+    @overload
+    def get(self, key: KT, default_value: Union[VT, T]) -> Union[VT, T]:
+        ...
+
+    def get(self, key: KT, default_value: Optional[Union[VT, object]] = None) -> Union[VT, None, object]:
+        serialized_key = self.serialize_key(key)
+        cur = self.connection.cursor()
+        serialized_value = self._get_serialized_value_by_serialized_key(cur, serialized_key)
+        if serialized_value is None:
+            return default_value
+        return self.deserialize(serialized_value)
+
 
 if sys.version_info >= (3, 8):
 
