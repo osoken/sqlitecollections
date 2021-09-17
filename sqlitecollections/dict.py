@@ -16,6 +16,7 @@ from .base import RebuildStrategy, SqliteCollectionBase
 T = TypeVar("T")
 KT = TypeVar("KT")
 VT = TypeVar("VT")
+_VT = TypeVar("_VT")
 
 
 class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
@@ -277,6 +278,22 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         if not self._is_hashable(o):
             raise TypeError(f"unhashable type: {type(o).__name__}")
         return self._is_serialized_key_in(self.connection.cursor(), self.serialize_key(cast(KT, o)))
+
+    @overload
+    def get(self, key: KT) -> Union[VT, None]:
+        ...
+
+    @overload
+    def get(self, key: KT, default_value: Optional[Union[VT, _VT]] = None) -> Union[VT, _VT]:
+        ...
+
+    def get(self, key: KT, default_value: Optional[Union[VT, _VT]] = None) -> Union[VT, _VT, None]:
+        serialized_key = self.serialize_key(key)
+        cur = self.connection.cursor()
+        serialized_value = self._get_serialized_value_by_serialized_key(cur, serialized_key)
+        if serialized_value is None:
+            return default_value
+        return self.deserialize(serialized_value)
 
 
 if sys.version_info >= (3, 8):
