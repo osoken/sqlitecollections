@@ -10,9 +10,9 @@ if sys.version_info > (3, 9):
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
 
-from test_base import SqlTestCase
-
 from sqlitecollections import Dict, RebuildStrategy
+
+from test_base import SqlTestCase
 
 
 class DictTestCase(SqlTestCase):

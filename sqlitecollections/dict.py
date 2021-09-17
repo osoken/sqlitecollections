@@ -16,7 +16,6 @@ from .base import RebuildStrategy, SqliteCollectionBase
 T = TypeVar("T")
 KT = TypeVar("KT")
 VT = TypeVar("VT")
-_VT = TypeVar("_VT")
 
 
 class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
@@ -284,10 +283,10 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         ...
 
     @overload
-    def get(self, key: KT, default_value: Optional[Union[VT, _VT]] = None) -> Union[VT, _VT]:
+    def get(self, key: KT, default_value: Union[VT, T]) -> Union[VT, T]:
         ...
 
-    def get(self, key: KT, default_value: Optional[Union[VT, _VT]] = None) -> Union[VT, _VT, None]:
+    def get(self, key: KT, default_value: Optional[Union[VT, object]] = None) -> Union[VT, None, object]:
         serialized_key = self.serialize_key(key)
         cur = self.connection.cursor()
         serialized_value = self._get_serialized_value_by_serialized_key(cur, serialized_key)
