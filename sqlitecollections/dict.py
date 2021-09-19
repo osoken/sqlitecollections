@@ -18,6 +18,70 @@ KT = TypeVar("KT")
 VT = TypeVar("VT")
 
 
+class _DictDatabaseDriver:
+    def __init__(self, table_name: str):
+        self.table_name = table_name
+
+    def _delete_single_record_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> None:
+        cur.execute(f"DELETE FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
+
+    def _delete_all_records(self, cur: sqlite3.Cursor) -> None:
+        cur.execute(f"DELETE FROM {self.table_name}")
+
+    def _is_serialized_key_in(self, cur: sqlite3.Cursor, serialized_key: bytes) -> bool:
+        cur.execute(f"SELECT 1 FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
+        return len(list(cur)) > 0
+
+    def _get_serialized_value_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> Union[None, bytes]:
+        cur.execute(
+            f"SELECT serialized_value FROM {self.table_name} WHERE serialized_key=?",
+            (serialized_key,),
+        )
+        res = cur.fetchone()
+        if res is None:
+            return None
+        return cast(bytes, res[0])
+
+    def _get_next_order(self, cur: sqlite3.Cursor) -> int:
+        cur.execute(f"SELECT MAX(item_order) FROM {self.table_name}")
+        res = cur.fetchone()[0]
+        if res is None:
+            return 0
+        return cast(int, res) + 1
+
+    def _get_count(self, cur: sqlite3.Cursor) -> int:
+        cur.execute(f"SELECT COUNT(*) FROM {self.table_name}")
+        res = cur.fetchone()
+        return cast(int, res[0])
+
+    def _get_serialized_keys(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
+        cur.execute(f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order")
+        for res in cur:
+            yield cast(bytes, res[0])
+
+    def _upsert(
+        self,
+        cur: sqlite3.Cursor,
+        serialized_key: bytes,
+        serialized_value: bytes,
+    ) -> None:
+        if self._is_serialized_key_in(cur, serialized_key):
+            cur.execute(
+                f"UPDATE {self.table_name} SET serialized_value=? WHERE serialized_key=?",
+                (serialized_value, serialized_key),
+            )
+        else:
+            item_order = self._get_next_order(cur)
+            cur.execute(
+                f"INSERT INTO {self.table_name} (serialized_key, serialized_value, item_order) VALUES (?, ?, ?)",
+                (serialized_key, serialized_value, item_order),
+            )
+
+    def _get_last_serialized_item(self, cur: sqlite3.Cursor) -> Tuple[bytes, bytes]:
+        cur.execute(f"SELECT serialized_key, serialized_value FROM {self.table_name} ORDER BY item_order DESC LIMIT 1")
+        return cast(Tuple[bytes, bytes], cur.fetchone())
+
+
 class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def __init__(
         self,
@@ -46,6 +110,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         self._key_deserializer = (
             cast(Callable[[bytes], KT], self.deserializer) if key_deserializer is None else key_deserializer
         )
+        self._database_driver = _DictDatabaseDriver(self.table_name)
         self._initialize(commit=True)
         if data is not None:
             self.clear()
@@ -116,65 +181,6 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def _is_hashable(self, key: object) -> bool:
         return isinstance(key, Hashable)
 
-    def _delete_single_record_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> None:
-        cur.execute(f"DELETE FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
-
-    def _delete_all_records(self, cur: sqlite3.Cursor) -> None:
-        cur.execute(f"DELETE FROM {self.table_name}")
-
-    def _is_serialized_key_in(self, cur: sqlite3.Cursor, serialized_key: bytes) -> bool:
-        cur.execute(f"SELECT 1 FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
-        return len(list(cur)) > 0
-
-    def _get_serialized_value_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> Union[None, bytes]:
-        cur.execute(
-            f"SELECT serialized_value FROM {self.table_name} WHERE serialized_key=?",
-            (serialized_key,),
-        )
-        res = cur.fetchone()
-        if res is None:
-            return None
-        return cast(bytes, res[0])
-
-    def _get_next_order(self, cur: sqlite3.Cursor) -> int:
-        cur.execute(f"SELECT MAX(item_order) FROM {self.table_name}")
-        res = cur.fetchone()[0]
-        if res is None:
-            return 0
-        return cast(int, res) + 1
-
-    def _get_count(self, cur: sqlite3.Cursor) -> int:
-        cur.execute(f"SELECT COUNT(*) FROM {self.table_name}")
-        res = cur.fetchone()
-        return cast(int, res[0])
-
-    def _get_serialized_keys(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
-        cur.execute(f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order")
-        for res in cur:
-            yield cast(bytes, res[0])
-
-    def _upsert(
-        self,
-        cur: sqlite3.Cursor,
-        serialized_key: bytes,
-        serialized_value: bytes,
-    ) -> None:
-        if self._is_serialized_key_in(cur, serialized_key):
-            cur.execute(
-                f"UPDATE {self.table_name} SET serialized_value=? WHERE serialized_key=?",
-                (serialized_value, serialized_key),
-            )
-        else:
-            item_order = self._get_next_order(cur)
-            cur.execute(
-                f"INSERT INTO {self.table_name} (serialized_key, serialized_value, item_order) VALUES (?, ?, ?)",
-                (serialized_key, serialized_value, item_order),
-            )
-
-    def _get_last_serialized_item(self, cur: sqlite3.Cursor) -> Tuple[bytes, bytes]:
-        cur.execute(f"SELECT serialized_key, serialized_value FROM {self.table_name} ORDER BY item_order DESC LIMIT 1")
-        return cast(Tuple[bytes, bytes], cur.fetchone())
-
     def serialize_key(self, key: KT) -> bytes:
         if not self._is_hashable(key):
             raise TypeError(f"unhashable type: '{type(key).__name__}'")
@@ -186,33 +192,33 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def __delitem__(self, key: KT) -> None:
         serialized_key = self.serialize_key(key)
         cur = self.connection.cursor()
-        if not self._is_serialized_key_in(cur, serialized_key):
+        if not self._database_driver._is_serialized_key_in(cur, serialized_key):
             raise KeyError(key)
-        self._delete_single_record_by_serialized_key(cur, serialized_key)
+        self._database_driver._delete_single_record_by_serialized_key(cur, serialized_key)
         self.connection.commit()
 
     def __getitem__(self, key: KT) -> VT:
         serialized_key = self.serialize_key(key)
         cur = self.connection.cursor()
-        serialized_value = self._get_serialized_value_by_serialized_key(cur, serialized_key)
+        serialized_value = self._database_driver._get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             raise KeyError(key)
         return self.deserialize(serialized_value)
 
     def __iter__(self) -> Iterator[KT]:
         cur = self.connection.cursor()
-        for serialized_key in self._get_serialized_keys(cur):
+        for serialized_key in self._database_driver._get_serialized_keys(cur):
             yield self.deserialize_key(serialized_key)
 
     def __len__(self) -> int:
         cur = self.connection.cursor()
-        return self._get_count(cur)
+        return self._database_driver._get_count(cur)
 
     def __setitem__(self, key: KT, value: VT) -> None:
         serialized_key = self.serialize_key(key)
         cur = self.connection.cursor()
         serialized_value = self.serializer(value)
-        self._upsert(cur, serialized_key, serialized_value)
+        self._database_driver._upsert(cur, serialized_key, serialized_value)
         self.connection.commit()
 
     def _create_volatile_copy(
@@ -240,10 +246,10 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
 
     def popitem(self) -> Tuple[KT, VT]:
         cur = self.connection.cursor()
-        serialized_item = self._get_last_serialized_item(cur)
+        serialized_item = self._database_driver._get_last_serialized_item(cur)
         if serialized_item is None:
             raise KeyError("popitem(): dictionary is empty")
-        self._delete_single_record_by_serialized_key(cur, serialized_item[0])
+        self._database_driver._delete_single_record_by_serialized_key(cur, serialized_item[0])
         self.connection.commit()
         return (
             self.deserialize_key(serialized_item[0]),
@@ -265,18 +271,18 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def update(self, __other: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: VT) -> None:
         cur = self.connection.cursor()
         for k, v in chain(dict({} if __other is None else __other).items(), cast(Mapping[KT, VT], kwargs).items()):
-            self._upsert(cur, self.serialize_key(k), self.serialize(v))
+            self._database_driver._upsert(cur, self.serialize_key(k), self.serialize(v))
         self.connection.commit()
 
     def clear(self) -> None:
         cur = self.connection.cursor()
-        self._delete_all_records(cur)
+        self._database_driver._delete_all_records(cur)
         self.connection.commit()
 
     def __contains__(self, o: object) -> bool:
         if not self._is_hashable(o):
             raise TypeError(f"unhashable type: {type(o).__name__}")
-        return self._is_serialized_key_in(self.connection.cursor(), self.serialize_key(cast(KT, o)))
+        return self._database_driver._is_serialized_key_in(self.connection.cursor(), self.serialize_key(cast(KT, o)))
 
     @overload
     def get(self, key: KT) -> Union[VT, None]:
@@ -289,7 +295,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def get(self, key: KT, default_value: Optional[Union[VT, object]] = None) -> Union[VT, None, object]:
         serialized_key = self.serialize_key(key)
         cur = self.connection.cursor()
-        serialized_value = self._get_serialized_value_by_serialized_key(cur, serialized_key)
+        serialized_value = self._database_driver._get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             return default_value
         return self.deserialize(serialized_value)
