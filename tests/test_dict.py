@@ -29,11 +29,16 @@ class DictTestCase(SqlTestCase):
             expected,
         )
 
+    @patch("sqlitecollections.Dict.table_name", return_value="items")
     @patch("sqlitecollections.Dict._initialize", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
     def test_init(
-        self, SqliteCollectionBase_del: MagicMock, SqliteCollectionBase_init: MagicMock, _initialize: MagicMock
+        self,
+        SqliteCollectionBase_del: MagicMock,
+        SqliteCollectionBase_init: MagicMock,
+        _initialize: MagicMock,
+        _table_name: MagicMock,
     ) -> None:
         memory_db = sqlite3.connect(":memory:")
         table_name = "items"

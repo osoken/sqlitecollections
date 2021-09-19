@@ -19,6 +19,10 @@ class RebuildStrategy(Enum):
     SKIP = 3
 
 
+def sanitize_table_name(table_name: str) -> str:
+    return "".join(c for c in table_name if c.isalnum() or c == "_")
+
+
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     def __init__(
         self,
@@ -46,7 +50,9 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
                 f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
             )
         self._table_name = (
-            f"{self.container_type_name}_{str(uuid4()).replace('-', '')}" if table_name is None else table_name
+            sanitize_table_name(f"{self.container_type_name}_{str(uuid4()).replace('-', '')}")
+            if table_name is None
+            else sanitize_table_name(table_name)
         )
         if do_initialize:
             self._initialize(commit=True)
@@ -106,7 +112,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
 
     @property
     def table_name(self) -> str:
-        return "".join(c for c in self._table_name if c.isalnum() or c == "_")
+        return self._table_name
 
     @property
     def connection(self) -> sqlite3.Connection:
