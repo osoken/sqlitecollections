@@ -5,7 +5,7 @@ from typing import AbstractSet, Any, Callable, Optional, Union, cast
 from uuid import uuid4
 
 from . import RebuildStrategy
-from .base import _S, _T, SqliteCollectionBase, T
+from .base import _S, _T, SqliteCollectionBase, T, TemporaryTableContext
 
 if sys.version_info >= (3, 9):
     from collections.abc import Iterable, Iterator, MutableSet
@@ -20,12 +20,15 @@ class _SetDatabaseDriver:
     def _delete_all(self, cur: sqlite3.Cursor) -> None:
         cur.execute(f"DELETE FROM {self.table_name}")
 
+    def _insert(self, cur: sqlite3.Cursor, serialized_value: bytes) -> None:
+        cur.execute(
+            f"INSERT INTO {self.table_name} (serialized_value) VALUES (?)",
+            (serialized_value,),
+        )
+
     def _upsert(self, cur: sqlite3.Cursor, serialized_value: bytes) -> None:
         if not self._is_serialized_value_in(cur, serialized_value):
-            cur.execute(
-                f"INSERT INTO {self.table_name} (serialized_value) VALUES (?)",
-                (serialized_value,),
-            )
+            self._insert(cur, serialized_value)
 
     def _delete_by_serialized_value(self, cur: sqlite3.Cursor, serialized_value: bytes) -> None:
         cur.execute(f"DELETE FROM {self.table_name} WHERE serialized_value = ?", (serialized_value,))
@@ -50,6 +53,36 @@ class _SetDatabaseDriver:
         cur.execute(f"SELECT serialized_value FROM {self.table_name}")
         for d in cur:
             yield cast(bytes, d[0])
+
+    def _intersection_update_single(self, cur: sqlite3.Cursor, data: Iterable[bytes]) -> None:
+        with TemporaryTableContext(cur, self.table_name) as temp_table_name:
+            temporay_driver = _SetDatabaseDriver(temp_table_name)
+            for d in data:
+                temporay_driver._upsert(cur, d)
+            cur.execute(
+                f"DELETE FROM {self.table_name} WHERE NOT EXISTS (SELECT serialized_value FROM {temp_table_name} WHERE {self.table_name}.serialized_value = {temp_table_name}.serialized_value)"
+            )
+
+    def _difference_update_single(self, cur: sqlite3.Cursor, data: Iterable[bytes]) -> None:
+        for d in data:
+            self._delete_by_serialized_value(cur, d)
+
+    def _union_update_single(self, cur: sqlite3.Cursor, data: Iterable[bytes]) -> None:
+        for d in data:
+            self._upsert(cur, d)
+
+    def _symmetric_difference_update_single(
+        self, cur: sqlite3.Cursor, cur2: sqlite3.Cursor, data: Iterable[bytes]
+    ) -> None:
+        with TemporaryTableContext(cur, self.table_name) as temp_table_name:
+            temporay_driver = _SetDatabaseDriver(temp_table_name)
+            for d in data:
+                temporay_driver._upsert(cur, d)
+            for serialized_value in temporay_driver._get_serialized_values(cur2):
+                if self._is_serialized_value_in(cur, serialized_value):
+                    self._delete_by_serialized_value(cur, serialized_value)
+                else:
+                    self._insert(cur, serialized_value)
 
 
 class Set(SqliteCollectionBase[T], MutableSet[T]):
@@ -174,29 +207,16 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def issubset(self, other: Iterable[T]) -> bool:
         return len(self) == len(self.intersection(other))
 
-    def _intersection_single(self, other: Iterable[T]) -> "Set[T]":
-        res = self._create_volatile_copy([])
-        for d in other:
-            if d in self:
-                res.add(d)
-        return res
-
     def intersection(self, *others: Iterable[T]) -> "Set[T]":
         res = self.copy()
         res.intersection_update(*others)
         return res
 
     def intersection_update(self, *others: Iterable[T]) -> None:
-        for other in others:
-            self._intersection_update_single(other)
-        self.connection.commit()
-
-    def _intersection_update_single(self, other: Iterable[T]) -> None:
-        buf = self._create_volatile_copy(other)
         cur = self.connection.cursor()
-        cur.execute(
-            f"DELETE FROM {self.table_name} WHERE NOT EXISTS (SELECT serialized_value FROM {buf.table_name} WHERE {self.table_name}.serialized_value = {buf.table_name}.serialized_value)"
-        )
+        for other in others:
+            self._database_driver._intersection_update_single(cur, (self.serialize(d) for d in other))
+        self.connection.commit()
 
     def issuperset(self, other: Iterable[T]) -> bool:
         for d in other:
@@ -212,12 +232,8 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def update(self, *others: Iterable[T]) -> None:
         cur = self.connection.cursor()
         for other in others:
-            self._union_update_single(cur, other)
+            self._database_driver._union_update_single(cur, (self.serialize(d) for d in other))
         self.connection.commit()
-
-    def _union_update_single(self, cur: sqlite3.Cursor, other: Iterable[T]) -> None:
-        for d in other:
-            self._database_driver._upsert(cur, self.serialize(d))
 
     @classmethod
     def _from_iterable(cls, *args: T) -> "Set[T]":
@@ -237,12 +253,8 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def difference_update(self, *others: Iterable[T]) -> None:
         cur = self.connection.cursor()
         for other in others:
-            self._difference_update_single(cur, other)
+            self._database_driver._difference_update_single(cur, (self.serialize(d) for d in other))
         self.connection.commit()
-
-    def _difference_update_single(self, cur: sqlite3.Cursor, other: Iterable[T]) -> None:
-        for d in other:
-            self._database_driver._delete_by_serialized_value(cur, self.serialize(d))
 
     def _create_volatile_copy(self, data: Optional[Iterable[T]] = None) -> "Set[T]":
         return Set[T](
@@ -267,18 +279,10 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
 
     def symmetric_difference_update(self, *others: Iterable[T]) -> None:
         cur = self.connection.cursor()
+        cur2 = self.connection.cursor()
         for other in others:
-            self._symmetric_difference_update_single(cur, other)
+            self._database_driver._symmetric_difference_update_single(cur, cur2, (self.serialize(d) for d in other))
         self.connection.commit()
-
-    def _symmetric_difference_update_single(self, cur: sqlite3.Cursor, other: Iterable[T]) -> None:
-        buf = self._create_volatile_copy(other)
-        iter_cursor = buf.connection.cursor()
-        for serialized_value in buf._database_driver._get_serialized_values(iter_cursor):
-            if self._database_driver._is_serialized_value_in(cur, serialized_value):
-                self._database_driver._delete_by_serialized_value(cur, serialized_value)
-            else:
-                self._database_driver._upsert(cur, serialized_value)
 
     def __xor__(self, s: AbstractSet[_T]) -> "Set[T]":
         return self.symmetric_difference(cast(Iterable[T], s))
