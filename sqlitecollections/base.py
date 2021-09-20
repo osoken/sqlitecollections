@@ -1,10 +1,19 @@
 import sqlite3
+import sys
 from abc import ABCMeta, abstractmethod
 from enum import Enum
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
-from typing import Callable, Generic, Optional, TypeVar, Union, cast
+from types import TracebackType
+from typing import Callable, Generic, Optional, Type, TypeVar, Union, cast
 from uuid import uuid4
+
+if sys.version_info >= (3, 9):
+    from contextlib import AbstractContextManager
+
+    ContextManager = AbstractContextManager
+else:
+    from typing import ContextManager
 
 T = TypeVar("T")
 KT = TypeVar("KT")
@@ -21,6 +30,32 @@ class RebuildStrategy(Enum):
 
 def sanitize_table_name(table_name: str) -> str:
     return "".join(c for c in table_name if c.isalnum() or c == "_")
+
+
+def create_random_name(suffix: str) -> str:
+    return f"{suffix}_{str(uuid4()).replace('-', '')}"
+
+
+class TemporaryTableContext(ContextManager[str]):
+    def __init__(self, cur: sqlite3.Cursor, reference_table_name: str):
+        self._cursor = cur
+        self._reference_table_name = reference_table_name
+        self._table_name = create_random_name("tmp")
+
+    def __enter__(self) -> str:
+        self._cursor.execute(
+            f"CREATE TABLE {self._table_name} AS SELECT * FROM {self._reference_table_name} WHERE 0 = 1"
+        )
+        return self._table_name
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        excinst: Optional[BaseException],
+        exctb: Optional[TracebackType],
+    ) -> None:
+        self._cursor.execute(f"DROP TABLE {self._table_name}")
+        return None
 
 
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
@@ -50,7 +85,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
                 f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
             )
         self._table_name = (
-            sanitize_table_name(f"{self.container_type_name}_{str(uuid4()).replace('-', '')}")
+            sanitize_table_name(create_random_name(self.container_type_name))
             if table_name is None
             else sanitize_table_name(table_name)
         )
