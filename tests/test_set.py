@@ -33,9 +33,12 @@ class SetTestCase(SqlTestCase):
     def assert_items_table_only(self, conn: sqlite3.Connection) -> None:
         return self.assert_metadata_state_equals(conn, [("items", "0", "Set")])
 
+    @patch("sqlitecollections.base.SqliteCollectionBase.table_name", return_value="items")
     @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
-    def test_init(self, SqliteCollectionBase_del: MagicMock, SqliteCollectionBase_init: MagicMock) -> None:
+    def test_init(
+        self, SqliteCollectionBase_del: MagicMock, SqliteCollectionBase_init: MagicMock, _table_name: MagicMock
+    ) -> None:
         memory_db = sqlite3.connect(":memory:")
         table_name = "items"
         serializer = MagicMock(spec=Callable[[Hashable], bytes])
