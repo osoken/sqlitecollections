@@ -244,6 +244,26 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def fromkeys(cls, iterable: Iterable[KT], value: Optional[VT]) -> "Dict[KT, VT]":
         raise NotImplementedError
 
+    @overload
+    def pop(self, k: KT) -> VT:
+        ...
+
+    @overload
+    def pop(self, k: KT, default: Union[VT, T] = ...) -> Union[VT, T]:
+        ...
+
+    def pop(self, k: KT, default: Optional[Union[VT, object]] = None) -> Union[VT, object]:
+        cur = self.connection.cursor()
+        serialized_key = self.serialize_key(k)
+        serialized_value = self._database_driver._get_serialized_value_by_serialized_key(cur, serialized_key)
+        if serialized_value is None:
+            if default is None:
+                raise KeyError(k)
+            return default
+        self._database_driver._delete_single_record_by_serialized_key(cur, serialized_key)
+        self.connection.commit()
+        return self.deserialize(serialized_value)
+
     def popitem(self) -> Tuple[KT, VT]:
         cur = self.connection.cursor()
         serialized_item = self._database_driver._get_last_serialized_item(cur)
