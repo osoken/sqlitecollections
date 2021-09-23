@@ -131,6 +131,9 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     def persist(self) -> bool:
         return self._persist
 
+    def set_persist(self, persist: bool) -> None:
+        self._persist = persist
+
     @property
     def serializer(self) -> Callable[[T], bytes]:
         return self._serializer

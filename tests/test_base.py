@@ -282,6 +282,19 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
     @patch.object(ConcreteSqliteCollectionClass, "_rebuild_check_with_first_element", return_value=True)
     @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
+    def test_set_persist(self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1", persist=True)
+        self.assertTrue(sut.persist)
+        sut.set_persist(False)
+        self.assertFalse(sut.persist)
+        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2", persist=False)
+        self.assertFalse(sut.persist)
+        sut.set_persist(True)
+        self.assertTrue(sut.persist)
+
+    @patch.object(ConcreteSqliteCollectionClass, "_rebuild_check_with_first_element", return_value=True)
+    @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
     def test_rebuild_check_with_first_element(
         self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock
     ) -> None:
