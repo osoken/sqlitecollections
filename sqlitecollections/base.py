@@ -1,6 +1,7 @@
 import sqlite3
 import sys
 from abc import ABCMeta, abstractmethod
+from collections.abc import Hashable
 from enum import Enum
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
@@ -34,6 +35,10 @@ def sanitize_table_name(table_name: str) -> str:
 
 def create_random_name(suffix: str) -> str:
     return f"{suffix}_{str(uuid4()).replace('-', '')}"
+
+
+def is_hashable(x: object) -> bool:
+    return isinstance(x, Hashable)
 
 
 class TemporaryTableContext(ContextManager[str]):

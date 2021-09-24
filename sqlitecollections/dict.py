@@ -1,6 +1,5 @@
 import sqlite3
 import sys
-from collections.abc import Hashable
 from itertools import chain
 from typing import Callable, Generic, Optional, Tuple, TypeVar, Union, cast, overload
 
@@ -11,7 +10,7 @@ else:
 if sys.version_info >= (3, 8):
     from typing import Reversible
 
-from .base import RebuildStrategy, SqliteCollectionBase
+from .base import RebuildStrategy, SqliteCollectionBase, is_hashable
 
 T = TypeVar("T")
 KT = TypeVar("KT")
@@ -178,11 +177,8 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         if commit:
             self.connection.commit()
 
-    def _is_hashable(self, key: object) -> bool:
-        return isinstance(key, Hashable)
-
     def serialize_key(self, key: KT) -> bytes:
-        if not self._is_hashable(key):
+        if not is_hashable(key):
             raise TypeError(f"unhashable type: '{type(key).__name__}'")
         return self.key_serializer(key)
 
@@ -300,8 +296,6 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         self.connection.commit()
 
     def __contains__(self, o: object) -> bool:
-        if not self._is_hashable(o):
-            raise TypeError(f"unhashable type: {type(o).__name__}")
         return self._database_driver._is_serialized_key_in(self.connection.cursor(), self.serialize_key(cast(KT, o)))
 
     @overload
