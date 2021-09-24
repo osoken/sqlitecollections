@@ -1,11 +1,10 @@
 import sqlite3
 import sys
-from collections.abc import Hashable
 from typing import AbstractSet, Any, Callable, Optional, Union, cast
 from uuid import uuid4
 
 from . import RebuildStrategy
-from .base import _S, _T, SqliteCollectionBase, T, TemporaryTableContext
+from .base import _S, _T, SqliteCollectionBase, T, TemporaryTableContext, is_hashable
 
 if sys.version_info >= (3, 9):
     from collections.abc import Iterable, Iterator, MutableSet
@@ -160,7 +159,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return serialized_value != self.serialize(value)
 
     def serialize(self, value: T) -> bytes:
-        if not self._is_hashable(value):
+        if not is_hashable(value):
             raise TypeError(f"unhashable type: '{type(value).__name__}'")
         return self.serializer(value)
 
@@ -200,9 +199,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     @property
     def schema_version(self) -> str:
         return "0"
-
-    def _is_hashable(self, value: T) -> bool:
-        return isinstance(value, Hashable)
 
     def issubset(self, other: Iterable[T]) -> bool:
         return len(self) == len(self.intersection(other))
