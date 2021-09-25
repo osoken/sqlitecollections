@@ -80,6 +80,11 @@ class _DictDatabaseDriver:
         cur.execute(f"SELECT serialized_key, serialized_value FROM {self.table_name} ORDER BY item_order DESC LIMIT 1")
         return cast(Tuple[bytes, bytes], cur.fetchone())
 
+    def _get_reversed_serialized_keys(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
+        cur.execute(f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order DESC")
+        for res in cur:
+            yield cast(bytes, res[0])
+
 
 class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def __init__(
@@ -318,18 +323,10 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
 if sys.version_info >= (3, 8):
 
     class _ReversibleDict(_Dict[KT, VT], Reversible[KT]):
-        def _get_reversed_serialized_keys(self, cur: sqlite3.Cursor) -> Iterable[bytes]:
-            cur.execute(f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order DESC")
-            for res in cur:
-                yield cast(bytes, res[0])
-
-        def reversed_keys(self) -> Iterator[KT]:
-            cur = self.connection.cursor()
-            for serialized_key in self._get_reversed_serialized_keys(cur):
-                yield self.deserialize_key(serialized_key)
-
         def __reversed__(self) -> Iterator[KT]:
-            return self.reversed_keys()
+            cur = self.connection.cursor()
+            for serialized_key in self._database_driver._get_reversed_serialized_keys(cur):
+                yield self.deserialize_key(serialized_key)
 
 
 if sys.version_info >= (3, 9):
