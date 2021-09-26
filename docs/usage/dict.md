@@ -229,13 +229,14 @@ If `key` is in the dictionary, return its value. If not, insert `key` with a val
 
 ---
 
-## `update([other])`
+## `update([other, **kwargs])`
 
 Update the dictionary with the key-value pairs from `other`, overwriting existing keys.
 
 ### Arguments:
 
 - `other`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`, optional; Key-value pairs to be added
+- `kwargs`: `VT`, optional; values to be added
 
 ### Return value:
 
