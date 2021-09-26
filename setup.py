@@ -10,7 +10,7 @@ from sqlitecollections import (
     __version__,
 )
 
-with open(os.path.join(os.dirname(os.path.abspath(__file__)), "README.md"), "r") as fin:
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "README.md"), "r") as fin:
     __long_description__ = fin.read()
 
 setup(
