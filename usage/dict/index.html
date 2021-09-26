@@ -745,11 +745,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#updateother" class="md-nav__link">
-    update([other])
+  <a href="#updateother-kwargs" class="md-nav__link">
+    update([other, **kwargs])
   </a>
   
-    <nav class="md-nav" aria-label="update([other])">
+    <nav class="md-nav" aria-label="update([other, **kwargs])">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1312,11 +1312,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#updateother" class="md-nav__link">
-    update([other])
+  <a href="#updateother-kwargs" class="md-nav__link">
+    update([other, **kwargs])
   </a>
   
-    <nav class="md-nav" aria-label="update([other])">
+    <nav class="md-nav" aria-label="update([other, **kwargs])">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1574,11 +1574,12 @@ If the dictionary is empty, raises a <code>KeyError</code>.</p>
 <h3 id="return-value_15">Return value:</h3>
 <p><code>VT</code>: Item of the dictionary with key <code>key</code> if <code>key</code> is in the dictionary, <code>default</code> otherwise.</p>
 <hr />
-<h2 id="updateother"><code>update([other])</code></h2>
+<h2 id="updateother-kwargs"><code>update([other, **kwargs])</code></h2>
 <p>Update the dictionary with the key-value pairs from <code>other</code>, overwriting existing keys.</p>
 <h3 id="arguments_9">Arguments:</h3>
 <ul>
 <li><code>other</code>: <code>Mapping[KT, VT]</code> or <code>Iterable[Tuple[KT, VT]]</code>, optional; Key-value pairs to be added</li>
+<li><code>kwargs</code>: <code>VT</code>, optional; values to be added</li>
 </ul>
 <h3 id="return-value_16">Return value:</h3>
 <p><code>None</code></p>
