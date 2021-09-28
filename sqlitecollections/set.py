@@ -3,13 +3,13 @@ import sys
 from typing import AbstractSet, Any, Callable, Optional, Union, cast
 from uuid import uuid4
 
-from . import RebuildStrategy
-from .base import _S, _T, SqliteCollectionBase, T, TemporaryTableContext, is_hashable
-
 if sys.version_info >= (3, 9):
     from collections.abc import Iterable, Iterator, MutableSet
 else:
     from typing import Iterable, Iterator, MutableSet
+
+from . import RebuildStrategy
+from .base import _S, _T, SqliteCollectionBase, T, TemporaryTableContext, is_hashable
 
 
 class _SetDatabaseDriver:

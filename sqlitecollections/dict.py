@@ -1,7 +1,7 @@
 import sqlite3
 import sys
 from itertools import chain
-from typing import Callable, Generic, Optional, Tuple, TypeVar, Union, cast, overload
+from typing import Callable, Generic, Optional, Tuple, Union, cast, overload
 
 if sys.version_info >= (3, 9):
     from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Reversible
@@ -10,11 +10,8 @@ else:
 if sys.version_info >= (3, 8):
     from typing import Reversible
 
-from .base import RebuildStrategy, SqliteCollectionBase, is_hashable
-
-T = TypeVar("T")
-KT = TypeVar("KT")
-VT = TypeVar("VT")
+from . import RebuildStrategy
+from .base import KT, VT, SqliteCollectionBase, T, is_hashable
 
 
 class _DictDatabaseDriver:

@@ -1,21 +1,18 @@
-import enum
 import pickle
 import sqlite3
 import sys
 from itertools import product
-from unittest import TestCase
+from typing import Any, Tuple, Union
 from unittest.mock import MagicMock, patch
-
-from sqlitecollections import List, RebuildStrategy
 
 if sys.version_info > (3, 9):
     from collections.abc import Callable, Iterable, Sequence
 else:
     from typing import Callable, Sequence, Iterable
 
-from typing import Any, Tuple, Union
-
 from test_base import SqlTestCase
+
+from sqlitecollections import List, RebuildStrategy
 
 
 class ListTestCase(SqlTestCase):
