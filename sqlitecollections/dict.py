@@ -58,6 +58,23 @@ class _DictDatabaseDriver:
         for res in cur:
             yield cast(bytes, res[0])
 
+    def _insert_serialized_value_by_serialized_key(
+        self, cur: sqlite3.Cursor, serialized_key: bytes, serialized_value: bytes
+    ) -> None:
+        item_order = self._get_next_order(cur)
+        cur.execute(
+            f"INSERT INTO {self.table_name} (serialized_key, serialized_value, item_order) VALUES (?, ?, ?)",
+            (serialized_key, serialized_value, item_order),
+        )
+
+    def _update_serialized_value_by_serialized_key(
+        self, cur: sqlite3.Cursor, serialized_key: bytes, serialized_value: bytes
+    ) -> None:
+        cur.execute(
+            f"UPDATE {self.table_name} SET serialized_value=? WHERE serialized_key=?",
+            (serialized_value, serialized_key),
+        )
+
     def _upsert(
         self,
         cur: sqlite3.Cursor,
@@ -65,16 +82,9 @@ class _DictDatabaseDriver:
         serialized_value: bytes,
     ) -> None:
         if self._is_serialized_key_in(cur, serialized_key):
-            cur.execute(
-                f"UPDATE {self.table_name} SET serialized_value=? WHERE serialized_key=?",
-                (serialized_value, serialized_key),
-            )
+            self._update_serialized_value_by_serialized_key(cur, serialized_key, serialized_value)
         else:
-            item_order = self._get_next_order(cur)
-            cur.execute(
-                f"INSERT INTO {self.table_name} (serialized_key, serialized_value, item_order) VALUES (?, ?, ?)",
-                (serialized_key, serialized_value, item_order),
-            )
+            self._insert_serialized_value_by_serialized_key(cur, serialized_key, serialized_value)
 
     def _get_last_serialized_item(self, cur: sqlite3.Cursor) -> Tuple[bytes, bytes]:
         cur.execute(f"SELECT serialized_key, serialized_value FROM {self.table_name} ORDER BY item_order DESC LIMIT 1")
@@ -317,6 +327,17 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         serialized_value = self._database_driver._get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             return default_value
+        return self.deserialize(serialized_value)
+
+    def setdefault(self, key: KT, default: VT = None) -> VT:  # type: ignore
+        serialized_key = self.serialize_key(key)
+        cur = self.connection.cursor()
+        serialized_value = self._database_driver._get_serialized_value_by_serialized_key(cur, serialized_key)
+        if serialized_value is None:
+            self._database_driver._insert_serialized_value_by_serialized_key(
+                cur, serialized_key, self.serialize(default)
+            )
+            return default
         return self.deserialize(serialized_value)
 
 
