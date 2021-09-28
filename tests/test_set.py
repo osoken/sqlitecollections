@@ -5,14 +5,12 @@ from collections.abc import Hashable
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-from test_base import SqlTestCase
-
-from sqlitecollections import RebuildStrategy
-
 if sys.version_info > (3, 9):
     from collections.abc import Callable
 else:
     from typing import Callable
+
+from test_base import SqlTestCase
 
 from sqlitecollections import RebuildStrategy, Set
 

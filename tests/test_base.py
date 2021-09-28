@@ -1,5 +1,4 @@
 import os
-import pickle
 import re
 import sqlite3
 import sys
@@ -10,9 +9,9 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 if sys.version_info > (3, 9):
-    from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
+    from collections.abc import Callable
 else:
-    from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
+    from typing import Callable
 
 from sqlitecollections import base
 
