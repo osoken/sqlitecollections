@@ -19,3 +19,90 @@ Constructor.
 - `persist`: `bool`, optional, default=`True`; If `True`, table won't be deleted even when the object is deleted. If `False`, the table is deleted when this object is deleted.
 - `rebuild_strategy`: `RebuildStrategy`, optional, default=`RebuildStrategy.CHECK_WITH_FIRST_ELEMENT`; Rebuild strategy.
 - `data`: `Iterable[T]`, optional, defualt=`None`; Initial data.
+
+---
+
+## `x in s`
+
+`True` if an item of `s` is equal to `x`, else `False`
+
+### Arguments:
+
+- `x`: `object`; an object to be checked
+
+### Return value:
+
+`bool`: `True` if `x` is in `s` and `False` otherwise.
+
+---
+
+## `x not in s`
+
+`False` if an item of `s` is equal to `x`, else `True`
+
+### Arguments:
+
+- `x`: `object`; an object to be checked
+
+### Return value:
+
+`bool`: `False` if `x` is in `s` and `True` otherwise.
+
+---
+
+## `s + t`
+
+The concatenation of `s` and `t`
+
+### Arguments:
+
+- `t`: `Iterable[T]`; an iterable to be concatenated
+
+### Return value:
+
+`List[T]`: the concatenation of `s` and `t`
+
+---
+
+## `s * n` or `n * s`
+
+equivalent to adding `s` to itself `n` times
+
+### Arguments:
+
+- `n`: `int`; number of times to repeat.
+
+### Return value:
+
+`List[T]`: a list of `n` times `s` was repeated
+
+---
+
+## `s[i]`
+
+`i`-th item of `s`, origin `0`
+
+### Arguments:
+
+- `i`: `int`; item index. If it is negative, it is equivalent to `len(s) + i`
+
+### Return value:
+
+`T`: `i`-th item of `s`, origin `0`
+
+---
+
+## `s[i:j]`
+
+Slice of `s` from `i` to `j`
+
+### Arguments:
+
+- `i`: `int` of `None`; item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int`; item index where the slice stops at. If `None`, it is treated as `len(s)`.
+
+### Return value:
+
+`List[T]`: Slice of `s` from `i` to `j`.
+
+---
