@@ -98,11 +98,27 @@ Slice of `s` from `i` to `j`
 
 ### Arguments:
 
-- `i`: `int` of `None`; item index where the slice starts from. If `None`, it is treated as `0`.
-- `j`: `int`; item index where the slice stops at. If `None`, it is treated as `len(s)`.
+- `i`: `int` or `None`; item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int` or `None`; item index where the slice stops at. If `None`, it is treated as `len(s)`.
 
 ### Return value:
 
 `List[T]`: Slice of `s` from `i` to `j`.
+
+---
+
+## `s[i:j:k]`
+
+Slice of `s` from `i` to `j` with step `k`
+
+### Arguments:
+
+- `i`: `int` or `None`; item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int` or `None`; item index where the slice stops at. If `None`, it is treated as `len(s)`.
+- `k`: `int` or `None`; step of the slice. If `None`, it is treated as `1`.
+
+### Return value:
+
+`List[T]`: Slice of `s` from `i` to `j` with step `k`.
 
 ---
