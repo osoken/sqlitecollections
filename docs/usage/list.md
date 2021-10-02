@@ -122,3 +122,13 @@ Slice of `s` from `i` to `j` with step `k`
 `List[T]`: Slice of `s` from `i` to `j` with step `k`.
 
 ---
+
+## `len(s)`
+
+Return the number of items in `s: List[T]`
+
+### Return value:
+
+`int`: The number of items in `s`
+
+---
