@@ -132,3 +132,20 @@ Return the number of items in `s: List[T]`
 `int`: The number of items in `s`
 
 ---
+
+## `index(x[, i[, j]]])`
+
+Return index of the first occurrence of `x` in the list (at or after index `i` and before index `j`).
+Raise `ValueError` if `x` is not in the list.
+
+### Arguments:
+
+- `x`: `T`; Value to retrieve corresponding index if exists.
+- `i`: `int`, optional, default=`None`; First index to look up the value. If it is `None`, start from the first element of the list.
+- `j`: `int`, optional, default=`None`; Index before the last one to look for a value. If `None`, search to the end.
+
+### Return value:
+
+`int`: Index of the first occurrence of `x` in the list.
+
+---
