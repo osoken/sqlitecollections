@@ -149,3 +149,17 @@ Raise `ValueError` if `x` is not in the list.
 `int`: Index of the first occurrence of `x` in the list.
 
 ---
+
+## `count(x)`
+
+Return total number of occurrences of `x` in the list.
+
+### Arguments:
+
+- `x`: `T`; Value that counts the number of occurrences.
+
+### Return value:
+
+`int`: The number of occurrences of `x` in the list.
+
+---
