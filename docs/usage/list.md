@@ -280,3 +280,13 @@ Remove all items from the list.
 `None`.
 
 ---
+
+## `copy()`
+
+Return a copy of the list. The actual behavior is to create a table with a unique table name and copy the items to the new table. Therefore, unlike the built-in list copy, the behavior is similar to deep copy. Be aware that the copied list is volatile.
+
+### Return value:
+
+`List[T]`: A volatile copy of the list.
+
+---
