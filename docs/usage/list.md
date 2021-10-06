@@ -56,50 +56,50 @@ The concatenation of `s` and `t`
 
 ### Arguments:
 
-- `t`: `Iterable[T]`; an iterable to be concatenated
+- `t`: `Iterable[T]`; An iterable to be concatenated.
 
 ### Return value:
 
-`List[T]`: the concatenation of `s` and `t`
+`List[T]`: The concatenation of `s` and `t`.
 
 ---
 
 ## `s * n` or `n * s`
 
-equivalent to adding `s` to itself `n` times
+equivalent to adding `s` to itself `n` times.
 
 ### Arguments:
 
-- `n`: `int`; number of times to repeat.
+- `n`: `int`; Number of times to repeat.
 
 ### Return value:
 
-`List[T]`: a list of `n` times `s` was repeated
+`List[T]`: a list of `n` times `s` was repeated.
 
 ---
 
 ## `s[i]`
 
-`i`-th item of `s`, origin `0`
+`i`-th item of `s`, origin `0`.
 
 ### Arguments:
 
-- `i`: `int`; item index. If it is negative, it is equivalent to `len(s) + i`
+- `i`: `int`; Item index. If it is negative, it is equivalent to `len(s) + i`.
 
 ### Return value:
 
-`T`: `i`-th item of `s`, origin `0`
+`T`: `i`-th item of `s`, origin `0`.
 
 ---
 
 ## `s[i:j]`
 
-Slice of `s` from `i` to `j`
+Slice of `s` from `i` to `j`.
 
 ### Arguments:
 
-- `i`: `int` or `None`; item index where the slice starts from. If `None`, it is treated as `0`.
-- `j`: `int` or `None`; item index where the slice stops at. If `None`, it is treated as `len(s)`.
+- `i`: `int` or `None`; Item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int` or `None`; Item index where the slice stops at. If `None`, it is treated as `len(s)`.
 
 ### Return value:
 
@@ -113,9 +113,9 @@ Slice of `s` from `i` to `j` with step `k`
 
 ### Arguments:
 
-- `i`: `int` or `None`; item index where the slice starts from. If `None`, it is treated as `0`.
-- `j`: `int` or `None`; item index where the slice stops at. If `None`, it is treated as `len(s)`.
-- `k`: `int` or `None`; step of the slice. If `None`, it is treated as `1`.
+- `i`: `int` or `None`; Item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int` or `None`; Item index where the slice stops at. If `None`, it is treated as `len(s)`.
+- `k`: `int` or `None`; Step of the slice. If `None`, it is treated as `1`.
 
 ### Return value:
 
@@ -161,5 +161,98 @@ Return total number of occurrences of `x` in the list.
 ### Return value:
 
 `int`: The number of occurrences of `x` in the list.
+
+---
+
+## `s[i] = x`
+
+Replace item `i` of `s` by `x`.
+
+### Arguments:
+
+- `i`: `int`; Item index to be set. If it is negative, it is equivalent to `len(s) + i`
+- `x`: `T`; Value to be set.
+
+### Return value:
+
+`None`.
+
+---
+
+## `del s[i]`
+
+Remove item `i` of `s`.
+
+### Arguments:
+
+- `i`: `int`; Item index to be removed. If it is negative, it is equivalent to `len(s) + i`.
+
+### Return value:
+
+`None`.
+
+---
+
+## `s[i:j] = t`
+
+Replace slice of `s` from `i` to `j` by the contents of the iterable `t`.
+
+### Arguments:
+
+- `i`: `int` or `None`; Item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int` or `None`; Item index where the slice stops at. If `None`, it is treated as `len(s)`.
+- `t`: `Iterable[T]`; Iterable to be inserted.
+
+### Return value:
+
+`None`.
+
+---
+
+## `del s[i:j]`
+
+Remove slice of `s` from `i` to `j`.
+
+### Arguments:
+
+- `i`: `int` or `None`; Item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int` or `None`; Item index where the slice stops at. If `None`, it is treated as `len(s)`.
+
+### Return value:
+
+`None`.
+
+---
+
+## `s[i:j:k] = t`
+
+Replace the elements of `s[i:j:k]` by those ofthe iterable `t`. The length must be the same. Otherwise, `ValueError` will be raised.
+
+### Arguments:
+
+- `i`: `int` or `None`; Item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int` or `None`; Item index where the slice stops at. If `None`, it is treated as `len(s)`.
+- `k`: `int` or `None`; Step of the slice. If `None`, it is treated as `1`.
+- `t`: `Iterable[T]`; Iterable to be substituted. The length must be the same as that of the slice.
+
+### Return value:
+
+`None`.
+
+---
+
+## `del s[i:j:k]`
+
+Remove the elements of `s[i:j:k]` from the list.
+
+### Arguments:
+
+- `i`: `int` or `None`; Item index where the slice starts from. If `None`, it is treated as `0`.
+- `j`: `int` or `None`; Item index where the slice stops at. If `None`, it is treated as `len(s)`.
+- `k`: `int` or `None`; Step of the slice. If `None`, it is treated as `1`.
+
+### Return value:
+
+`None`.
 
 ---
