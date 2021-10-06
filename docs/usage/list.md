@@ -332,3 +332,69 @@ Update `s` with its contents repeated `n` times.
 `None`.
 
 ---
+
+## `insert(i, x)`
+
+Insert `x` into the list at the index `i`.
+
+### Arguments:
+
+- `i`: `int`; Index to be inserted.
+- `x`: `T`; Item to be inserted.
+
+### Return value:
+
+`None`.
+
+---
+
+## `pop(i)`
+
+Retrieve the item at `i` and also remove it from s.
+
+### Arguments:
+
+- `i`: `int` or `None`, optional, default=`None`; Index to be retrieved and removed. If it is `None`, it is treated as the last index of the list.
+
+### Return value:
+
+`T`: `i`-th item of `s`, origin `0`.
+
+---
+
+## `remove(x)`
+
+Remove the first item of `s` whose value is equal to `x`.
+
+### Arguments:
+
+- `x`: `T`; Item to be removed.
+
+### Return value:
+
+`None`.
+
+---
+
+## `reverse()`
+
+Reverse the items of the list in place.
+
+### Return value:
+
+`None`.
+
+---
+
+## `sort(reverse, key)`
+
+Sort the items of the list in place. The value of `reverse` can be either `True` or `False`, resulting in descending or ascending order, respectively. `key` specifies a function of one argument that is used to extract a comparison key from each list element.
+
+### Arguments:
+
+- `reverse`: `bool`, optional, default=`False`; By default, the order is ascending, but if this value is `True`, the order will be descending.
+- `key`: `Callable[[T], Any]`, optional, default=`None`; Function to extract a comparison key from each list element.
+
+### Return value:
+
+`None`.
