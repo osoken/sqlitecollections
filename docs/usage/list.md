@@ -290,3 +290,45 @@ Return a copy of the list. The actual behavior is to create a table with a uniqu
 `List[T]`: A volatile copy of the list.
 
 ---
+
+## `extend(t)`
+
+Concatenate the list and `t`.
+
+### Arguments:
+
+- `t`: `Iterable[T]`; An iterable to be concatenated.
+
+### Return value:
+
+`None`.
+
+---
+
+## `s += t`
+
+Concatenate `s` and `t`.
+
+### Arguments:
+
+- `t`: `Iterable[T]`; An iterable to be concatenated.
+
+### Return value:
+
+`None`.
+
+---
+
+## `s *= n`
+
+Update `s` with its contents repeated `n` times.
+
+### Arguments:
+
+- `n`: `int`; Number of times to repeat.
+
+### Return value:
+
+`None`.
+
+---
