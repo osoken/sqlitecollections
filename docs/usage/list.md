@@ -256,3 +256,27 @@ Remove the elements of `s[i:j:k]` from the list.
 `None`.
 
 ---
+
+## `append(x)`
+
+Append `x` to the end of the sequence.
+
+### Arguments:
+
+- `x`: `T`; Item to be appended.
+
+### Return value;
+
+`None`.
+
+---
+
+## `clear()`
+
+Remove all items from the list.
+
+### Return value:
+
+`None`.
+
+---
