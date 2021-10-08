@@ -6,7 +6,7 @@ on:
       - "v*"
 
 jobs:
-  build-release:
+  update-version-and-commit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -30,6 +30,18 @@ jobs:
           git commit -am "build: renew version ${{ steps.get_version.outputs.VERSION }}"
           git push origin HEAD:main
 
+  build-and-release:
+    needs: update-version-and-commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Pull code
+        run: |
+          git fetch
+          git checkout main
+
       - name: Set up python
         uses: actions/setup-python@v2
         with:
@@ -42,3 +54,29 @@ jobs:
         env:
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
         run: tox -e build-release
+
+  build-docs-and-release:
+    needs: update-version-and-commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Setup git config
+        run: |
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git fetch
+          git checkout main
+
+      - name: Build and release
+        run: tox -e docs-release
