@@ -449,3 +449,14 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         buf.sort(key=lambda x: x[0], reverse=reverse)  # type: ignore
         self._database_driver._remap_index(cur, [i[1] for i in buf])
         self.connection.commit()
+
+    def remove(self, value: T) -> None:
+        cur = self.connection.cursor()
+        cur2 = self.connection.cursor()
+        index = self._database_driver._get_index_by_serialized_value(cur, self.serialize(value))
+        if index == -1:
+            raise ValueError(f"'{value}' is not in list")
+        self._database_driver._delete_record_by_index(cur, index)
+        self._database_driver._tidy_indices(cur, cur2, index)
+        self.connection.commit()
+        return None
