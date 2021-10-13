@@ -19,3 +19,15 @@ Constructor.
 - `persist`: `bool`, optional, default=`True`; If `True`, table won't be deleted even when the object is deleted. If `False`, the table is deleted when this object is deleted.
 - `rebuild_strategy`: `RebuildStrategy`, optional, default=`RebuildStrategy.CHECK_WITH_FIRST_ELEMENT`; Rebuild strategy.
 - `data`: `Iterable[T]`, optional, defualt=`None`; Initial data.
+
+---
+
+## `len(s)`
+
+Return the number of items in `s: Set[T]`
+
+### Return value:
+
+`int`: The number of items in `s`
+
+---
