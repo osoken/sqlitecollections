@@ -31,3 +31,31 @@ Return the number of items in `s: Set[T]`
 `int`: The number of items in `s`
 
 ---
+
+## `x in s`
+
+`True` if `x` is in `s`, else `False`
+
+### Arguments:
+
+- `x`: `object`; an object to be checked
+
+### Return value:
+
+`bool`: `True` if `x` is in `s` and `False` otherwise.
+
+---
+
+## `x not in s`
+
+`False` if `x` is in `s`, else `True`
+
+### Arguments:
+
+- `x`: `object`; an object to be checked
+
+### Return value:
+
+`bool`: `False` if `x` is in `s` and `True` otherwise.
+
+---
