@@ -72,14 +72,46 @@ Return `True` if the set has no elements in common with `other`.
 
 `bool`: `True` if the set is disjoint with `other`, `False` otherwise.
 
+---
+
 ## `issubset(other)`
 
 Return `True` if every element in the set is in `other`.
 
 ### Arguments:
 
-- `other`: `Iterable[T]`; iterable to check if this one contains the set.
+- `other`: `Iterable[T]`; Iterable to check if this one contains the set.
 
 ### Return value:
 
-`bool`: `True` if the set is subset of `other`, `False` othersise.
+`bool`: `True` if the set is subset of `other`, `False` otherwise.
+
+---
+
+## `s <= other`
+
+Return `True` if every element in the set is in `other`.
+
+### Argument:
+
+- `other` : `Iterable[T]`; Iterable to check if this one contains all the elements in the set.
+
+### Return value:
+
+`bool`: `True` if the set is subset of `other`, `False` otherwise.
+
+---
+
+## `s < other`
+
+Return `True` if every element in the set is in `other` and `s` is not equal to `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to check if it contains all elements of the set and is not equal to the set.
+
+### Return value:
+
+`bool`: `True` if the set is a proper subset of `other`, `False` otherwise.
+
+---
