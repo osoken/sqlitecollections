@@ -59,3 +59,27 @@ Return the number of items in `s: Set[T]`
 `bool`: `False` if `x` is in `s` and `True` otherwise.
 
 ---
+
+## `isdisjoint(other)`
+
+Return `True` if the set has no elements in common with `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to check if disjoint.
+
+### Return value:
+
+`bool`: `True` if the set is disjoint with `other`, `False` otherwise.
+
+## `issubset(other)`
+
+Return `True` if every element in the set is in `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; iterable to check if this one contains the set.
+
+### Return value:
+
+`bool`: `True` if the set is subset of `other`, `False` othersise.
