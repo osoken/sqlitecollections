@@ -115,3 +115,45 @@ Return `True` if every element in the set is in `other` and `s` is not equal to 
 `bool`: `True` if the set is a proper subset of `other`, `False` otherwise.
 
 ---
+
+## `issuperset(other)`
+
+Return `True` if every element in `other` is in the set.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to check if the elements are contained.
+
+### Return value:
+
+`bool`: `True` if the set is superset of `other`, `False` otherwise.
+
+---
+
+## `s >= other`
+
+Return `True` if every element in `other` is in the set.
+
+### Argument:
+
+- `other`: `Iterable[T]`; Iterable to check if the elements are contained.
+
+### Return value:
+
+`bool`: `True` if the set is superset of `other`, `False` otherwise.
+
+---
+
+## `s > other`
+
+Return `True` if every element in `other` is in the set and `s` is not equal to `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to check if it all elements are in the set and is not equal to the set.
+
+### Return value:
+
+`bool`: `True` if the set is a proper superset of `other`, `False` otherwise.
+
+---
