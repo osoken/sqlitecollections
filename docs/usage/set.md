@@ -164,7 +164,7 @@ Return a new set with elements from the set and all `others`.
 
 ### Arguments:
 
-- `others`: `Iterable[T]`; Iterables to take the union set.
+- `others`: `Iterable[T]`; Iterables to take the union.
 
 ### Return value:
 
@@ -174,14 +174,42 @@ Return a new set with elements from the set and all `others`.
 
 ## `s | other`
 
-Return a new set with elements from the set and `other`.
+Return a new set with elements from `s` and `other`.
 
 ### Arguments:
 
-- `other`: `Iterable[T]`; Iterable to take the union set.
+- `other`: `Iterable[T]`; Iterable to take the union.
 
 ### Return value:
 
-`Set[T]`: A new set with elements from the set and `other`.
+`Set[T]`: A new set with elements from `s` and `other`.
+
+---
+
+## `intersection(*others)`
+
+Return a new set with elements common to the set and all `others`.
+
+### Arguments:
+
+- `others`: `Iterable[T]`; Iterables to take the intersection.
+
+### Return value:
+
+`Set[T]`: A new set with elements common to the set and all `others`.
+
+---
+
+## `s & other`
+
+Return a new set with elements common to `s` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the intersection.
+
+### Return value:
+
+`Set[T]`: A new set with elements commont ot `s` and `other`.
 
 ---
