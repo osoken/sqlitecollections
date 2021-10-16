@@ -157,3 +157,31 @@ Return `True` if every element in `other` is in the set and `s` is not equal to 
 `bool`: `True` if the set is a proper superset of `other`, `False` otherwise.
 
 ---
+
+## `union(*others)`
+
+Return a new set with elements from the set and all `others`.
+
+### Arguments:
+
+- `others`: `Iterable[T]`; Iterables to take the union set.
+
+### Return value:
+
+`Set[T]`: A new set with elements from the set and all `others`.
+
+---
+
+## `s | other`
+
+Return a new set with elements from the set and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the union set.
+
+### Return value:
+
+`Set[T]`: A new set with elements from the set and `other`.
+
+---
