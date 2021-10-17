@@ -213,3 +213,31 @@ Return a new set with elements common to `s` and `other`.
 `Set[T]`: A new set with elements commont ot `s` and `other`.
 
 ---
+
+## `difference(*others)`
+
+Return a new set with elements in the set that are not in the `others`.
+
+### Arguments:
+
+- `others`: `Iterable[T]`; Iterables to take the difference.
+
+### Return value:
+
+`Set[T]`: A new set withh elements in the set that are not in the `others`.
+
+---
+
+## `s - other`
+
+Return a new set with elements in the set that are not in the `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the difference.
+
+### Return value:
+
+`Set[T]`: A new set withh elements in the set that are not in the `other`.
+
+---
