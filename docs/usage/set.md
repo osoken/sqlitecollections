@@ -366,3 +366,17 @@ Update the set by keeping only elements found in either the set or `other` but n
 `None`.
 
 ---
+
+## `add(elem)`
+
+Add an element `elem` to the set.
+
+### Arguments:
+
+- `elem`: `T`; An element to be added.
+
+### Return value:
+
+`None`.
+
+---
