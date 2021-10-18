@@ -269,3 +269,16 @@ Return a new set with elements in either the set or `other` but not both.
 `Set[T]`: A new set with elements in enther the set or `other` but not both.
 
 ---
+
+## `copy()`
+
+Return a copy of the set.
+The actual behavior is to create a table with a unique table name and copy the elements to the new table.
+Therefore, unlike the built-in set copy, the behavior is similar to deep copy.
+Be aware that the copied set is volatile.
+
+### Return value:
+
+`Set[T]`: A volatile copy of the set.
+
+---
