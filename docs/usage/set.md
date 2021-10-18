@@ -224,7 +224,7 @@ Return a new set with elements in the set that are not in the `others`.
 
 ### Return value:
 
-`Set[T]`: A new set withh elements in the set that are not in the `others`.
+`Set[T]`: A new set with elements in the set that are not in the `others`.
 
 ---
 
@@ -238,6 +238,6 @@ Return a new set with elements in the set that are not in the `other`.
 
 ### Return value:
 
-`Set[T]`: A new set withh elements in the set that are not in the `other`.
+`Set[T]`: A new set with elements in the set that are not in the `other`.
 
 ---
