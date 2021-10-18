@@ -282,3 +282,31 @@ Be aware that the copied set is volatile.
 `Set[T]`: A volatile copy of the set.
 
 ---
+
+## `update(*others)`
+
+Update the set by adding elements from all `others`.
+
+### Arguments:
+
+- `others`: `Iterable[T]`; Iterables to take the union.
+
+### Return value:
+
+`None`.
+
+---
+
+## `s |= other`
+
+Update the set by adding elements from `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the union.
+
+### Return value:
+
+`None`.
+
+---
