@@ -380,3 +380,31 @@ Add an element `elem` to the set.
 `None`.
 
 ---
+
+## `remove(elem)`
+
+Remove an element `elem` from the set. Raises `KeyError` if `elem` is not contained in the set.
+
+### Arguemnts:
+
+- `elem`: `T`; An element to be removed.
+
+### Return value:
+
+`None`.
+
+---
+
+## `discard(elem)`
+
+Remove an element `elem` from the set if it is present.
+
+### Arguments:
+
+- `elem`: `T`; An element to be removed.
+
+### Return value:
+
+`None`.
+
+---
