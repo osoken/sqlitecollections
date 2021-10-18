@@ -310,3 +310,31 @@ Update the set by adding elements from `other`.
 `None`.
 
 ---
+
+## `intersection_update(*others)`
+
+Update the set by keeping only elements found in the set and all `others`.
+
+### Arguments:
+
+- `others`: `Iterable[T]`; Iterables to take the intersection.
+
+### Return value:
+
+`None`.
+
+---
+
+## `s &= other`
+
+Update the set by keeping only elements found in the set and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the intersection.
+
+### Return value:
+
+`None`.
+
+---
