@@ -241,3 +241,31 @@ Return a new set with elements in the set that are not in the `other`.
 `Set[T]`: A new set with elements in the set that are not in the `other`.
 
 ---
+
+## `symmetric_difference(other)`
+
+Return a new set with elements in either the set or `other` but not both.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the symmetric difference.
+
+### Return value:
+
+`Set[T]`: A new set with elements in enther the set or `other` but not both.
+
+---
+
+## `s ^ other`
+
+Return a new set with elements in either the set or `other` but not both.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the symmetric difference.
+
+### Return value:
+
+`Set[T]`: A new set with elements in enther the set or `other` but not both.
+
+---
