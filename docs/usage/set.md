@@ -408,3 +408,23 @@ Remove an element `elem` from the set if it is present.
 `None`.
 
 ---
+
+## `pop()`
+
+Remove and return an arbitrary element from the set. Raises `KeyError` if the set is empty.
+
+### Return value:
+
+`T`: An element in the set.
+
+---
+
+## `clear()`
+
+Remove all elements from the set.
+
+### Return value:
+
+`None`.
+
+---
