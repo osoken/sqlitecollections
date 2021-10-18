@@ -338,3 +338,31 @@ Update the set by keeping only elements found in the set and `other`.
 `None`.
 
 ---
+
+## `symmetric_difference_update(other)`
+
+Update the set by keeping only elements found in either the set or `other` but not both.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the symmetric difference.
+
+### Return value:
+
+`None`.
+
+---
+
+## `s ^= other`
+
+Update the set by keeping only elements found in either the set or `other` but not both.
+
+### Arguments:
+
+- `other`: `Iterable[T]`; Iterable to take the symmetric difference.
+
+### Return value:
+
+`None`.
+
+---
