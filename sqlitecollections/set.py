@@ -208,6 +208,9 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         l = len(self)
         return l < len(buf) and l == len(self.intersection(buf))
 
+    def __le__(self, other: Iterable[T]) -> bool:
+        return self.issubset(other)
+
     def intersection(self, *others: Iterable[T]) -> "Set[T]":
         res = self.copy()
         res.intersection_update(*others)
