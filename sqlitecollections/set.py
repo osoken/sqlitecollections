@@ -232,8 +232,9 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         self.connection.commit()
 
     def issuperset(self, other: Iterable[T]) -> bool:
+        cur = self.connection.cursor()
         for d in other:
-            if not d in self:
+            if not self._database_driver.is_serialized_value_in(cur, self.serialize(d)):
                 return False
         return True
 
@@ -241,6 +242,9 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return self._database_driver.is_proper_superset(
             self.connection.cursor(), self.connection.cursor(), (self.serialize(d) for d in other)
         )
+
+    def __ge__(self, other: Iterable[T]) -> bool:
+        return self.issuperset(other)
 
     def union(self, *others: Iterable[T]) -> "Set[T]":
         res = self.copy()
