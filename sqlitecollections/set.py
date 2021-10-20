@@ -243,6 +243,9 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             self.connection.cursor(), self.connection.cursor(), (self.serialize(d) for d in other)
         )
 
+    def __ge__(self, other: Iterable[T]) -> bool:
+        return self.issuperset(other)
+
     def union(self, *others: Iterable[T]) -> "Set[T]":
         res = self.copy()
         res.update(*others)
