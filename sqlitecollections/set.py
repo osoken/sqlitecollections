@@ -92,6 +92,17 @@ class _SetDatabaseDriver:
                 temporay_driver.upsert(cur2, d)
             return temporay_driver.get_count(cur2) < self.get_count(cur2)
 
+    def is_proper_subset(self, cur: sqlite3.Cursor, cur2: sqlite3.Cursor, data: Iterable[bytes]) -> bool:
+        is_proper = False
+        with TemporaryTableContext(cur, self.table_name) as temp_table_name:
+            temporary_driver = _SetDatabaseDriver(temp_table_name)
+            for d in data:
+                if not self.is_serialized_value_in(cur2, d):
+                    is_proper = True
+                else:
+                    temporary_driver.upsert(cur2, d)
+            return is_proper and temporary_driver.get_count(cur2) == self.get_count(cur2)
+
 
 class Set(SqliteCollectionBase[T], MutableSet[T]):
     def __init__(
@@ -213,9 +224,9 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         return len(self) == len(self.intersection(other))
 
     def __lt__(self, other: Iterable[T]) -> bool:
-        buf = self._create_volatile_copy(data=other)
-        l = len(self)
-        return l < len(buf) and l == len(self.intersection(buf))
+        return self._database_driver.is_proper_subset(
+            self.connection.cursor(), self.connection.cursor(), (self.serialize(d) for d in other)
+        )
 
     def __le__(self, other: Iterable[T]) -> bool:
         return self.issubset(other)
