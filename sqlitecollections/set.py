@@ -268,6 +268,13 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             self._database_driver.union_update_single(cur, (self.serialize(d) for d in other))
         self.connection.commit()
 
+    def isdisjoint(self, other: Iterable[T]) -> bool:
+        cur = self.connection.cursor()
+        for d in other:
+            if self._database_driver.is_serialized_value_in(cur, self.serialize(d)):
+                return False
+        return True
+
     @classmethod
     def _from_iterable(cls, *args: T) -> "Set[T]":
         raise NotImplementedError
