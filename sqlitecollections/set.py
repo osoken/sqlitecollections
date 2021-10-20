@@ -83,6 +83,15 @@ class _SetDatabaseDriver:
                 else:
                     self.insert(cur, serialized_value)
 
+    def is_proper_superset(self, cur: sqlite3.Cursor, cur2: sqlite3.Cursor, data: Iterable[bytes]) -> bool:
+        with TemporaryTableContext(cur, self.table_name) as temp_table_name:
+            temporay_driver = _SetDatabaseDriver(temp_table_name)
+            for d in data:
+                if not self.is_serialized_value_in(cur2, d):
+                    return False
+                temporay_driver.upsert(cur2, d)
+            return temporay_driver.get_count(cur2) < self.get_count(cur2)
+
 
 class Set(SqliteCollectionBase[T], MutableSet[T]):
     def __init__(
@@ -227,6 +236,11 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             if not d in self:
                 return False
         return True
+
+    def __gt__(self, other: Iterable[T]) -> bool:
+        return self._database_driver.is_proper_superset(
+            self.connection.cursor(), self.connection.cursor(), (self.serialize(d) for d in other)
+        )
 
     def union(self, *others: Iterable[T]) -> "Set[T]":
         res = self.copy()
