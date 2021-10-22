@@ -179,6 +179,11 @@ class _ListDatabaseDriver:
             cur.execute(f"UPDATE {self.table_name} SET item_index = ? WHERE item_index = ?", (idx + 1, idx))
             idx -= 1
 
+    def reverse_indices(self, cur: sqlite3.Cursor) -> None:
+        l = self.get_max_index_plus_one(cur)
+        cur.execute(f"UPDATE {self.table_name} SET item_index = -1 - item_index")
+        cur.execute(f"UPDATE {self.table_name} SET item_index = item_index + ?", (l,))
+
 
 class List(SqliteCollectionBase[T], MutableSequence[T]):
     def __init__(
@@ -446,6 +451,11 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         buf = [(key_(self.deserialize(v)), i) for i, v in enumerate(self._database_driver.iter_serialized_value(cur))]
         buf.sort(key=lambda x: x[0], reverse=reverse)  # type: ignore
         self._database_driver.remap_index(cur, [i[1] for i in buf])
+        self.connection.commit()
+
+    def reverse(self) -> None:
+        cur = self.connection.cursor()
+        self._database_driver.reverse_indices(cur)
         self.connection.commit()
 
     def remove(self, value: T) -> None:
