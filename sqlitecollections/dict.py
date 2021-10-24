@@ -1,6 +1,7 @@
 import sqlite3
 import sys
 from itertools import chain
+from pickle import dumps, loads
 from typing import Callable, Generic, Optional, Tuple, Union, cast, overload
 
 if sys.version_info >= (3, 9):
@@ -106,6 +107,16 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
         data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
     ) -> None:
+        self._key_serializer = (
+            cast(Callable[[KT], bytes], (serializer if serializer is not None else dumps))
+            if key_serializer is None
+            else key_serializer
+        )
+        self._key_deserializer = (
+            cast(Callable[[bytes], KT], (deserializer if deserializer is not None else loads))
+            if key_deserializer is None
+            else key_deserializer
+        )
         super(_Dict, self).__init__(
             connection=connection,
             table_name=table_name,
@@ -113,16 +124,8 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             deserializer=deserializer,
             persist=persist,
             rebuild_strategy=rebuild_strategy,
-            do_initialize=False,
-        )
-        self._key_serializer = (
-            cast(Callable[[KT], bytes], self.serializer) if key_serializer is None else key_serializer
-        )
-        self._key_deserializer = (
-            cast(Callable[[bytes], KT], self.deserializer) if key_deserializer is None else key_deserializer
         )
         self._database_driver = _DictDatabaseDriver(self.table_name)
-        self._initialize(commit=True)
         if data is not None:
             self.clear()
             self.update(data)
@@ -139,7 +142,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def schema_version(self) -> str:
         return "0"
 
-    def _do_create_table(self, commit: bool = False) -> None:
+    def _do_create_table(self) -> None:
         cur = self.connection.cursor()
         cur.execute(
             f"CREATE TABLE {self.table_name} ("
@@ -147,8 +150,6 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             "serialized_value BLOB NOT NULL, "
             "item_order INTEGER PRIMARY KEY)"
         )
-        if commit:
-            self._connection.commit()
 
     def _rebuild_check_with_first_element(self) -> bool:
         cur = self.connection.cursor()
@@ -160,7 +161,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         key = self.deserialize_key(serialized_key)
         return serialized_key != self.serialize_key(key)
 
-    def _do_rebuild(self, commit: bool = False) -> None:
+    def _do_rebuild(self) -> None:
         cur = self.connection.cursor()
         last_order = -1
         while last_order is not None:
@@ -186,8 +187,6 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
                 ),
             )
             last_order = i
-        if commit:
-            self.connection.commit()
 
     def serialize_key(self, key: KT) -> bytes:
         if not is_hashable(key):

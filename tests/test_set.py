@@ -58,7 +58,6 @@ class SetTestCase(SqlTestCase):
             deserializer=deserializer,
             persist=persist,
             rebuild_strategy=rebuild_strategy,
-            do_initialize=True,
         )
 
     def test_initialize(self) -> None:

@@ -203,20 +203,17 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             deserializer=deserializer,
             persist=persist,
             rebuild_strategy=rebuild_strategy,
-            do_initialize=True,
         )
         self._database_driver = _ListDatabaseDriver(self.table_name)
         if data is not None:
             self.clear()
             self.extend(data)
 
-    def _do_create_table(self, commit: bool = False) -> None:
+    def _do_create_table(self) -> None:
         cur = self.connection.cursor()
         cur.execute(f"CREATE TABLE {self.table_name} (serialized_value BLOB, item_index INTEGER PRIMARY KEY)")
-        if commit:
-            self.connection.commit()
 
-    def _do_rebuild(self, commit: bool = False) -> None:
+    def _do_rebuild(self) -> None:
         cur = self.connection.cursor()
         last_index = -1
         while last_index is not None:
@@ -232,8 +229,6 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
                 (self.serialize(self.deserialize(res[0])), res[1]),
             )
             last_index = res[1]
-        if commit:
-            self.connection.commit()
 
     def _rebuild_check_with_first_element(self) -> bool:
         cur = self.connection.cursor()

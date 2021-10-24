@@ -57,14 +57,14 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         def schema_version(self) -> str:
             return "test_0"
 
-        def _do_create_table(self, commit: bool = False) -> None:
+        def _do_create_table(self) -> None:
             cur = self.connection.cursor()
             cur.execute(f"CREATE TABLE {self.table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
 
         def _rebuild_check_with_first_element(self) -> bool:
             return False
 
-        def _do_rebuild(self, commit: bool = False) -> None:
+        def _do_rebuild(self) -> None:
             ...
 
     @patch(
@@ -92,7 +92,6 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         self.assertEqual(sut.serializer, dumps)
         self.assertEqual(sut.deserializer, loads)
         self.assertEqual(sut.persist, True)
-        self.assertEqual(sut.rebuild_strategy, base.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT)
         self.assertEqual(
             sut.table_name,
             "ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
@@ -112,6 +111,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             "SELECT 1 FROM ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
             [],
         )
+        self.assertFalse(hasattr(sut, "rebuild_strategy"))
 
     @patch("sqlitecollections.base.sqlite3.connect")
     def test_init_with_args(self, sqlite3_connect: MagicMock) -> None:
@@ -138,7 +138,6 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             "tablename",
         )
         self.assertEqual(sut.persist, persist)
-        self.assertEqual(sut.rebuild_strategy, rebuild_strategy)
         self.assert_metadata_state_equals(
             memory_db,
             [
@@ -302,7 +301,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             connection=memory_db, table_name="items1", rebuild_strategy=base.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT
         )
         _rebuild_check_with_first_element.assert_called_once_with()
-        _do_rebuild.assert_called_once_with(commit=True)
+        _do_rebuild.assert_called_once_with()
 
     @patch.object(ConcreteSqliteCollectionClass, "_rebuild_check_with_first_element", return_value=True)
     @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
@@ -312,7 +311,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             connection=memory_db, table_name="items1", rebuild_strategy=base.RebuildStrategy.ALWAYS
         )
         _rebuild_check_with_first_element.assert_not_called()
-        _do_rebuild.assert_called_once_with(commit=True)
+        _do_rebuild.assert_called_once_with()
 
     @patch.object(ConcreteSqliteCollectionClass, "_rebuild_check_with_first_element", return_value=True)
     @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
