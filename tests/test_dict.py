@@ -65,7 +65,6 @@ class DictTestCase(SqlTestCase):
             deserializer=deserializer,
             persist=persist,
             rebuild_strategy=rebuild_strategy,
-            do_initialize=False,
         )
         self.assertEqual(sut.key_serializer, key_serializer)
         self.assertEqual(sut.key_deserializer, key_deserializer)

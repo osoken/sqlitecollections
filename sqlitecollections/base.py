@@ -72,13 +72,11 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
-        do_initialize: bool = True,
     ):
         super(SqliteCollectionBase, self).__init__()
         self._serializer = cast(Callable[[T], bytes], dumps) if serializer is None else serializer
         self._deserializer = cast(Callable[[bytes], T], loads) if deserializer is None else deserializer
         self._persist = persist
-        self._rebuild_strategy = rebuild_strategy
         if connection is None:
             self._connection = sqlite3.connect(NamedTemporaryFile().name)
         elif isinstance(connection, str):
@@ -94,8 +92,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             if table_name is None
             else sanitize_table_name(table_name)
         )
-        if do_initialize:
-            self._initialize(commit=True)
+        self._initialize(rebuild_strategy=rebuild_strategy)
 
     def __del__(self) -> None:
         if not self.persist:
@@ -107,16 +104,17 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             cur.execute(f"DROP TABLE {self.table_name}")
             self.connection.commit()
 
-    def _initialize(self, commit: bool = False) -> None:
-        self._initialize_metadata_table(commit=commit)
-        self._initialize_table(commit=commit)
-        if self._should_rebuild():
-            self._do_rebuild(commit=commit)
+    def _initialize(self, rebuild_strategy: RebuildStrategy) -> None:
+        self._initialize_metadata_table()
+        self._initialize_table()
+        if self._should_rebuild(rebuild_strategy):
+            self._do_rebuild()
+        self.connection.commit()
 
-    def _should_rebuild(self) -> bool:
-        if self.rebuild_strategy == RebuildStrategy.ALWAYS:
+    def _should_rebuild(self, rebuild_strategy: RebuildStrategy) -> bool:
+        if rebuild_strategy == RebuildStrategy.ALWAYS:
             return True
-        if self.rebuild_strategy == RebuildStrategy.SKIP:
+        if rebuild_strategy == RebuildStrategy.SKIP:
             return False
         return self._rebuild_check_with_first_element()
 
@@ -125,12 +123,8 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         ...
 
     @abstractmethod
-    def _do_rebuild(self, commit: bool = False) -> None:
+    def _do_rebuild(self) -> None:
         ...
-
-    @property
-    def rebuild_strategy(self) -> RebuildStrategy:
-        return self._rebuild_strategy
 
     @property
     def persist(self) -> bool:
@@ -189,24 +183,20 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             pass
         return False
 
-    def _do_tidy_table_metadata(self, commit: bool = False) -> None:
+    def _do_tidy_table_metadata(self) -> None:
         cur = self.connection.cursor()
         cur.execute(
             "INSERT INTO metadata (table_name, schema_version, container_type) VALUES (?, ?, ?)",
             (self.table_name, self.schema_version, self.container_type_name),
         )
-        if commit:
-            self.connection.commit()
 
-    def _initialize_table(self, commit: bool = False) -> None:
+    def _initialize_table(self) -> None:
         if not self._is_table_initialized():
             self._do_create_table()
             self._do_tidy_table_metadata()
-        if commit:
-            self.connection.commit()
 
     @abstractmethod
-    def _do_create_table(self, commit: bool = False) -> None:
+    def _do_create_table(self) -> None:
         ...
 
     def _is_metadata_table_initialized(self) -> bool:
@@ -218,7 +208,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             pass
         return False
 
-    def _do_initialize_metadata_table(self, commit: bool = False) -> None:
+    def _do_initialize_metadata_table(self) -> None:
         cur = self.connection.cursor()
         cur.execute(
             """
@@ -230,9 +220,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             )
         """
         )
-        if commit:
-            self.connection.commit()
 
-    def _initialize_metadata_table(self, commit: bool = False) -> None:
+    def _initialize_metadata_table(self) -> None:
         if not self._is_metadata_table_initialized():
-            self._do_initialize_metadata_table(commit)
+            self._do_initialize_metadata_table()

@@ -122,7 +122,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             deserializer=deserializer,
             persist=persist,
             rebuild_strategy=rebuild_strategy,
-            do_initialize=True,
         )
         self._database_driver = _SetDatabaseDriver(self.table_name)
         if data is not None:
@@ -143,13 +142,11 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         cur = self.connection.cursor()
         return self._database_driver.get_count(cur)
 
-    def _do_create_table(self, commit: bool = False) -> None:
+    def _do_create_table(self) -> None:
         cur = self.connection.cursor()
         cur.execute(f"CREATE TABLE {self.table_name} (serialized_value BLOB PRIMARY KEY)")
-        if commit:
-            self.connection.commit()
 
-    def _do_rebuild(self, commit: bool = False) -> None:
+    def _do_rebuild(self) -> None:
         cur = self.connection.cursor()
         backup_table_name = f'bk_{self.container_type_name}_{str(uuid4()).replace("-", "")}'
         cur.execute(f"CREATE TABLE {backup_table_name} AS SELECT * FROM {self.table_name}")
@@ -165,8 +162,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             )
             delete_old_records.execute(f"DELETE FROM {backup_table_name} WHERE serialized_value = ?", d)
         cur.execute(f"DROP TABLE {backup_table_name}")
-        if commit:
-            self.connection.commit()
 
     def _rebuild_check_with_first_element(self) -> bool:
         cur = self.connection.cursor()
