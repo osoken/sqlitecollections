@@ -40,6 +40,7 @@ We aim to implement containers that are as compatible as possible with the built
 
 - Normal behavior will be compatible, but in case of errors it may be different.
 - The constructor arguments are not compatible, as they require arguments specific to this package's container, such as sqlite3 DB file paths and serialization methods.
+- `copy` method in each container behaves similarly to deep copy, since it copies the table containing serialized elements.
 - `Dict`'s item order is guaranteed to be insertion order not only for python 3.7 and upper but for all versions.
 - `Dict.fromkeys` class method is not provided.
 - Any member in the container cannot be mutated directly. If you want to mutate any member, mutate it via temporary variable then write it back.
