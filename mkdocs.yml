@@ -29,3 +29,12 @@ markdown_extensions:
 - pymdownx.superfences
 - mdx_include:
     base_path: docs
+
+nav:
+- Overview: index.md
+- install.md
+- Usage:
+  - List: usage/list.md
+  - Dict: usage/dict.md
+  - Set: usage/set.md
+- development.md
