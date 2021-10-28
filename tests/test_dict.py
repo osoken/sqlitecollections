@@ -40,7 +40,7 @@ class DictTestCase(SqlTestCase):
         SqliteCollectionBase_init: MagicMock,
         _initialize: MagicMock,
         _table_name: MagicMock,
-    ):
+    ) -> None:
         def serializer(x: str) -> bytes:
             return x.encode("utf-8")
 
@@ -63,7 +63,7 @@ class DictTestCase(SqlTestCase):
         SqliteCollectionBase_init: MagicMock,
         _initialize: MagicMock,
         _table_name: MagicMock,
-    ):
+    ) -> None:
         def deserializer(x: bytes) -> str:
             return x.decode("utf-8")
 

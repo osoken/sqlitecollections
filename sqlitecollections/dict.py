@@ -244,7 +244,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
         serialized_value = self._database_driver.get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             raise KeyError(key)
-        return self.deserialize(serialized_value)
+        return self.deserialize_value(serialized_value)
 
     def __iter__(self) -> Iterator[KT]:
         cur = self.connection.cursor()
@@ -303,7 +303,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
             return default
         self._database_driver.delete_single_record_by_serialized_key(cur, serialized_key)
         self.connection.commit()
-        return self.deserialize(serialized_value)
+        return self.deserialize_value(serialized_value)
 
     def popitem(self) -> Tuple[KT, VT]:
         cur = self.connection.cursor()
@@ -314,7 +314,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
         self.connection.commit()
         return (
             self.deserialize_key(serialized_item[0]),
-            self.deserialize(serialized_item[1]),
+            self.deserialize_value(serialized_item[1]),
         )
 
     @overload
@@ -357,7 +357,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
         serialized_value = self._database_driver.get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             return default_value
-        return self.deserialize(serialized_value)
+        return self.deserialize_value(serialized_value)
 
     def setdefault(self, key: KT, default: VT = None) -> VT:  # type: ignore
         serialized_key = self.serialize_key(key)
@@ -368,7 +368,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
                 cur, serialized_key, self.serialize_value(default)
             )
             return default
-        return self.deserialize(serialized_value)
+        return self.deserialize_value(serialized_value)
 
 
 if sys.version_info >= (3, 8):
