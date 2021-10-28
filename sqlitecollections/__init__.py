@@ -1,4 +1,4 @@
-__version__ = "0.6.2"
+__version__ = "0.7.0"
 __author__ = "osoken"
 __description__ = "Python collections that are backended by sqlite3 DB and are compatible with the built-in collections"
 __email__ = "osoken.devel@outlook.jp"
