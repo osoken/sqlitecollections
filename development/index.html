@@ -12,7 +12,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.5">
     
     
       
@@ -20,7 +20,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.cdeb8541.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -247,6 +247,97 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        Install
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Usage
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Usage" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/list/" class="md-nav__link">
+        List
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/dict/" class="md-nav__link">
+        Dict
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/set/" class="md-nav__link">
+        Set
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -268,6 +359,8 @@
       </a>
       
         
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -303,111 +396,6 @@
   
 
     
-      
-      
-      
-
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../install/" class="md-nav__link">
-        Install
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
-      
-      
-      
-      
-        <label class="md-nav__link" for="__nav_4">
-          Usage
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <nav class="md-nav" aria-label="Usage" data-md-level="1">
-        <label class="md-nav__title" for="__nav_4">
-          <span class="md-nav__icon md-icon"></span>
-          Usage
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/common/" class="md-nav__link">
-        Common
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/dict/" class="md-nav__link">
-        Dict
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/list/" class="md-nav__link">
-        List
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/set/" class="md-nav__link">
-        Set
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-    
   </ul>
 </nav>
                   </div>
@@ -420,6 +408,8 @@
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
                     
+
+
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
@@ -466,7 +456,7 @@
                 
                 <h1 id="development">Development</h1>
 <h2 id="tests-type-checking-and-linting-locally">Tests, type checking and linting locally</h2>
-<p>To run tests, type checking and linting locally, you'll need to have <strong>python 3.6</strong>, <strong>3.7</strong>, <strong>3.8</strong> and <strong>3.9</strong> installed.
+<p>To run tests, type checking and linting locally, you'll need to have <strong>python 3.6</strong>, <strong>3.7</strong>, <strong>3.8</strong>, <strong>3.9</strong> and <strong>3.10</strong> installed.
 We use <code>tox</code> to run tests and type checking on all the supported python versions.
 You can set up the development environment with the following commands:</p>
 <div class="highlight"><pre><span></span><code>git clone git@github.com:osoken/sqlitecollections.git
@@ -485,6 +475,7 @@ pip install -e .[dev]
   py37: commands succeeded
   py38: commands succeeded
   py39: commands succeeded
+  py310: commands succeeded
   congratulations :)
 </code></pre></div>
 <h2 id="compatibility-policy">Compatibility policy</h2>
@@ -492,6 +483,7 @@ pip install -e .[dev]
 <ul>
 <li>Normal behavior will be compatible, but in case of errors it may be different.</li>
 <li>The constructor arguments are not compatible, as they require arguments specific to this package's container, such as sqlite3 DB file paths and serialization methods.</li>
+<li><code>copy</code> method in each container behaves similarly to deep copy, since it copies the table containing serialized elements.</li>
 <li><code>Dict</code>'s item order is guaranteed to be insertion order not only for python 3.7 and upper but for all versions.</li>
 <li><code>Dict.fromkeys</code> class method is not provided.</li>
 <li>Any member in the container cannot be mutated directly. If you want to mutate any member, mutate it via temporary variable then write it back.</li>
@@ -526,7 +518,7 @@ pip install -e .[dev]
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Overview" rel="prev">
+        <a href="../usage/set/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Set" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -535,26 +527,11 @@ pip install -e .[dev]
               <span class="md-footer__direction">
                 Previous
               </span>
-              Overview
+              Set
             </div>
           </div>
         </a>
       
-      
-        
-        <a href="../install/" class="md-footer__link md-footer__link--next" aria-label="Next: Install" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Install
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-          </div>
-        </a>
       
     </nav>
   
