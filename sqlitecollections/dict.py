@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+import warnings
 from itertools import chain
 from pickle import dumps, loads
 from typing import Callable, Generic, Optional, Tuple, Union, cast, overload
@@ -94,34 +95,53 @@ class _DictDatabaseDriver:
             yield cast(bytes, res[0])
 
 
-class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
+class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
         table_name: Optional[str] = None,
-        serializer: Optional[Callable[[VT], bytes]] = None,
-        deserializer: Optional[Callable[[bytes], VT]] = None,
         key_serializer: Optional[Callable[[KT], bytes]] = None,
         key_deserializer: Optional[Callable[[bytes], KT]] = None,
+        value_serializer: Optional[Callable[[VT], bytes]] = None,
+        value_deserializer: Optional[Callable[[bytes], VT]] = None,
+        serializer: Optional[Callable[[VT], bytes]] = None,
+        deserializer: Optional[Callable[[bytes], VT]] = None,
         persist: bool = True,
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
         data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
     ) -> None:
-        self._key_serializer = (
-            cast(Callable[[KT], bytes], (serializer if serializer is not None else dumps))
-            if key_serializer is None
-            else key_serializer
+        if serializer is not None:
+            warnings.warn(
+                "serializer argument is deprecated. use key_serializer or value_serializer instead",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        self._value_serializer = (
+            value_serializer
+            if value_serializer is not None
+            else serializer
+            if serializer is not None
+            else cast(Callable[[VT], bytes], dumps if key_serializer is None else key_serializer)
         )
-        self._key_deserializer = (
-            cast(Callable[[bytes], KT], (deserializer if deserializer is not None else loads))
-            if key_deserializer is None
-            else key_deserializer
+        if deserializer is not None:
+            warnings.warn(
+                "deserializer argument is deprecated. use key_deserializer or value_deserializer instead",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        self._value_deserializer = (
+            value_deserializer
+            if value_deserializer is not None
+            else deserializer
+            if deserializer is not None
+            else cast(Callable[[bytes], VT], loads if key_deserializer is None else key_deserializer)
         )
+
         super(_Dict, self).__init__(
             connection=connection,
             table_name=table_name,
-            serializer=serializer,
-            deserializer=deserializer,
+            serializer=key_serializer,
+            deserializer=key_deserializer,
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
@@ -132,11 +152,19 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:
-        return self._key_serializer
+        return self._serializer
 
     @property
     def key_deserializer(self) -> Callable[[bytes], KT]:
-        return self._key_deserializer
+        return self._deserializer
+
+    @property
+    def value_serializer(self) -> Callable[[VT], bytes]:
+        return self._value_serializer
+
+    @property
+    def value_deserializer(self) -> Callable[[bytes], VT]:
+        return self._value_deserializer
 
     @property
     def schema_version(self) -> str:
@@ -182,7 +210,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
                 f"UPDATE {self.table_name} SET serialized_key=?, serialized_value=? WHERE item_order=?",
                 (
                     self.serialize_key(self.deserialize_key(serialized_key)),
-                    self.serialize(self.deserialize(serialized_value)),
+                    self.serialize_value(self.deserialize_value(serialized_value)),
                     i,
                 ),
             )
@@ -195,6 +223,12 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
 
     def deserialize_key(self, serialized_key: bytes) -> KT:
         return self.key_deserializer(serialized_key)
+
+    def serialize_value(self, value: VT) -> bytes:
+        return self.value_serializer(value)
+
+    def deserialize_value(self, value: bytes) -> VT:
+        return self.value_deserializer(value)
 
     def __delitem__(self, key: KT) -> None:
         serialized_key = self.serialize_key(key)
@@ -210,7 +244,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         serialized_value = self._database_driver.get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             raise KeyError(key)
-        return self.deserialize(serialized_value)
+        return self.deserialize_value(serialized_value)
 
     def __iter__(self) -> Iterator[KT]:
         cur = self.connection.cursor()
@@ -224,7 +258,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def __setitem__(self, key: KT, value: VT) -> None:
         serialized_key = self.serialize_key(key)
         cur = self.connection.cursor()
-        serialized_value = self.serializer(value)
+        serialized_value = self.serialize_value(value)
         self._database_driver.upsert(cur, serialized_key, serialized_value)
         self.connection.commit()
 
@@ -235,10 +269,10 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
 
         return Dict[KT, VT](
             connection=self.connection,
-            serializer=self.serializer,
-            deserializer=self.deserializer,
             key_serializer=self.key_serializer,
             key_deserializer=self.key_deserializer,
+            value_serializer=self.value_serializer,
+            value_deserializer=self.value_deserializer,
             rebuild_strategy=RebuildStrategy.SKIP,
             persist=False,
             data=(self if data is None else data),
@@ -269,7 +303,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
             return default
         self._database_driver.delete_single_record_by_serialized_key(cur, serialized_key)
         self.connection.commit()
-        return self.deserialize(serialized_value)
+        return self.deserialize_value(serialized_value)
 
     def popitem(self) -> Tuple[KT, VT]:
         cur = self.connection.cursor()
@@ -280,7 +314,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         self.connection.commit()
         return (
             self.deserialize_key(serialized_item[0]),
-            self.deserialize(serialized_item[1]),
+            self.deserialize_value(serialized_item[1]),
         )
 
     @overload
@@ -298,7 +332,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
     def update(self, __other: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: VT) -> None:
         cur = self.connection.cursor()
         for k, v in chain(dict({} if __other is None else __other).items(), cast(Mapping[KT, VT], kwargs).items()):
-            self._database_driver.upsert(cur, self.serialize_key(k), self.serialize(v))
+            self._database_driver.upsert(cur, self.serialize_key(k), self.serialize_value(v))
         self.connection.commit()
 
     def clear(self) -> None:
@@ -323,7 +357,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         serialized_value = self._database_driver.get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             return default_value
-        return self.deserialize(serialized_value)
+        return self.deserialize_value(serialized_value)
 
     def setdefault(self, key: KT, default: VT = None) -> VT:  # type: ignore
         serialized_key = self.serialize_key(key)
@@ -331,10 +365,10 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[VT], MutableMapping[KT, VT]):
         serialized_value = self._database_driver.get_serialized_value_by_serialized_key(cur, serialized_key)
         if serialized_value is None:
             self._database_driver.insert_serialized_value_by_serialized_key(
-                cur, serialized_key, self.serialize(default)
+                cur, serialized_key, self.serialize_value(default)
             )
             return default
-        return self.deserialize(serialized_value)
+        return self.deserialize_value(serialized_value)
 
 
 if sys.version_info >= (3, 8):
@@ -352,10 +386,10 @@ if sys.version_info >= (3, 9):
         def __or__(self, other: Mapping[KT, VT]) -> "Dict[KT, VT]":
             tmp = Dict(
                 connection=self.connection,
-                serializer=self.serializer,
-                deserializer=self.deserializer,
                 key_serializer=self.key_serializer,
                 key_deserializer=self.key_deserializer,
+                value_serializer=self.value_serializer,
+                value_deserializer=self.value_deserializer,
                 persist=self.persist,
                 data=self,
             )

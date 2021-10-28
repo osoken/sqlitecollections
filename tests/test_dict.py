@@ -1,6 +1,7 @@
 import pickle
 import sqlite3
 import sys
+import warnings
 from collections.abc import Hashable
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -33,6 +34,53 @@ class DictTestCase(SqlTestCase):
     @patch("sqlitecollections.Dict._initialize", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
+    def test_serializer_argument_is_deprecated(
+        self,
+        SqliteCollectionBase_del: MagicMock,
+        SqliteCollectionBase_init: MagicMock,
+        _initialize: MagicMock,
+        _table_name: MagicMock,
+    ) -> None:
+        def serializer(x: str) -> bytes:
+            return x.encode("utf-8")
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = Dict[Hashable, Any](serializer=serializer)
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message), "serializer argument is deprecated. use key_serializer or value_serializer instead"
+            )
+
+    @patch("sqlitecollections.Dict.table_name", return_value="items")
+    @patch("sqlitecollections.Dict._initialize", return_value=None)
+    @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
+    @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
+    def test_deserializer_argument_is_deprecated(
+        self,
+        SqliteCollectionBase_del: MagicMock,
+        SqliteCollectionBase_init: MagicMock,
+        _initialize: MagicMock,
+        _table_name: MagicMock,
+    ) -> None:
+        def deserializer(x: bytes) -> str:
+            return x.decode("utf-8")
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = Dict[Hashable, Any](deserializer=deserializer)
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "deserializer argument is deprecated. use key_deserializer or value_deserializer instead",
+            )
+
+    @patch("sqlitecollections.Dict.table_name", return_value="items")
+    @patch("sqlitecollections.Dict._initialize", return_value=None)
+    @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
+    @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
     def test_init(
         self,
         SqliteCollectionBase_del: MagicMock,
@@ -42,8 +90,8 @@ class DictTestCase(SqlTestCase):
     ) -> None:
         memory_db = sqlite3.connect(":memory:")
         table_name = "items"
-        serializer = MagicMock(spec=Callable[[Any], bytes])
-        deserializer = MagicMock(spec=Callable[[bytes], Any])
+        value_serializer = MagicMock(spec=Callable[[Any], bytes])
+        value_deserializer = MagicMock(spec=Callable[[bytes], Any])
         key_serializer = MagicMock(spec=Callable[[Hashable], bytes])
         key_deserializer = MagicMock(spec=Callable[[bytes], Hashable])
         persist = False
@@ -51,8 +99,8 @@ class DictTestCase(SqlTestCase):
         sut = Dict[Hashable, Any](
             connection=memory_db,
             table_name=table_name,
-            serializer=serializer,
-            deserializer=deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
             persist=persist,
@@ -61,13 +109,13 @@ class DictTestCase(SqlTestCase):
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
             table_name=table_name,
-            serializer=serializer,
-            deserializer=deserializer,
+            serializer=key_serializer,
+            deserializer=key_deserializer,
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        self.assertEqual(sut.key_serializer, key_serializer)
-        self.assertEqual(sut.key_deserializer, key_deserializer)
+        self.assertEqual(sut.value_serializer, value_serializer)
+        self.assertEqual(sut.value_deserializer, value_deserializer)
 
     def test_initialize(self) -> None:
         memory_db = sqlite3.connect(":memory:")
@@ -101,8 +149,10 @@ class DictTestCase(SqlTestCase):
         sut = Dict[str, str](
             connection=memory_db,
             table_name="items",
-            serializer=serializer,
-            deserializer=deserializer,
+            key_serializer=serializer,
+            key_deserializer=deserializer,
+            value_serializer=serializer,
+            value_deserializer=deserializer,
             rebuild_strategy=RebuildStrategy.ALWAYS,
         )
         self.assert_dict_state_equals(memory_db, [(b"A", b"B", 0)])
