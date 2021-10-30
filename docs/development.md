@@ -2,7 +2,6 @@
 
 ## Tests, type checking and linting locally
 
-
 To run tests, type checking and linting locally, you'll need to have **python 3.6**, **3.7**, **3.8**, **3.9** and **3.10** installed.
 We use `tox` to run tests and type checking on all the supported python versions.
 You can set up the development environment with the following commands:
@@ -33,6 +32,35 @@ __________________ summary __________________
   py310: commands succeeded
   congratulations :)
 ```
+
+## Building documents
+
+We use `mkdocs` to build the documentation.
+To set up the environment for building the document, run the following commands:
+
+```
+git clone git@github.com:osoken/sqlitecollections.git
+cd sqlitecollections
+python -m venv .venv
+source ./.venv/bin/activate
+pip install -e .[docs]
+```
+
+Then, building the documentation can be done by the following command:
+
+```
+mkdocs build
+```
+
+The output will be located in `site` directory in your current directory.
+
+During development, you can also run `mkdoc`'s builtin development server with hot-reloading enabled with the following command:
+
+```
+mkdocs serve
+```
+
+In that case, you can check the result on `http://127.0.0.1:8000`.
 
 ## Compatibility policy
 
