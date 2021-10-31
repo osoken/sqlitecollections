@@ -193,6 +193,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
         data: Optional[Iterable[T]] = None,
     ) -> None:
+        self._database_driver: _ListDatabaseDriver
         super(List, self).__init__(
             connection=connection,
             table_name=table_name,

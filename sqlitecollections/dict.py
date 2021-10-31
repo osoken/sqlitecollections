@@ -140,7 +140,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
             if deserializer is not None
             else cast(Callable[[bytes], VT], loads if key_deserializer is None else key_deserializer)
         )
-
+        self._database_driver: _DictDatabaseDriver
         super(_Dict, self).__init__(
             connection=connection,
             table_name=table_name,

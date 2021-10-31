@@ -120,6 +120,8 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
         data: Optional[Iterable[T]] = None,
     ) -> None:
+        self._database_driver: _SetDatabaseDriver
+
         super(Set, self).__init__(
             connection=connection,
             table_name=table_name,
