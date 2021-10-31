@@ -9,13 +9,18 @@ else:
     from typing import Iterable, Iterator, MutableSet
 
 from . import RebuildStrategy
-from .base import _S, _T, SqliteCollectionBase, T, TemporaryTableContext, is_hashable
+from .base import (
+    _S,
+    _T,
+    SqliteCollectionBase,
+    T,
+    TemporaryTableContext,
+    _SqliteCollectionBaseDatabaseDriver,
+    is_hashable,
+)
 
 
-class _SetDatabaseDriver:
-    def __init__(self, table_name: str):
-        self.table_name = table_name
-
+class _SetDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     def delete_all(self, cur: sqlite3.Cursor) -> None:
         cur.execute(f"DELETE FROM {self.table_name}")
 
@@ -123,10 +128,12 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        self._database_driver = _SetDatabaseDriver(self.table_name)
         if data is not None:
             self.clear()
             self.update(data)
+
+    def _initialize_database_driver(self) -> _SetDatabaseDriver:
+        return _SetDatabaseDriver(self.table_name)
 
     def __contains__(self, value: object) -> bool:
         cur = self.connection.cursor()

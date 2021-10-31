@@ -9,7 +9,7 @@ else:
     from typing import Callable, Iterable, MutableSequence, Iterator
 
 from . import RebuildStrategy
-from .base import SqliteCollectionBase, T
+from .base import SqliteCollectionBase, T, _SqliteCollectionBaseDatabaseDriver
 
 
 def _generate_indices_from_slice(l: int, s: slice) -> Iterator[int]:
@@ -69,10 +69,7 @@ def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]) -> Iterable[Tuple[An
             raise DifferentLengthDetected(element_count + iter1_unused_count, element_count + iter2_unused_count)
 
 
-class _ListDatabaseDriver:
-    def __init__(self, table_name: str):
-        self.table_name = table_name
-
+class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     def get_max_index_plus_one(self, cur: sqlite3.Cursor) -> int:
         cur.execute(f"SELECT MAX(item_index) FROM {self.table_name}")
         res = cur.fetchone()
@@ -204,10 +201,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        self._database_driver = _ListDatabaseDriver(self.table_name)
         if data is not None:
             self.clear()
             self.extend(data)
+
+    def _initialize_database_driver(self) -> _ListDatabaseDriver:
+        return _ListDatabaseDriver(self.table_name)
 
     def _do_create_table(self) -> None:
         cur = self.connection.cursor()

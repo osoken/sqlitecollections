@@ -13,13 +13,17 @@ if sys.version_info >= (3, 8):
     from typing import Reversible
 
 from . import RebuildStrategy
-from .base import KT, VT, SqliteCollectionBase, T, is_hashable
+from .base import (
+    KT,
+    VT,
+    SqliteCollectionBase,
+    T,
+    _SqliteCollectionBaseDatabaseDriver,
+    is_hashable,
+)
 
 
-class _DictDatabaseDriver:
-    def __init__(self, table_name: str):
-        self.table_name = table_name
-
+class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     def delete_single_record_by_serialized_key(self, cur: sqlite3.Cursor, serialized_key: bytes) -> None:
         cur.execute(f"DELETE FROM {self.table_name} WHERE serialized_key=?", (serialized_key,))
 
@@ -145,10 +149,12 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        self._database_driver = _DictDatabaseDriver(self.table_name)
         if data is not None:
             self.clear()
             self.update(data)
+
+    def _initialize_database_driver(self) -> _DictDatabaseDriver:
+        return _DictDatabaseDriver(self.table_name)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:

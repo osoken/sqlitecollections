@@ -63,6 +63,35 @@ class TemporaryTableContext(ContextManager[str]):
         return None
 
 
+class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
+    def __init__(self, table_name: str):
+        self.table_name = table_name
+
+    def initialize_metadata_table(self, cur: sqlite3.Cursor) -> None:
+        if not self.is_metadata_table_initialized(cur):
+            self.do_initialize_metadata_table(cur)
+
+    def is_metadata_table_initialized(self, cur: sqlite3.Cursor) -> bool:
+        try:
+            cur.execute("SELECT 1 FROM metadata")
+            return True
+        except sqlite3.OperationalError as _:
+            pass
+        return False
+
+    def do_initialize_metadata_table(self, cur: sqlite3.Cursor) -> None:
+        cur.execute(
+            """
+            CREATE TABLE metadata (
+                table_name TEXT PRIMARY KEY,
+                schema_version TEXT NOT NULL,
+                container_type TEXT NOT NULL,
+                UNIQUE (table_name, container_type)
+            )
+        """
+        )
+
+
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     def __init__(
         self,
@@ -92,7 +121,12 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             if table_name is None
             else sanitize_table_name(table_name)
         )
+        self._database_driver = self._initialize_database_driver()
         self._initialize(rebuild_strategy=rebuild_strategy)
+
+    @abstractmethod
+    def _initialize_database_driver(self) -> _SqliteCollectionBaseDatabaseDriver:
+        pass
 
     def __del__(self) -> None:
         if not self.persist:
@@ -105,7 +139,8 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             self.connection.commit()
 
     def _initialize(self, rebuild_strategy: RebuildStrategy) -> None:
-        self._initialize_metadata_table()
+        cur = self.connection.cursor()
+        self._database_driver.initialize_metadata_table(cur)
         self._initialize_table()
         if self._should_rebuild(rebuild_strategy):
             self._do_rebuild()
@@ -198,15 +233,6 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     @abstractmethod
     def _do_create_table(self) -> None:
         ...
-
-    def _is_metadata_table_initialized(self) -> bool:
-        try:
-            cur = self.connection.cursor()
-            cur.execute("SELECT 1 FROM metadata")
-            return True
-        except sqlite3.OperationalError as _:
-            pass
-        return False
 
     def _do_initialize_metadata_table(self) -> None:
         cur = self.connection.cursor()
