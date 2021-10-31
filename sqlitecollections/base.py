@@ -74,6 +74,7 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     def is_metadata_table_initialized(self, cur: sqlite3.Cursor) -> bool:
         try:
             cur.execute("SELECT 1 FROM metadata")
+            _ = list(cur)
             return True
         except sqlite3.OperationalError as _:
             pass
@@ -140,7 +141,8 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
 
     def _initialize(self, rebuild_strategy: RebuildStrategy) -> None:
         cur = self.connection.cursor()
-        self._database_driver.initialize_metadata_table(cur)
+        if not self._database_driver.is_metadata_table_initialized(cur):
+            self._database_driver.initialize_metadata_table(cur)
         self._initialize_table()
         if self._should_rebuild(rebuild_strategy):
             self._do_rebuild()
@@ -233,20 +235,3 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     @abstractmethod
     def _do_create_table(self) -> None:
         ...
-
-    def _do_initialize_metadata_table(self) -> None:
-        cur = self.connection.cursor()
-        cur.execute(
-            """
-            CREATE TABLE metadata (
-                table_name TEXT PRIMARY KEY,
-                schema_version TEXT NOT NULL,
-                container_type TEXT NOT NULL,
-                UNIQUE (table_name, container_type)
-            )
-        """
-        )
-
-    def _initialize_metadata_table(self) -> None:
-        if not self._is_metadata_table_initialized():
-            self._do_initialize_metadata_table()
