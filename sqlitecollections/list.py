@@ -206,8 +206,8 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             self.clear()
             self.extend(data)
 
-    def _initialize_database_driver(self) -> _ListDatabaseDriver:
-        return _ListDatabaseDriver(self.table_name)
+    def _initialize_database_driver(self, table_name: str) -> _ListDatabaseDriver:
+        return _ListDatabaseDriver(table_name)
 
     def _do_create_table(self) -> None:
         cur = self.connection.cursor()

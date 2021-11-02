@@ -153,8 +153,8 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
             self.clear()
             self.update(data)
 
-    def _initialize_database_driver(self) -> _DictDatabaseDriver:
-        return _DictDatabaseDriver(self.table_name)
+    def _initialize_database_driver(self, table_name: str) -> _DictDatabaseDriver:
+        return _DictDatabaseDriver(table_name)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:

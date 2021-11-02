@@ -134,8 +134,8 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             self.clear()
             self.update(data)
 
-    def _initialize_database_driver(self) -> _SetDatabaseDriver:
-        return _SetDatabaseDriver(self.table_name)
+    def _initialize_database_driver(self, table_name: str) -> _SetDatabaseDriver:
+        return _SetDatabaseDriver(table_name)
 
     def __contains__(self, value: object) -> bool:
         cur = self.connection.cursor()

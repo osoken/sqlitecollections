@@ -56,8 +56,10 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         ...
 
     class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
-        def _initialize_database_driver(self) -> "SqliteCollectionsBaseTestCase.ConcreteSqliteCollectionDatabaseDriver":
-            return SqliteCollectionsBaseTestCase.ConcreteSqliteCollectionDatabaseDriver(self.table_name)
+        def _initialize_database_driver(
+            self, table_name: str
+        ) -> "SqliteCollectionsBaseTestCase.ConcreteSqliteCollectionDatabaseDriver":
+            return SqliteCollectionsBaseTestCase.ConcreteSqliteCollectionDatabaseDriver(table_name)
 
         @property
         def schema_version(self) -> str:

@@ -121,16 +121,16 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             raise TypeError(
                 f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
             )
-        self._table_name = (
+        _table_name = (
             sanitize_table_name(create_random_name(self.container_type_name))
             if table_name is None
             else sanitize_table_name(table_name)
         )
-        self._database_driver = self._initialize_database_driver()
+        self._database_driver = self._initialize_database_driver(_table_name)
         self._initialize(rebuild_strategy=rebuild_strategy)
 
     @abstractmethod
-    def _initialize_database_driver(self) -> _SqliteCollectionBaseDatabaseDriver:
+    def _initialize_database_driver(self, table_name: str) -> _SqliteCollectionBaseDatabaseDriver:
         pass
 
     def __del__(self) -> None:
@@ -190,7 +190,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
 
     @property
     def table_name(self) -> str:
-        return self._table_name
+        return self._database_driver.table_name
 
     @property
     def connection(self) -> sqlite3.Connection:
