@@ -65,7 +65,11 @@ class TemporaryTableContext(ContextManager[str]):
 
 class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     def __init__(self, table_name: str):
-        self.table_name = table_name
+        self._table_name = table_name
+
+    @property
+    def table_name(self) -> str:
+        return self._table_name
 
     def initialize_metadata_table(self, cur: sqlite3.Cursor) -> None:
         if not self.is_metadata_table_initialized(cur):
