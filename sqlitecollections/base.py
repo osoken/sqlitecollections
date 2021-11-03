@@ -64,18 +64,13 @@ class TemporaryTableContext(ContextManager[str]):
 
 
 class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
-    def __init__(self, table_name: str):
-        self._table_name = table_name
+    @classmethod
+    def initialize_metadata_table(cls, cur: sqlite3.Cursor) -> None:
+        if not cls.is_metadata_table_initialized(cur):
+            cls.do_initialize_metadata_table(cur)
 
-    @property
-    def table_name(self) -> str:
-        return self._table_name
-
-    def initialize_metadata_table(self, cur: sqlite3.Cursor) -> None:
-        if not self.is_metadata_table_initialized(cur):
-            self.do_initialize_metadata_table(cur)
-
-    def is_metadata_table_initialized(self, cur: sqlite3.Cursor) -> bool:
+    @classmethod
+    def is_metadata_table_initialized(cls, cur: sqlite3.Cursor) -> bool:
         try:
             cur.execute("SELECT 1 FROM metadata")
             _ = list(cur)
@@ -84,7 +79,8 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
             pass
         return False
 
-    def do_initialize_metadata_table(self, cur: sqlite3.Cursor) -> None:
+    @classmethod
+    def do_initialize_metadata_table(cls, cur: sqlite3.Cursor) -> None:
         cur.execute(
             """
             CREATE TABLE metadata (
@@ -123,16 +119,12 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             raise TypeError(
                 f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
             )
-        _table_name = (
+        self._table_name = (
             sanitize_table_name(create_random_name(self.container_type_name))
             if table_name is None
             else sanitize_table_name(table_name)
         )
-        self._database_driver = self._initialize_database_driver(_table_name)
         self._initialize(rebuild_strategy=rebuild_strategy)
-
-    def _initialize_database_driver(self, table_name: str) -> _SqliteCollectionBaseDatabaseDriver:
-        return self._driver_class(table_name)
 
     def __del__(self) -> None:
         if not self.persist:
@@ -146,8 +138,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
 
     def _initialize(self, rebuild_strategy: RebuildStrategy) -> None:
         cur = self.connection.cursor()
-        if not self._database_driver.is_metadata_table_initialized(cur):
-            self._database_driver.initialize_metadata_table(cur)
+        self._driver_class.initialize_metadata_table(cur)
         self._initialize_table()
         if self._should_rebuild(rebuild_strategy):
             self._do_rebuild()
@@ -191,7 +182,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
 
     @property
     def table_name(self) -> str:
-        return self._database_driver.table_name
+        return self._table_name
 
     @property
     def connection(self) -> sqlite3.Connection:
