@@ -51,30 +51,29 @@ class SqlTestCase(TestCase):
         self.assert_sql_result_equals(conn, "SELECT table_name, schema_version, container_type FROM metadata", expected)
 
 
-class SqliteCollectionsBaseTestCase(SqlTestCase):
-    class ConcreteSqliteCollectionDatabaseDriver(base._SqliteCollectionBaseDatabaseDriver):
+class ConcreteSqliteCollectionDatabaseDriver(base._SqliteCollectionBaseDatabaseDriver):
+    ...
+
+
+class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
+    _driver_class = ConcreteSqliteCollectionDatabaseDriver
+
+    @property
+    def schema_version(self) -> str:
+        return "test_0"
+
+    def _do_create_table(self) -> None:
+        cur = self.connection.cursor()
+        cur.execute(f"CREATE TABLE {self.table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
+
+    def _rebuild_check_with_first_element(self) -> bool:
+        return False
+
+    def _do_rebuild(self) -> None:
         ...
 
-    class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
-        def _initialize_database_driver(
-            self, table_name: str
-        ) -> "SqliteCollectionsBaseTestCase.ConcreteSqliteCollectionDatabaseDriver":
-            return SqliteCollectionsBaseTestCase.ConcreteSqliteCollectionDatabaseDriver(table_name)
 
-        @property
-        def schema_version(self) -> str:
-            return "test_0"
-
-        def _do_create_table(self) -> None:
-            cur = self.connection.cursor()
-            cur.execute(f"CREATE TABLE {self.table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
-
-        def _rebuild_check_with_first_element(self) -> bool:
-            return False
-
-        def _do_rebuild(self) -> None:
-            ...
-
+class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch(
         "sqlitecollections.base.uuid4",
         return_value=uuid.UUID("4da95358-64e7-40e7-b888-31e14e1c1d09"),
@@ -94,7 +93,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         memory_db = sqlite3.Connection(":memory:")
         NamedTemporaryFile.return_value.name = "tempfilename"
         sqlite3_connect.return_value = memory_db
-        sut = self.ConcreteSqliteCollectionClass()
+        sut = ConcreteSqliteCollectionClass()
         sqlite3_connect.assert_called_once_with("tempfilename")
         self.assertEqual(sut.connection, memory_db)
         self.assertEqual(sut.serializer, dumps)
@@ -129,7 +128,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         deserializer = MagicMock(spec=Callable[[bytes], Any])
         persist = False
         rebuild_strategy = base.RebuildStrategy.SKIP
-        sut = self.ConcreteSqliteCollectionClass(
+        sut = ConcreteSqliteCollectionClass(
             connection="connection",
             table_name="tablename",
             serializer=serializer,
@@ -168,7 +167,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     )
     def test_init_with_connection(self, uuid4: MagicMock) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(connection=memory_db)
+        sut = ConcreteSqliteCollectionClass(connection=memory_db)
         self.assert_metadata_state_equals(
             memory_db,
             [
@@ -187,8 +186,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
     def test_init_same_container_twice(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
-        sut2 = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
+        sut2 = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
         self.assert_metadata_state_equals(
             memory_db,
             [
@@ -207,8 +206,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
     def test_init_different_containers(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1")
-        sut2 = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1")
+        sut2 = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2")
         self.assert_metadata_state_equals(
             memory_db,
             [
@@ -237,8 +236,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
 
     def test_destruct_container(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1", persist=False)
-        sut2 = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2", persist=True)
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1", persist=False)
+        sut2 = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2", persist=True)
         self.assert_metadata_state_equals(
             memory_db,
             [
@@ -290,11 +289,11 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
     def test_set_persist(self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1", persist=True)
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items1", persist=True)
         self.assertTrue(sut.persist)
         sut.set_persist(False)
         self.assertFalse(sut.persist)
-        sut = self.ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2", persist=False)
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items2", persist=False)
         self.assertFalse(sut.persist)
         sut.set_persist(True)
         self.assertTrue(sut.persist)
@@ -305,7 +304,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock
     ) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(
+        sut = ConcreteSqliteCollectionClass(
             connection=memory_db, table_name="items1", rebuild_strategy=base.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT
         )
         _rebuild_check_with_first_element.assert_called_once_with()
@@ -315,7 +314,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
     def test_rebuild_always(self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(
+        sut = ConcreteSqliteCollectionClass(
             connection=memory_db, table_name="items1", rebuild_strategy=base.RebuildStrategy.ALWAYS
         )
         _rebuild_check_with_first_element.assert_not_called()
@@ -325,7 +324,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
     def test_rebuild_skip(self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = self.ConcreteSqliteCollectionClass(
+        sut = ConcreteSqliteCollectionClass(
             connection=memory_db, table_name="items1", rebuild_strategy=base.RebuildStrategy.SKIP
         )
         _rebuild_check_with_first_element.assert_not_called()

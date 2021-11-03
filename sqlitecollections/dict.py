@@ -100,6 +100,8 @@ class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
 
 
 class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
+    _driver_class = _DictDatabaseDriver
+
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
@@ -152,9 +154,6 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
         if data is not None:
             self.clear()
             self.update(data)
-
-    def _initialize_database_driver(self, table_name: str) -> _DictDatabaseDriver:
-        return _DictDatabaseDriver(table_name)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:

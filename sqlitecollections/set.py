@@ -110,6 +110,8 @@ class _SetDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
 
 
 class Set(SqliteCollectionBase[T], MutableSet[T]):
+    _driver_class = _SetDatabaseDriver
+
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,

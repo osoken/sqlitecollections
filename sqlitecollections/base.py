@@ -93,11 +93,13 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
                 container_type TEXT NOT NULL,
                 UNIQUE (table_name, container_type)
             )
-        """
+            """
         )
 
 
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
+    _driver_class = _SqliteCollectionBaseDatabaseDriver
+
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
@@ -129,9 +131,8 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         self._database_driver = self._initialize_database_driver(_table_name)
         self._initialize(rebuild_strategy=rebuild_strategy)
 
-    @abstractmethod
     def _initialize_database_driver(self, table_name: str) -> _SqliteCollectionBaseDatabaseDriver:
-        pass
+        return self._driver_class(table_name)
 
     def __del__(self) -> None:
         if not self.persist:
