@@ -52,7 +52,11 @@ class SqlTestCase(TestCase):
 
 
 class ConcreteSqliteCollectionDatabaseDriver(base._SqliteCollectionBaseDatabaseDriver):
-    ...
+    @classmethod
+    def do_create_table(
+        cls, table_name: str, container_type_nam: str, schema_version: str, cur: sqlite3.Cursor
+    ) -> None:
+        cur.execute(f"CREATE TABLE {table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
 
 
 class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
@@ -61,10 +65,6 @@ class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
     @property
     def schema_version(self) -> str:
         return "test_0"
-
-    def _do_create_table(self) -> None:
-        cur = self.connection.cursor()
-        cur.execute(f"CREATE TABLE {self.table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
 
     def _rebuild_check_with_first_element(self) -> bool:
         return False

@@ -25,6 +25,17 @@ from .base import (
 
 class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     @classmethod
+    def do_create_table(
+        cls, table_name: str, container_type_nam: str, schema_version: str, cur: sqlite3.Cursor
+    ) -> None:
+        cur.execute(
+            f"CREATE TABLE {table_name} ("
+            "serialized_key BLOB NOT NULL UNIQUE, "
+            "serialized_value BLOB NOT NULL, "
+            "item_order INTEGER PRIMARY KEY)"
+        )
+
+    @classmethod
     def delete_single_record_by_serialized_key(
         cls, table_name: str, cur: sqlite3.Cursor, serialized_key: bytes
     ) -> None:
@@ -190,15 +201,6 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
     @property
     def schema_version(self) -> str:
         return "0"
-
-    def _do_create_table(self) -> None:
-        cur = self.connection.cursor()
-        cur.execute(
-            f"CREATE TABLE {self.table_name} ("
-            "serialized_key BLOB NOT NULL UNIQUE, "
-            "serialized_value BLOB NOT NULL, "
-            "item_order INTEGER PRIMARY KEY)"
-        )
 
     def _rebuild_check_with_first_element(self) -> bool:
         cur = self.connection.cursor()

@@ -71,6 +71,12 @@ def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]) -> Iterable[Tuple[An
 
 class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     @classmethod
+    def do_create_table(
+        cls, table_name: str, container_type_nam: str, schema_version: str, cur: sqlite3.Cursor
+    ) -> None:
+        cur.execute(f"CREATE TABLE {table_name} (serialized_value BLOB, item_index INTEGER PRIMARY KEY)")
+
+    @classmethod
     def get_max_index_plus_one(cls, table_name: str, cur: sqlite3.Cursor) -> int:
         cur.execute(f"SELECT MAX(item_index) FROM {table_name}")
         res = cur.fetchone()
@@ -220,10 +226,6 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         if data is not None:
             self.clear()
             self.extend(data)
-
-    def _do_create_table(self) -> None:
-        cur = self.connection.cursor()
-        cur.execute(f"CREATE TABLE {self.table_name} (serialized_value BLOB, item_index INTEGER PRIMARY KEY)")
 
     def _do_rebuild(self) -> None:
         cur = self.connection.cursor()

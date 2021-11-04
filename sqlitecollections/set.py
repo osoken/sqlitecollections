@@ -22,6 +22,12 @@ from .base import (
 
 class _SetDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     @classmethod
+    def do_create_table(
+        cls, table_name: str, container_type_nam: str, schema_version: str, cur: sqlite3.Cursor
+    ) -> None:
+        cur.execute(f"CREATE TABLE {table_name} (serialized_value BLOB PRIMARY KEY)")
+
+    @classmethod
     def delete_all(cls, table_name: str, cur: sqlite3.Cursor) -> None:
         cur.execute(f"DELETE FROM {table_name}")
 
@@ -161,10 +167,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def __len__(self) -> int:
         cur = self.connection.cursor()
         return self._driver_class.get_count(self.table_name, cur)
-
-    def _do_create_table(self) -> None:
-        cur = self.connection.cursor()
-        cur.execute(f"CREATE TABLE {self.table_name} (serialized_value BLOB PRIMARY KEY)")
 
     def _do_rebuild(self) -> None:
         cur = self.connection.cursor()
