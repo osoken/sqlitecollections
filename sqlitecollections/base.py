@@ -138,6 +138,14 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     ) -> None:
         ...
 
+    @classmethod
+    def drop_table(cls, table_name: str, container_type_name: str, cur: sqlite3.Cursor) -> None:
+        cur.execute(
+            "DELETE FROM metadata WHERE table_name=? AND container_type=?",
+            (table_name, container_type_name),
+        )
+        cur.execute(f"DROP TABLE {table_name}")
+
 
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     _driver_class = _SqliteCollectionBaseDatabaseDriver
@@ -175,11 +183,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     def __del__(self) -> None:
         if not self.persist:
             cur = self.connection.cursor()
-            cur.execute(
-                "DELETE FROM metadata WHERE table_name=? AND container_type=?",
-                (self.table_name, self.container_type_name),
-            )
-            cur.execute(f"DROP TABLE {self.table_name}")
+            self._driver_class.drop_table(self.table_name, self.container_type_name, cur)
             self.connection.commit()
 
     def _initialize(self, rebuild_strategy: RebuildStrategy) -> None:
