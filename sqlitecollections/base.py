@@ -63,7 +63,93 @@ class TemporaryTableContext(ContextManager[str]):
         return None
 
 
+class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
+    @classmethod
+    def initialize_metadata_table(cls, cur: sqlite3.Cursor) -> None:
+        if not cls.is_metadata_table_initialized(cur):
+            cls.do_initialize_metadata_table(cur)
+
+    @classmethod
+    def is_metadata_table_initialized(cls, cur: sqlite3.Cursor) -> bool:
+        try:
+            cur.execute("SELECT 1 FROM metadata LIMIT 1")
+            _ = list(cur)
+            return True
+        except sqlite3.OperationalError as _:
+            pass
+        return False
+
+    @classmethod
+    def do_initialize_metadata_table(cls, cur: sqlite3.Cursor) -> None:
+        cur.execute(
+            """
+            CREATE TABLE metadata (
+                table_name TEXT PRIMARY KEY,
+                schema_version TEXT NOT NULL,
+                container_type TEXT NOT NULL,
+                UNIQUE (table_name, container_type)
+            )
+            """
+        )
+
+    @classmethod
+    def initialize_table(
+        cls, table_name: str, container_type_name: str, schema_version: str, cur: sqlite3.Cursor
+    ) -> None:
+        if not cls.is_table_initialized(table_name, container_type_name, schema_version, cur):
+            cls.do_create_table(table_name, container_type_name, schema_version, cur)
+            cls.do_tidy_table_metadata(table_name, container_type_name, schema_version, cur)
+
+    @classmethod
+    def is_table_initialized(
+        self, table_name: str, container_type_name: str, schema_version: str, cur: sqlite3.Cursor
+    ) -> bool:
+        try:
+            cur.execute(
+                "SELECT schema_version FROM metadata WHERE table_name=? AND container_type=?",
+                (table_name, container_type_name),
+            )
+            buf = cur.fetchone()
+            if buf is None:
+                return False
+            version = buf[0]
+            if version != schema_version:
+                return False
+            cur.execute(f"SELECT 1 FROM {table_name} LIMIT 1")
+            _ = list(cur)
+            return True
+        except sqlite3.OperationalError as _:
+            pass
+        return False
+
+    @classmethod
+    def do_tidy_table_metadata(
+        cls, table_name: str, container_type_name: str, schema_version: str, cur: sqlite3.Cursor
+    ) -> None:
+        cur.execute(
+            "INSERT INTO metadata (table_name, schema_version, container_type) VALUES (?, ?, ?)",
+            (table_name, schema_version, container_type_name),
+        )
+
+    @classmethod
+    @abstractmethod
+    def do_create_table(
+        cls, table_name: str, container_type_name: str, schema_version: str, cur: sqlite3.Cursor
+    ) -> None:
+        ...
+
+    @classmethod
+    def drop_table(cls, table_name: str, container_type_name: str, cur: sqlite3.Cursor) -> None:
+        cur.execute(
+            "DELETE FROM metadata WHERE table_name=? AND container_type=?",
+            (table_name, container_type_name),
+        )
+        cur.execute(f"DROP TABLE {table_name}")
+
+
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
+    _driver_class = _SqliteCollectionBaseDatabaseDriver
+
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
@@ -97,16 +183,13 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     def __del__(self) -> None:
         if not self.persist:
             cur = self.connection.cursor()
-            cur.execute(
-                "DELETE FROM metadata WHERE table_name=? AND container_type=?",
-                (self.table_name, self.container_type_name),
-            )
-            cur.execute(f"DROP TABLE {self.table_name}")
+            self._driver_class.drop_table(self.table_name, self.container_type_name, cur)
             self.connection.commit()
 
     def _initialize(self, rebuild_strategy: RebuildStrategy) -> None:
-        self._initialize_metadata_table()
-        self._initialize_table()
+        cur = self.connection.cursor()
+        self._driver_class.initialize_metadata_table(cur)
+        self._driver_class.initialize_table(self.table_name, self.container_type_name, self.schema_version, cur)
         if self._should_rebuild(rebuild_strategy):
             self._do_rebuild()
         self.connection.commit()
@@ -163,64 +246,3 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     @abstractmethod
     def schema_version(self) -> str:
         ...
-
-    def _is_table_initialized(self) -> bool:
-        try:
-            cur = self._connection.cursor()
-            cur.execute(
-                "SELECT schema_version FROM metadata WHERE table_name=? AND container_type=?",
-                (self.table_name, self.container_type_name),
-            )
-            buf = cur.fetchone()
-            if buf is None:
-                return False
-            version = buf[0]
-            if version != self.schema_version:
-                return False
-            cur.execute(f"SELECT 1 FROM {self.table_name}")
-            return True
-        except sqlite3.OperationalError as _:
-            pass
-        return False
-
-    def _do_tidy_table_metadata(self) -> None:
-        cur = self.connection.cursor()
-        cur.execute(
-            "INSERT INTO metadata (table_name, schema_version, container_type) VALUES (?, ?, ?)",
-            (self.table_name, self.schema_version, self.container_type_name),
-        )
-
-    def _initialize_table(self) -> None:
-        if not self._is_table_initialized():
-            self._do_create_table()
-            self._do_tidy_table_metadata()
-
-    @abstractmethod
-    def _do_create_table(self) -> None:
-        ...
-
-    def _is_metadata_table_initialized(self) -> bool:
-        try:
-            cur = self.connection.cursor()
-            cur.execute("SELECT 1 FROM metadata")
-            return True
-        except sqlite3.OperationalError as _:
-            pass
-        return False
-
-    def _do_initialize_metadata_table(self) -> None:
-        cur = self.connection.cursor()
-        cur.execute(
-            """
-            CREATE TABLE metadata (
-                table_name TEXT PRIMARY KEY,
-                schema_version TEXT NOT NULL,
-                container_type TEXT NOT NULL,
-                UNIQUE (table_name, container_type)
-            )
-        """
-        )
-
-    def _initialize_metadata_table(self) -> None:
-        if not self._is_metadata_table_initialized():
-            self._do_initialize_metadata_table()
