@@ -4,18 +4,16 @@ from typing import Tuple
 from memory_profiler import memory_usage
 
 
-class Benchmark:
-    def __init__(self, statement: str):
-        self.statement = statement
+def benchmark_statement(
+    statement: str, number: int = 10, interval: float = 0.1, scope: dict = globals()
+) -> Tuple[float, float]:
+    timing = None
 
-    def __call__(self) -> Tuple[float, float]:
-        timing = None
+    current_memory = max(memory_usage(lambda: 0))
 
-        current_memory = max(memory_usage(lambda: 0))
+    def _():
+        nonlocal timing
+        timing = timeit(statement, number=number, globals=scope)
 
-        def _():
-            nonlocal timing
-            timing = timeit(self.statement, number=10, globals=globals())
-
-        memory = max(memory_usage((_,))) - current_memory
-        return memory, timing
+    memory = max(memory_usage((_,), interval=interval)) - current_memory
+    return memory, timing
