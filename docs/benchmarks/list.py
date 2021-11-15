@@ -64,6 +64,11 @@ class BenchmarkGetitemSliceBase(BenchmarkBase):
         return all([a == b for a, b in zip(target_list[10:5010], result)])
 
 
+class BenchmarkCreateWithInitialDataBase(BenchmarkBase):
+    def assertion(self, result):
+        return len(result) == 10000 and all(a == b for a, b in zip(result, target_list))
+
+
 class BuiltinListBenchmarkDelitem(BuiltinListBenchmarkBase, BenchmarkDelitemBase):
     pass
 
@@ -88,7 +93,22 @@ class SqliteCollectionsListBenchmarkGetitemSlice(SqliteCollectionsListBenchmarkB
     pass
 
 
+class BuiltinListBenchmarkCreateWithInitialData(BuiltinListBenchmarkBase, BenchmarkCreateWithInitialDataBase):
+    def exec(self):
+        return list(iter(target_list))
+
+
+class SqliteCollectionsListBenchmarkCreateWithInitialData(BuiltinListBenchmarkBase, BenchmarkCreateWithInitialDataBase):
+    def exec(self):
+        return List[int](data=iter(target_list))
+
+
 if __name__ == "__main__":
     print(Comparison(BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
     print(Comparison(BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
     print(Comparison(BuiltinListBenchmarkGetitemSlice(), SqliteCollectionsListBenchmarkGetitemSlice())().dict())
+    print(
+        Comparison(
+            BuiltinListBenchmarkCreateWithInitialData(), SqliteCollectionsListBenchmarkCreateWithInitialData()
+        )().dict()
+    )
