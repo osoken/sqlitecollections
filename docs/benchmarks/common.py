@@ -10,7 +10,7 @@ if sys.version_info > (3, 9):
 else:
     from typing import Mapping
 
-from memory_profiler import memory_usage, profile
+from memory_profiler import memory_usage
 
 
 class BenchmarkResult:
