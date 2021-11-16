@@ -85,6 +85,17 @@ class BenchmarkNotContainsBase(BenchmarkBase):
         return result == False
 
 
+class BenchmarkSetitemBase(BenchmarkBase):
+    def exec(self):
+        self._sut[0] = -123
+        self._sut[1000] = -2
+        self._sut[-3] = -10
+        return self._sut
+
+    def assertion(self, result) -> bool:
+        return self._sut[0] == -123 and self._sut[1000] == -2 and self._sut[-3] == -10
+
+
 class BuiltinListBenchmarkDelitem(BuiltinListBenchmarkBase, BenchmarkDelitemBase):
     pass
 
@@ -135,6 +146,14 @@ class SqliteCollectionsListBenchmarkNotContains(SqliteCollectionsListBenchmarkBa
     pass
 
 
+class BuiltinListBenchmarkSetitem(BuiltinListBenchmarkBase, BenchmarkSetitemBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkSetitem(SqliteCollectionsListBenchmarkBase, BenchmarkSetitemBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison(BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
     print(Comparison(BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
@@ -146,3 +165,4 @@ if __name__ == "__main__":
     )
     print(Comparison(BuiltinListBenchmarkContains(), SqliteCollectionsListBenchmarkContains())().dict())
     print(Comparison(BuiltinListBenchmarkNotContains(), SqliteCollectionsListBenchmarkNotContains())().dict())
+    print(Comparison(BuiltinListBenchmarkSetitem(), SqliteCollectionsListBenchmarkSetitem())().dict())
