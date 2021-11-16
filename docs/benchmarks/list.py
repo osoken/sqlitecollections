@@ -69,6 +69,22 @@ class BenchmarkCreateWithInitialDataBase(BenchmarkBase):
         return len(result) == 10000 and all(a == b for a, b in zip(result, target_list))
 
 
+class BenchmarkContainsBase(BenchmarkBase):
+    def exec(self):
+        return 651 in self._sut
+
+    def assertion(self, result):
+        return result == True
+
+
+class BenchmarkNotContainsBase(BenchmarkBase):
+    def exec(self):
+        return 12345 in self._sut
+
+    def assertion(self, result):
+        return result == False
+
+
 class BuiltinListBenchmarkDelitem(BuiltinListBenchmarkBase, BenchmarkDelitemBase):
     pass
 
@@ -103,6 +119,22 @@ class SqliteCollectionsListBenchmarkCreateWithInitialData(BuiltinListBenchmarkBa
         return List[int](data=iter(target_list))
 
 
+class BuiltinListBenchmarkContains(BuiltinListBenchmarkBase, BenchmarkContainsBase):
+    pass
+
+
+class BuiltinListBenchmarkNotContains(BuiltinListBenchmarkBase, BenchmarkNotContainsBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkContains(SqliteCollectionsListBenchmarkBase, BenchmarkContainsBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkNotContains(SqliteCollectionsListBenchmarkBase, BenchmarkNotContainsBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison(BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
     print(Comparison(BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
@@ -112,3 +144,5 @@ if __name__ == "__main__":
             BuiltinListBenchmarkCreateWithInitialData(), SqliteCollectionsListBenchmarkCreateWithInitialData()
         )().dict()
     )
+    print(Comparison(BuiltinListBenchmarkContains(), SqliteCollectionsListBenchmarkContains())().dict())
+    print(Comparison(BuiltinListBenchmarkNotContains(), SqliteCollectionsListBenchmarkNotContains())().dict())

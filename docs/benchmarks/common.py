@@ -31,7 +31,7 @@ class BenchmarkResult:
 
 
 class BenchmarkBase(metaclass=ABCMeta):
-    def __init__(self, number: int = 32, interval: float = 0.01):
+    def __init__(self, number: int = 16, interval: float = 0.01):
         self._number = number
         self._interval = interval
 
