@@ -18,6 +18,10 @@ class BuiltinListBenchmarkBase(BenchmarkBase):
         super(BuiltinListBenchmarkBase, self).__init__()
         self._sut_orig = target_list.copy()
 
+    @property
+    def name(self) -> str:
+        return "builtin_list"
+
     def setup(self):
         self._sut = self._sut_orig.copy()
 
@@ -31,6 +35,10 @@ class SqliteCollectionsListBenchmarkBase(BenchmarkBase):
     def __init__(self):
         super(SqliteCollectionsListBenchmarkBase, self).__init__()
         self._sut_orig = List[int](data=target_list)
+
+    @property
+    def name(self) -> str:
+        return "sqlitecollections_list"
 
     def setup(self):
         self._sut = self._sut_orig.copy()
@@ -172,15 +180,25 @@ class SqliteCollectionsListBenchmarkInsert(SqliteCollectionsListBenchmarkBase, B
 
 
 if __name__ == "__main__":
-    print(Comparison(BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
-    print(Comparison(BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
-    print(Comparison(BuiltinListBenchmarkGetitemSlice(), SqliteCollectionsListBenchmarkGetitemSlice())().dict())
+    print(Comparison("__delitem__", BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
+    print(Comparison("__getitem__", BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
     print(
         Comparison(
-            BuiltinListBenchmarkCreateWithInitialData(), SqliteCollectionsListBenchmarkCreateWithInitialData()
+            "__getitem__ (slice)", BuiltinListBenchmarkGetitemSlice(), SqliteCollectionsListBenchmarkGetitemSlice()
         )().dict()
     )
-    print(Comparison(BuiltinListBenchmarkContains(), SqliteCollectionsListBenchmarkContains())().dict())
-    print(Comparison(BuiltinListBenchmarkNotContains(), SqliteCollectionsListBenchmarkNotContains())().dict())
-    print(Comparison(BuiltinListBenchmarkSetitem(), SqliteCollectionsListBenchmarkSetitem())().dict())
-    print(Comparison(BuiltinListBenchmarkInsert(), SqliteCollectionsListBenchmarkInsert())().dict())
+    print(
+        Comparison(
+            "__init__",
+            BuiltinListBenchmarkCreateWithInitialData(),
+            SqliteCollectionsListBenchmarkCreateWithInitialData(),
+        )().dict()
+    )
+    print(Comparison("__contains__", BuiltinListBenchmarkContains(), SqliteCollectionsListBenchmarkContains())().dict())
+    print(
+        Comparison(
+            "__contains__ (not)", BuiltinListBenchmarkNotContains(), SqliteCollectionsListBenchmarkNotContains()
+        )().dict()
+    )
+    print(Comparison("__setitem__", BuiltinListBenchmarkSetitem(), SqliteCollectionsListBenchmarkSetitem())().dict())
+    print(Comparison("insert", BuiltinListBenchmarkInsert(), SqliteCollectionsListBenchmarkInsert())().dict())

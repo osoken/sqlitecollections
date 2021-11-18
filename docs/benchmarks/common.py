@@ -14,7 +14,8 @@ from memory_profiler import memory_usage
 
 
 class BenchmarkResult:
-    def __init__(self, timing: float, memory: float):
+    def __init__(self, name: str, timing: float, memory: float):
+        self._name = name
         self._timing = timing
         self._memory = memory
 
@@ -26,14 +27,23 @@ class BenchmarkResult:
     def memory(self) -> float:
         return self._memory
 
+    @property
+    def name(self) -> str:
+        return self._name
+
     def dict(self) -> Mapping[str, float]:
-        return {"timing": self.timing, "memory": self.memory}
+        return {"name": self.name, "timing": self.timing, "memory": self.memory}
 
 
 class BenchmarkBase(metaclass=ABCMeta):
     def __init__(self, number: int = 16, interval: float = 0.01):
         self._number = number
         self._interval = interval
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        ...
 
     @abstractmethod
     def setup(self) -> None:
@@ -75,6 +85,7 @@ class BenchmarkBase(metaclass=ABCMeta):
             memory_after_setup_buffer.append(memory_after_setup)
             memory_during_exec_buffer.append(memory_during_exec)
         return BenchmarkResult(
+            self.name,
             statistics.mean(timing_buffer),
             max(m2 - m1 for m1, m2 in zip(memory_after_setup_buffer, memory_during_exec_buffer)),
         )
@@ -116,21 +127,31 @@ class BenchmarkRatio:
 
 
 class ComparisonResult:
-    def __init__(self, one: BenchmarkResult, another: BenchmarkResult):
+    def __init__(self, subject: str, one: BenchmarkResult, another: BenchmarkResult):
+        self._subject = subject
         self._one = one
-
         self._another = another
+
+    @property
+    def subject(self) -> str:
+        return self._subject
 
     @property
     def ratio(self) -> BenchmarkRatio:
         return BenchmarkRatio.calc(self._one, self._another)
 
     def dict(self) -> Mapping[str, Mapping[str, float]]:
-        return {"one": self._one.dict(), "another": self._another.dict(), "ratio": self.ratio.dict()}
+        return {
+            "subject": self.subject,
+            "one": self._one.dict(),
+            "another": self._another.dict(),
+            "ratio": self.ratio.dict(),
+        }
 
 
 class Comparison:
-    def __init__(self, one: BenchmarkBase, another: BenchmarkBase):
+    def __init__(self, subject: str, one: BenchmarkBase, another: BenchmarkBase):
+        self._subject = subject
         self._one = one
         self._another = another
 
@@ -139,4 +160,4 @@ class Comparison:
     ) -> ComparisonResult:
         one_result = self._one()
         another_result = self._another()
-        return ComparisonResult(one_result, another_result)
+        return ComparisonResult(self._subject, one_result, another_result)
