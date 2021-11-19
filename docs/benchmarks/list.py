@@ -23,6 +23,8 @@ class BuiltinListBenchmarkBase(BenchmarkBase):
         return "builtin_list"
 
     def setup(self):
+        gc.collect()
+        gc.collect()
         self._sut = self._sut_orig.copy()
 
     def teardown(self):
@@ -41,10 +43,14 @@ class SqliteCollectionsListBenchmarkBase(BenchmarkBase):
         return "sqlitecollections_list"
 
     def setup(self):
+        gc.collect()
+        gc.collect()
         self._sut = self._sut_orig.copy()
 
     def teardown(self):
         del self._sut
+        gc.collect()
+        gc.collect()
 
 
 class BenchmarkDelitemBase(BenchmarkBase):

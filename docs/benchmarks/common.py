@@ -1,3 +1,4 @@
+import gc
 import statistics
 import sys
 import time
@@ -69,6 +70,8 @@ class BenchmarkBase(metaclass=ABCMeta):
         memory_during_exec_buffer = []
         timing_buffer = []
         for i in range(self._number):
+            gc.collect()
+            gc.collect()
             self.setup()
             memory_after_setup = self._get_current_memory()
 
@@ -80,6 +83,8 @@ class BenchmarkBase(metaclass=ABCMeta):
             if not self.assertion(result):
                 raise AssertionError()
             self.teardown()
+            gc.collect()
+            gc.collect()
             timing = t2 - t1
             timing_buffer.append(timing)
             memory_after_setup_buffer.append(memory_after_setup)
@@ -158,6 +163,10 @@ class Comparison:
     def __call__(
         self,
     ) -> ComparisonResult:
+        gc.collect()
+        gc.collect()
         one_result = self._one()
+        gc.collect()
+        gc.collect()
         another_result = self._another()
         return ComparisonResult(self._subject, one_result, another_result)
