@@ -4,7 +4,7 @@ import sys
 import time
 from abc import ABCMeta, abstractmethod
 from timeit import timeit
-from typing import Any, Tuple
+from typing import Any, Generic, Tuple, TypeVar, Union, cast
 
 if sys.version_info > (3, 9):
     from collections.abc import Mapping
@@ -12,6 +12,8 @@ else:
     from typing import Mapping
 
 from memory_profiler import memory_usage
+
+T = TypeVar("T")
 
 
 class BenchmarkResult:
@@ -32,11 +34,11 @@ class BenchmarkResult:
     def name(self) -> str:
         return self._name
 
-    def dict(self) -> Mapping[str, float]:
+    def dict(self) -> Mapping[str, Union[str, float]]:
         return {"name": self.name, "timing": self.timing, "memory": self.memory}
 
 
-class BenchmarkBase(metaclass=ABCMeta):
+class BenchmarkBase(Generic[T], metaclass=ABCMeta):
     def __init__(self, number: int = 16, interval: float = 0.01):
         self._number = number
         self._interval = interval
@@ -55,15 +57,15 @@ class BenchmarkBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def exec(self) -> Any:
+    def exec(self) -> T:
         pass
 
     @abstractmethod
-    def assertion(self, result: Any) -> bool:
+    def assertion(self, result: T) -> bool:
         return True
 
     def _get_current_memory(self) -> float:
-        return memory_usage((lambda: None,), max_usage=True)
+        return cast(float, memory_usage((lambda: None,), max_usage=True))
 
     def __call__(self) -> BenchmarkResult:
         memory_after_setup_buffer = []
@@ -145,7 +147,7 @@ class ComparisonResult:
     def ratio(self) -> BenchmarkRatio:
         return BenchmarkRatio.calc(self._one, self._another)
 
-    def dict(self) -> Mapping[str, Mapping[str, float]]:
+    def dict(self) -> Mapping[str, Union[str, Mapping[str, Union[str, float]]]]:
         return {
             "subject": self.subject,
             "one": self._one.dict(),
@@ -154,8 +156,8 @@ class ComparisonResult:
         }
 
 
-class Comparison:
-    def __init__(self, subject: str, one: BenchmarkBase, another: BenchmarkBase):
+class Comparison(Generic[T]):
+    def __init__(self, subject: str, one: BenchmarkBase[T], another: BenchmarkBase[T]):
         self._subject = subject
         self._one = one
         self._another = another
