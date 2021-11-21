@@ -15,7 +15,10 @@ from common import BenchmarkBase, Comparison
 
 benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 
-target_list = list(range(10000))
+target_list_len = 100000
+target_list = list([f"{i:016}" for i in range(target_list_len)])
+target_list_element_t = str
+target_list_t = MutableSequence[target_list_element_t]
 random.seed(5432)
 random.shuffle(target_list)
 
@@ -24,7 +27,7 @@ class BuiltinListBenchmarkBase:
     def __init__(self) -> None:
         super(BuiltinListBenchmarkBase, self).__init__()
         self._sut_orig = target_list.copy()
-        self._sut: MutableSequence[int]
+        self._sut: target_list_t
 
     @property
     def name(self) -> str:
@@ -34,6 +37,8 @@ class BuiltinListBenchmarkBase:
         gc.collect()
         gc.collect()
         self._sut = self._sut_orig.copy()
+        gc.collect()
+        gc.collect()
 
     def teardown(self) -> None:
         del self._sut
@@ -44,8 +49,8 @@ class BuiltinListBenchmarkBase:
 class SqliteCollectionsListBenchmarkBase:
     def __init__(self) -> None:
         super(SqliteCollectionsListBenchmarkBase, self).__init__()
-        self._sut_orig = List[int](data=target_list)
-        self._sut: MutableSequence[int]
+        self._sut_orig = List[target_list_element_t](data=target_list)
+        self._sut: target_list_t
 
     @property
     def name(self) -> str:
@@ -55,6 +60,8 @@ class SqliteCollectionsListBenchmarkBase:
         gc.collect()
         gc.collect()
         self._sut = self._sut_orig.copy()
+        gc.collect()
+        gc.collect()
 
     def teardown(self) -> None:
         del self._sut
@@ -62,43 +69,47 @@ class SqliteCollectionsListBenchmarkBase:
         gc.collect()
 
 
-class BenchmarkDelitemBase(BenchmarkBase[MutableSequence[int]]):
-    def exec(self) -> MutableSequence[int]:
-        self._sut: MutableSequence[int]
+class BenchmarkDelitemBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut: target_list_t
         del self._sut[5000]
         return self._sut
 
-    def assertion(self, result: MutableSequence[int]) -> bool:
-        return len(result) == 9999 and result[4999] == target_list[4999] and result[5000] == target_list[5001]
+    def assertion(self, result: target_list_t) -> bool:
+        return (
+            len(result) == (target_list_len - 1)
+            and result[4999] == target_list[4999]
+            and result[5000] == target_list[5001]
+        )
 
 
-class BenchmarkGetitemBase(BenchmarkBase[int]):
-    def exec(self) -> int:
-        self._sut: MutableSequence[int]
+class BenchmarkGetitemBase(BenchmarkBase[target_list_element_t]):
+    def exec(self) -> target_list_element_t:
+        self._sut: target_list_t
         return self._sut[5000]
 
-    def assertion(self, result: int) -> bool:
+    def assertion(self, result: target_list_element_t) -> bool:
         return result == target_list[5000]
 
 
-class BenchmarkGetitemSliceBase(BenchmarkBase[MutableSequence[int]]):
-    def exec(self) -> MutableSequence[int]:
-        self._sut: MutableSequence[int]
+class BenchmarkGetitemSliceBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut: target_list_t
         return self._sut[10:5010]
 
-    def assertion(self, result: MutableSequence[int]) -> bool:
+    def assertion(self, result: target_list_t) -> bool:
         return all([a == b for a, b in zip(target_list[10:5010], result)])
 
 
-class BenchmarkCreateWithInitialDataBase(BenchmarkBase[MutableSequence[int]]):
-    def assertion(self, result: MutableSequence[int]) -> bool:
-        return len(result) == 10000 and all(a == b for a, b in zip(result, target_list))
+class BenchmarkCreateWithInitialDataBase(BenchmarkBase[target_list_t]):
+    def assertion(self, result: target_list_t) -> bool:
+        return len(result) == target_list_len and all(a == b for a, b in zip(result, target_list))
 
 
 class BenchmarkContainsBase(BenchmarkBase[bool]):
     def exec(self) -> bool:
-        self._sut: MutableSequence[int]
-        return 651 in self._sut
+        self._sut: target_list_t
+        return f"{651:016}" in self._sut
 
     def assertion(self, result: bool) -> bool:
         return result == True
@@ -106,53 +117,77 @@ class BenchmarkContainsBase(BenchmarkBase[bool]):
 
 class BenchmarkNotContainsBase(BenchmarkBase[bool]):
     def exec(self) -> bool:
-        self._sut: MutableSequence[int]
-        return 12345 in self._sut
+        self._sut: target_list_t
+        return f"{(target_list_len + 123):016}" in self._sut
 
     def assertion(self, result: bool) -> bool:
         return result == False
 
 
-class BenchmarkSetitemBase(BenchmarkBase[MutableSequence[int]]):
-    def exec(self) -> MutableSequence[int]:
-        self._sut: MutableSequence[int]
-        self._sut[0] = -123
-        self._sut[1000] = -2
-        self._sut[-3] = -10
+class BenchmarkSetitemBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut: target_list_t
+        self._sut[0] = "-123"
+        self._sut[1000] = "-2"
+        self._sut[-3] = "-10"
         return self._sut
 
-    def assertion(self, result: MutableSequence[int]) -> bool:
-        return result[0] == -123 and result[1000] == -2 and result[-3] == -10
+    def assertion(self, result: target_list_t) -> bool:
+        return result[0] == "-123" and result[1000] == "-2" and result[-3] == "-10"
 
 
-class BenchmarkInsertBase(BenchmarkBase[MutableSequence[int]]):
-    def exec(self) -> MutableSequence[int]:
-        self._sut: MutableSequence[int]
-        self._sut.insert(0, -123)
+class BenchmarkInsertBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut: target_list_t
+        self._sut.insert(0, "-123")
         return self._sut
 
-    def assertion(self, result: MutableSequence[int]) -> bool:
-        return len(result) == 10001 and result[0] == -123 and result[1] == target_list[0]
+    def assertion(self, result: target_list_t) -> bool:
+        return len(result) == (target_list_len + 1) and result[0] == "-123" and result[1] == target_list[0]
 
 
-class BenchmarkAppendBase(BenchmarkBase[MutableSequence[int]]):
-    def exec(self) -> MutableSequence[int]:
-        self._sut: MutableSequence[int]
-        self._sut.append(-123)
+class BenchmarkAppendBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut: target_list_t
+        self._sut.append("-123")
         return self._sut
 
-    def assertion(self, result: MutableSequence[int]) -> bool:
-        return len(result) == 10001 and result[10000] == -123
+    def assertion(self, result: target_list_t) -> bool:
+        return len(result) == (target_list_len + 1) and result[target_list_len] == "-123"
 
 
-class BenchmarkClearBase(BenchmarkBase[MutableSequence[int]]):
-    def exec(self) -> MutableSequence[int]:
-        self._sut: MutableSequence[int]
+class BenchmarkClearBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut: target_list_t
         self._sut.clear()
         return self._sut
 
-    def assertion(self, result: MutableSequence[int]) -> bool:
+    def assertion(self, result: target_list_t) -> bool:
         return len(result) == 0
+
+
+class BenchmarkExtendBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut: target_list_t
+        self._sut.extend(["-1", "-2", "-3"])
+        return self._sut
+
+    def assertion(self, result: target_list_t) -> bool:
+        return (
+            len(result) == (target_list_len + 3)
+            and result[target_list_len - 1] == target_list[target_list_len - 1]
+            and result[target_list_len] == "-1"
+        )
+
+
+class BenchmarkCopyBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut: target_list_t
+        retval = self._sut.copy()
+        return retval
+
+    def assertion(self, result: target_list_t) -> bool:
+        return all([a == b for a, b in zip(result, target_list)])
 
 
 class BuiltinListBenchmarkDelitem(BuiltinListBenchmarkBase, BenchmarkDelitemBase):
@@ -186,7 +221,7 @@ class BuiltinListBenchmarkCreateWithInitialData(BuiltinListBenchmarkBase, Benchm
 
 class SqliteCollectionsListBenchmarkCreateWithInitialData(BuiltinListBenchmarkBase, BenchmarkCreateWithInitialDataBase):
     def exec(self) -> Any:
-        return List[int](data=iter(target_list))
+        return List[target_list_element_t](data=iter(target_list))
 
 
 class BuiltinListBenchmarkContains(BuiltinListBenchmarkBase, BenchmarkContainsBase):
@@ -237,6 +272,22 @@ class SqliteCollectionsListBenchmarkClear(SqliteCollectionsListBenchmarkBase, Be
     pass
 
 
+class BuiltinListBenchmarkExtend(BuiltinListBenchmarkBase, BenchmarkExtendBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkExtend(SqliteCollectionsListBenchmarkBase, BenchmarkExtendBase):
+    pass
+
+
+class BuiltinListBenchmarkCopy(BuiltinListBenchmarkBase, BenchmarkCopyBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkCopy(SqliteCollectionsListBenchmarkBase, BenchmarkCopyBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("__delitem__", BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
     print(Comparison("__getitem__", BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
@@ -262,3 +313,5 @@ if __name__ == "__main__":
     print(Comparison("insert", BuiltinListBenchmarkInsert(), SqliteCollectionsListBenchmarkInsert())().dict())
     print(Comparison("append", BuiltinListBenchmarkAppend(), SqliteCollectionsListBenchmarkAppend())().dict())
     print(Comparison("clear", BuiltinListBenchmarkClear(), SqliteCollectionsListBenchmarkClear())().dict())
+    print(Comparison("extend", BuiltinListBenchmarkExtend(), SqliteCollectionsListBenchmarkExtend())().dict())
+    print(Comparison("copy", BuiltinListBenchmarkCopy(), SqliteCollectionsListBenchmarkCopy())().dict())
