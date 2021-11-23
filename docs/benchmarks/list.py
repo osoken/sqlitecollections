@@ -128,12 +128,10 @@ class BenchmarkSetitemBase(BenchmarkBase[target_list_t]):
     def exec(self) -> target_list_t:
         self._sut: target_list_t
         self._sut[0] = "-123"
-        self._sut[1000] = "-2"
-        self._sut[-3] = "-10"
         return self._sut
 
     def assertion(self, result: target_list_t) -> bool:
-        return result[0] == "-123" and result[1000] == "-2" and result[-3] == "-10"
+        return result[0] == "-123" and result[1] == target_list[1]
 
 
 class BenchmarkInsertBase(BenchmarkBase[target_list_t]):
@@ -208,12 +206,20 @@ class BenchmarkMultBase(BenchmarkBase[target_list_t]):
 
 class BenchmarkGetitemSliceSkipBase(BenchmarkBase[target_list_t]):
     def exec(self) -> target_list_t:
-        return self._sut[0:target_list_t:100]
+        return self._sut[0:target_list_len:100]
 
-    def assertion(self, result: target_list_t):
+    def assertion(self, result: target_list_t) -> bool:
         return len(result) == (target_list_len // 100) and all(
             [result[i] == target_list[j] for i, j in zip(range(target_list_len), range(0, target_list_len, 100))]
         )
+
+
+class BenchmarkLenBase(BenchmarkBase[int]):
+    def exec(self) -> int:
+        return len(self._sut)
+
+    def assertion(self, result: int) -> bool:
+        return result == target_list_len
 
 
 class BuiltinListBenchmarkDelitem(BuiltinListBenchmarkBase, BenchmarkDelitemBase):
@@ -237,6 +243,14 @@ class BuiltinListBenchmarkGetitemSlice(BuiltinListBenchmarkBase, BenchmarkGetite
 
 
 class SqliteCollectionsListBenchmarkGetitemSlice(SqliteCollectionsListBenchmarkBase, BenchmarkGetitemSliceBase):
+    pass
+
+
+class BuiltinListBenchmarkGetitemSliceSkip(BuiltinListBenchmarkBase, BenchmarkGetitemSliceSkipBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkGetitemSliceSkip(SqliteCollectionsListBenchmarkBase, BenchmarkGetitemSliceSkipBase):
     pass
 
 
@@ -330,6 +344,14 @@ class SqliteCollectionsListBenchmarkMult(SqliteCollectionsListBenchmarkBase, Ben
     pass
 
 
+class BuiltinListBenchmarkLen(BuiltinListBenchmarkBase, BenchmarkLenBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkLen(SqliteCollectionsListBenchmarkBase, BenchmarkLenBase):
+    pass
+
+
 if __name__ == "__main__":
     print(
         Comparison(
@@ -347,13 +369,21 @@ if __name__ == "__main__":
     print(Comparison("__add__", BuiltinListBenchmarkAdd(), SqliteCollectionsListBenchmarkAdd())().dict())
     print(Comparison("__mult__", BuiltinListBenchmarkMult(), SqliteCollectionsListBenchmarkMult())().dict())
 
-    print(Comparison("__delitem__", BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
     print(Comparison("__getitem__", BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
     print(
         Comparison(
             "__getitem__ (slice)", BuiltinListBenchmarkGetitemSlice(), SqliteCollectionsListBenchmarkGetitemSlice()
         )().dict()
     )
+    print(
+        Comparison(
+            "__getitem__ (slice skip)",
+            BuiltinListBenchmarkGetitemSliceSkip(),
+            SqliteCollectionsListBenchmarkGetitemSliceSkip(),
+        )().dict()
+    )
+    print(Comparison("__len__", BuiltinListBenchmarkLen(), SqliteCollectionsListBenchmarkLen())().dict())
+    print(Comparison("__delitem__", BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
     print(Comparison("__setitem__", BuiltinListBenchmarkSetitem(), SqliteCollectionsListBenchmarkSetitem())().dict())
     print(Comparison("insert", BuiltinListBenchmarkInsert(), SqliteCollectionsListBenchmarkInsert())().dict())
     print(Comparison("append", BuiltinListBenchmarkAppend(), SqliteCollectionsListBenchmarkAppend())().dict())
