@@ -222,6 +222,25 @@ class BenchmarkLenBase(BenchmarkBase[int]):
         return result == target_list_len
 
 
+class BenchmarkIndexBase(BenchmarkBase[int]):
+    def exec(self) -> int:
+        return self._sut.index(target_list[target_list_len // 2])
+
+    def assertion(self, result: int) -> bool:
+        return result == (target_list_len // 2)
+
+
+class BenchmarkIndexUnsuccessfulSearchBase(BenchmarkBase[int]):
+    def exec(self) -> int:
+        try:
+            return self._sut.index("-123")
+        except ValueError:
+            return -1
+
+    def assertion(self, result: int) -> bool:
+        return result == -1
+
+
 class BuiltinListBenchmarkDelitem(BuiltinListBenchmarkBase, BenchmarkDelitemBase):
     pass
 
@@ -352,6 +371,24 @@ class SqliteCollectionsListBenchmarkLen(SqliteCollectionsListBenchmarkBase, Benc
     pass
 
 
+class BuiltinListBenchmarkIndex(BuiltinListBenchmarkBase, BenchmarkIndexBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkIndex(SqliteCollectionsListBenchmarkBase, BenchmarkIndexBase):
+    pass
+
+
+class BuiltinListBenchmarkIndexUnsuccessfulSearch(BuiltinListBenchmarkBase, BenchmarkIndexUnsuccessfulSearchBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkIndexUnsuccessfulSearch(
+    SqliteCollectionsListBenchmarkBase, BenchmarkIndexUnsuccessfulSearchBase
+):
+    pass
+
+
 if __name__ == "__main__":
     print(
         Comparison(
@@ -363,7 +400,9 @@ if __name__ == "__main__":
     print(Comparison("__contains__", BuiltinListBenchmarkContains(), SqliteCollectionsListBenchmarkContains())().dict())
     print(
         Comparison(
-            "__contains__ (not)", BuiltinListBenchmarkNotContains(), SqliteCollectionsListBenchmarkNotContains()
+            "__contains__ (unsuccessful search)",
+            BuiltinListBenchmarkNotContains(),
+            SqliteCollectionsListBenchmarkNotContains(),
         )().dict()
     )
     print(Comparison("__add__", BuiltinListBenchmarkAdd(), SqliteCollectionsListBenchmarkAdd())().dict())
@@ -380,6 +419,14 @@ if __name__ == "__main__":
             "__getitem__ (slice skip)",
             BuiltinListBenchmarkGetitemSliceSkip(),
             SqliteCollectionsListBenchmarkGetitemSliceSkip(),
+        )().dict()
+    )
+    print(Comparison("index", BuiltinListBenchmarkIndex(), SqliteCollectionsListBenchmarkIndex())().dict())
+    print(
+        Comparison(
+            "index (unsuccessful search)",
+            BuiltinListBenchmarkIndexUnsuccessfulSearch(),
+            SqliteCollectionsListBenchmarkIndexUnsuccessfulSearch(),
         )().dict()
     )
     print(Comparison("__len__", BuiltinListBenchmarkLen(), SqliteCollectionsListBenchmarkLen())().dict())
