@@ -5,9 +5,9 @@ import sys
 from typing import Any, cast
 
 if sys.version_info > (3, 9):
-    from collections.abc import MutableSequence
+    from collections.abc import MutableSequence, Tuple
 else:
-    from typing import MutableSequence
+    from typing import MutableSequence, Tuple
 
 from sqlitecollections import List
 
@@ -31,7 +31,7 @@ class BuiltinListBenchmarkBase:
 
     @property
     def name(self) -> str:
-        return "builtin_list"
+        return "`list`"
 
     def setup(self) -> None:
         gc.collect()
@@ -54,7 +54,7 @@ class SqliteCollectionsListBenchmarkBase:
 
     @property
     def name(self) -> str:
-        return "sqlitecollections_list"
+        return "`sqlitecollections.List`"
 
     def setup(self) -> None:
         gc.collect()
@@ -306,6 +306,63 @@ class BenchmarkDelitemSliceSkipBase(BenchmarkBase[target_list_t]):
         )
 
 
+class BenchmarkIaddBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut += ["-1", "-2", "-3"]
+        return self._sut
+
+    def assertion(self, result: target_list_t) -> bool:
+        return len(result) == (target_list_len + 3) and result[target_list_len] == "-1"
+
+
+class BenchmarkImultBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut *= 2
+        return self._sut
+
+    def assertion(self, result: target_list_t) -> bool:
+        return len(result) == (target_list_len * 2) and result[target_list_len] == target_list[0]
+
+
+class BenchmarkPopBase(BenchmarkBase[Tuple[target_list_t, str]]):
+    def exec(self) -> target_list_t:
+        retval = self._sut.pop(5000)
+        return (self._sut, retval)
+
+    def assertion(self, result: Tuple[target_list_t, str]) -> bool:
+        return (
+            len(result[0]) == (target_list_len - 1)
+            and result[0][4999] == target_list[4999]
+            and result[0][5000] == target_list[5001]
+            and result[1] == target_list[5000]
+        )
+
+
+class BenchmarkRemoveBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut.remove("651")
+        return self._sut
+
+    def assertion(self, result: target_list_t) -> bool:
+        if len(result) != target_list_len - 1:
+            return False
+        idx = target_list.index("651")
+        if idx == target_list_len - 1:
+            return result[idx - 1] == target_list[idx - 1]
+        return result[idx] == target_list[idx + 1]
+
+
+class BenchmarkSortBase(BenchmarkBase[target_list_t]):
+    def exec(self) -> target_list_t:
+        self._sut.sort()
+        return self._sut
+
+    def assertion(self, result: target_list_t) -> bool:
+        if len(result) != target_list_len:
+            return False
+        return all((a < b for a, b in zip(result, result[1:])))
+
+
 class BuiltinListBenchmarkDelitem(BuiltinListBenchmarkBase, BenchmarkDelitemBase):
     pass
 
@@ -494,83 +551,129 @@ class SqliteCollectionsListBenchmarkDelitemSliceSkip(SqliteCollectionsListBenchm
     pass
 
 
+class BuiltinListBenchmarkIadd(BuiltinListBenchmarkBase, BenchmarkIaddBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkIadd(SqliteCollectionsListBenchmarkBase, BenchmarkIaddBase):
+    pass
+
+
+class BuiltinListBenchmarkImult(BuiltinListBenchmarkBase, BenchmarkImultBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkImult(SqliteCollectionsListBenchmarkBase, BenchmarkImultBase):
+    pass
+
+
+class BuiltinListBenchmarkPop(BuiltinListBenchmarkBase, BenchmarkPopBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkPop(SqliteCollectionsListBenchmarkBase, BenchmarkPopBase):
+    pass
+
+
+class BuiltinListBenchmarkRemove(BuiltinListBenchmarkBase, BenchmarkRemoveBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkRemove(SqliteCollectionsListBenchmarkBase, BenchmarkRemoveBase):
+    pass
+
+
+class BuiltinListBenchmarkSort(BuiltinListBenchmarkBase, BenchmarkSortBase):
+    pass
+
+
+class SqliteCollectionsListBenchmarkSort(SqliteCollectionsListBenchmarkBase, BenchmarkSortBase):
+    pass
+
+
 if __name__ == "__main__":
     print(
         Comparison(
-            "__init__",
+            "`__init__`",
             BuiltinListBenchmarkCreateWithInitialData(),
             SqliteCollectionsListBenchmarkCreateWithInitialData(),
         )().dict()
     )
-    print(Comparison("__contains__", BuiltinListBenchmarkContains(), SqliteCollectionsListBenchmarkContains())().dict())
+    print(
+        Comparison("`__contains__`", BuiltinListBenchmarkContains(), SqliteCollectionsListBenchmarkContains())().dict()
+    )
     print(
         Comparison(
-            "__contains__ (unsuccessful search)",
+            "`__contains__` (unsuccessful search)",
             BuiltinListBenchmarkNotContains(),
             SqliteCollectionsListBenchmarkNotContains(),
         )().dict()
     )
-    print(Comparison("__add__", BuiltinListBenchmarkAdd(), SqliteCollectionsListBenchmarkAdd())().dict())
-    print(Comparison("__mult__", BuiltinListBenchmarkMult(), SqliteCollectionsListBenchmarkMult())().dict())
+    print(Comparison("`__add__`", BuiltinListBenchmarkAdd(), SqliteCollectionsListBenchmarkAdd())().dict())
+    print(Comparison("`__mult__`", BuiltinListBenchmarkMult(), SqliteCollectionsListBenchmarkMult())().dict())
 
-    print(Comparison("__getitem__", BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
+    print(Comparison("`__getitem__`", BuiltinListBenchmarkGetitem(), SqliteCollectionsListBenchmarkGetitem())().dict())
     print(
         Comparison(
-            "__getitem__ (slice)", BuiltinListBenchmarkGetitemSlice(), SqliteCollectionsListBenchmarkGetitemSlice()
+            "`__getitem__` (slice)", BuiltinListBenchmarkGetitemSlice(), SqliteCollectionsListBenchmarkGetitemSlice()
         )().dict()
     )
     print(
         Comparison(
-            "__getitem__ (slice with skip)",
+            "`__getitem__` (slice with skip)",
             BuiltinListBenchmarkGetitemSliceSkip(),
             SqliteCollectionsListBenchmarkGetitemSliceSkip(),
         )().dict()
     )
-    print(Comparison("__len__", BuiltinListBenchmarkLen(), SqliteCollectionsListBenchmarkLen())().dict())
-    print(Comparison("index", BuiltinListBenchmarkIndex(), SqliteCollectionsListBenchmarkIndex())().dict())
+    print(Comparison("`__len__`", BuiltinListBenchmarkLen(), SqliteCollectionsListBenchmarkLen())().dict())
+    print(Comparison("`index`", BuiltinListBenchmarkIndex(), SqliteCollectionsListBenchmarkIndex())().dict())
     print(
         Comparison(
-            "index (unsuccessful search)",
+            "`index` (unsuccessful search)",
             BuiltinListBenchmarkIndexUnsuccessfulSearch(),
             SqliteCollectionsListBenchmarkIndexUnsuccessfulSearch(),
         )().dict()
     )
     print(
         Comparison(
-            "count",
+            "`count`",
             BuiltinListBenchmarkCount(),
             SqliteCollectionsListBenchmarkCount(),
         )().dict()
     )
-    print(Comparison("__setitem__", BuiltinListBenchmarkSetitem(), SqliteCollectionsListBenchmarkSetitem())().dict())
-    print(Comparison("__delitem__", BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
+    print(Comparison("`__setitem__`", BuiltinListBenchmarkSetitem(), SqliteCollectionsListBenchmarkSetitem())().dict())
+    print(Comparison("`__delitem__`", BuiltinListBenchmarkDelitem(), SqliteCollectionsListBenchmarkDelitem())().dict())
     print(
         Comparison(
-            "__setitem__ (slice)", BuiltinListBenchmarkSetitemSlice(), SqliteCollectionsListBenchmarkSetitemSlice()
+            "`__setitem__` (slice)", BuiltinListBenchmarkSetitemSlice(), SqliteCollectionsListBenchmarkSetitemSlice()
         )().dict()
     )
     print(
         Comparison(
-            "__delitem__ (slice)", BuiltinListBenchmarkDelitemSlice(), SqliteCollectionsListBenchmarkDelitemSlice()
+            "`__delitem__` (slice)", BuiltinListBenchmarkDelitemSlice(), SqliteCollectionsListBenchmarkDelitemSlice()
         )().dict()
     )
     print(
         Comparison(
-            "__setitem__ (slice with skip)",
+            "`__setitem__` (slice with skip)",
             BuiltinListBenchmarkSetitemSliceSkip(),
             SqliteCollectionsListBenchmarkSetitemSliceSkip(),
         )().dict()
     )
     print(
         Comparison(
-            "__delitem__ (slice with skip)",
+            "`__delitem__` (slice with skip)",
             BuiltinListBenchmarkDelitemSliceSkip(),
             SqliteCollectionsListBenchmarkDelitemSliceSkip(),
         )().dict()
     )
-    print(Comparison("append", BuiltinListBenchmarkAppend(), SqliteCollectionsListBenchmarkAppend())().dict())
-    print(Comparison("clear", BuiltinListBenchmarkClear(), SqliteCollectionsListBenchmarkClear())().dict())
-    print(Comparison("copy", BuiltinListBenchmarkCopy(), SqliteCollectionsListBenchmarkCopy())().dict())
-    print(Comparison("extend", BuiltinListBenchmarkExtend(), SqliteCollectionsListBenchmarkExtend())().dict())
-
-    print(Comparison("insert", BuiltinListBenchmarkInsert(), SqliteCollectionsListBenchmarkInsert())().dict())
+    print(Comparison("`append`", BuiltinListBenchmarkAppend(), SqliteCollectionsListBenchmarkAppend())().dict())
+    print(Comparison("`clear`", BuiltinListBenchmarkClear(), SqliteCollectionsListBenchmarkClear())().dict())
+    print(Comparison("`copy`", BuiltinListBenchmarkCopy(), SqliteCollectionsListBenchmarkCopy())().dict())
+    print(Comparison("`extend`", BuiltinListBenchmarkExtend(), SqliteCollectionsListBenchmarkExtend())().dict())
+    print(Comparison("`__iadd__`", BuiltinListBenchmarkIadd(), SqliteCollectionsListBenchmarkIadd())().dict())
+    print(Comparison("`__imult__`", BuiltinListBenchmarkImult(), SqliteCollectionsListBenchmarkImult())().dict())
+    print(Comparison("`insert`", BuiltinListBenchmarkInsert(), SqliteCollectionsListBenchmarkInsert())().dict())
+    print(Comparison("`pop`", BuiltinListBenchmarkPop(), SqliteCollectionsListBenchmarkPop())().dict())
+    print(Comparison("`remove`", BuiltinListBenchmarkRemove(), SqliteCollectionsListBenchmarkRemove())().dict())
+    print(Comparison("`sort`", BuiltinListBenchmarkSort(), SqliteCollectionsListBenchmarkSort())().dict())
