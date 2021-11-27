@@ -101,6 +101,20 @@ class BenchmarkSetitemReplaceBase(BenchmarkBase[target_dict_t]):
         )
 
 
+class BenchmarkSetitemAddNewItemBase(BenchmarkBase[target_dict_t]):
+    def exec(self) -> target_dict_t:
+        self._sut["-651"] = -651
+        return self._sut
+
+    def assertion(self, result: target_dict_t) -> bool:
+        return (
+            len(result) == (target_dict_len + 1)
+            and all((result[k] == target_dict[k] for k in target_dict.keys()))
+            and result["-651"] == -651
+            and "-651" not in target_dict
+        )
+
+
 class BenchmarkDelitemBase(BenchmarkBase[target_dict_t]):
     def exec(self) -> target_dict_t:
         del self._sut["651"]
@@ -162,6 +176,16 @@ class SqliteCollectionsDictBenchmarkSetitemReplace(SqliteCollectionsDictBenchmar
     pass
 
 
+class BuiltinDictBenchmarkSetitemAddNewItem(BuiltinDictBenchmarkBase, BenchmarkSetitemAddNewItemBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkSetitemAddNewItem(
+    SqliteCollectionsDictBenchmarkBase, BenchmarkSetitemAddNewItemBase
+):
+    pass
+
+
 class BuiltinDictBenchmarkDelitem(BuiltinDictBenchmarkBase, BenchmarkDelitemBase):
     pass
 
@@ -195,6 +219,13 @@ if __name__ == "__main__":
             "`__setitem__` (replace)",
             BuiltinDictBenchmarkSetitemReplace(),
             SqliteCollectionsDictBenchmarkSetitemReplace(),
+        )().dict()
+    )
+    print(
+        Comparison(
+            "`__setitem__` (add new item)",
+            BuiltinDictBenchmarkSetitemAddNewItem(),
+            SqliteCollectionsDictBenchmarkSetitemAddNewItem(),
         )().dict()
     )
     print(Comparison("`__delitem__`", BuiltinDictBenchmarkDelitem(), SqliteCollectionsDictBenchmarkDelitem())().dict())
