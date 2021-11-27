@@ -75,6 +75,14 @@ class BenchmarkLenBase(BenchmarkBase[int]):
         return result == target_dict_len
 
 
+class BenchmarkGetitemBase(BenchmarkBase[target_dict_value_t]):
+    def exec(self) -> target_dict_value_t:
+        return self._sut["651"]
+
+    def assertion(self, result: target_dict_value_t) -> bool:
+        return result == 651
+
+
 class BuiltinDictBenchmarkLen(BuiltinDictBenchmarkBase, BenchmarkLenBase):
     pass
 
@@ -83,5 +91,14 @@ class SqliteCollectionsDictBenchmarkLen(SqliteCollectionsDictBenchmarkBase, Benc
     pass
 
 
+class BuiltinDictBenchmarkGetitem(BuiltinDictBenchmarkBase, BenchmarkGetitemBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkGetitem(SqliteCollectionsDictBenchmarkBase, BenchmarkGetitemBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
+    print(Comparison("`__getitem__`", BuiltinDictBenchmarkGetitem(), SqliteCollectionsDictBenchmarkGetitem())().dict())
