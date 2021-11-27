@@ -67,6 +67,11 @@ class SqliteCollectionsDictBenchmarkBase:
         gc.collect()
 
 
+class BenchmarkInitBase(BenchmarkBase[target_dict_t]):
+    def assertion(self, result: target_dict_t) -> bool:
+        return len(result) == target_dict_len and all((result[k] == target_dict[k] for k in target_dict.keys()))
+
+
 class BenchmarkLenBase(BenchmarkBase[int]):
     def exec(self) -> int:
         return len(self._sut)
@@ -81,6 +86,16 @@ class BenchmarkGetitemBase(BenchmarkBase[target_dict_value_t]):
 
     def assertion(self, result: target_dict_value_t) -> bool:
         return result == 651
+
+
+class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
+    def exec(self) -> target_dict_t:
+        return dict(target_dict.items())
+
+
+class SqliteCollectionsDictBenchmarkInit(SqliteCollectionsDictBenchmarkBase, BenchmarkInitBase):
+    def exec(self) -> target_dict_t:
+        return Dict[target_dict_key_t, target_dict_value_t](data=target_dict.items())
 
 
 class BuiltinDictBenchmarkLen(BuiltinDictBenchmarkBase, BenchmarkLenBase):
@@ -100,5 +115,6 @@ class SqliteCollectionsDictBenchmarkGetitem(SqliteCollectionsDictBenchmarkBase, 
 
 
 if __name__ == "__main__":
+    print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
     print(Comparison("`__getitem__`", BuiltinDictBenchmarkGetitem(), SqliteCollectionsDictBenchmarkGetitem())().dict())
