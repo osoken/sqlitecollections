@@ -72,11 +72,11 @@ class BenchmarkInitBase(BenchmarkBase[target_dict_t]):
         return len(result) == target_dict_len and all((result[k] == target_dict[k] for k in target_dict.keys()))
 
 
-class BenchmarkLenBase(BenchmarkBase[int]):
-    def exec(self) -> int:
+class BenchmarkLenBase(BenchmarkBase[target_dict_value_t]):
+    def exec(self) -> target_dict_value_t:
         return len(self._sut)
 
-    def assertion(self, result: int) -> bool:
+    def assertion(self, result: target_dict_value_t) -> bool:
         return result == target_dict_len
 
 
