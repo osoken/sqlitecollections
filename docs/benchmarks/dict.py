@@ -120,6 +120,14 @@ class BenchmarkContainsBase(BenchmarkBase[bool]):
         return result
 
 
+class BenchmarkNotContainsBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        return "-651" not in self._sut
+
+    def assertion(self, result: bool) -> bool:
+        return result
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -170,6 +178,14 @@ class SqliteCollectionsDictBenchmarkContains(SqliteCollectionsDictBenchmarkBase,
     pass
 
 
+class BuiltinDictBenchmarkNotContains(BuiltinDictBenchmarkBase, BenchmarkNotContainsBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkNotContains(SqliteCollectionsDictBenchmarkBase, BenchmarkNotContainsBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -178,4 +194,11 @@ if __name__ == "__main__":
     print(Comparison("`__delitem__`", BuiltinDictBenchmarkDelitem(), SqliteCollectionsDictBenchmarkDelitem())().dict())
     print(
         Comparison("`__contains__`", BuiltinDictBenchmarkContains(), SqliteCollectionsDictBenchmarkContains())().dict()
+    )
+    print(
+        Comparison(
+            "`__contains__` (unsuccessful search)",
+            BuiltinDictBenchmarkNotContains(),
+            SqliteCollectionsDictBenchmarkNotContains(),
+        )().dict()
     )
