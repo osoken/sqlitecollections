@@ -4,9 +4,9 @@ import sys
 from typing import Any, cast
 
 if sys.version_info > (3, 9):
-    from collections.abc import MutableMapping, Tuple
+    from collections.abc import MutableMapping, Set, Tuple
 else:
-    from typing import MutableMapping, Tuple
+    from typing import MutableMapping, Tuple, Set
 
 from sqlitecollections import Dict
 
@@ -134,6 +134,14 @@ class BenchmarkContainsBase(BenchmarkBase[bool]):
         return result
 
 
+class BenchmarkIterBase(BenchmarkBase[Set[target_dict_key_t]]):
+    def exec(self) -> Set[target_dict_key_t]:
+        return set(self._sut)
+
+    def assertion(self, result: Set[target_dict_key_t]) -> bool:
+        return result == set(target_dict)
+
+
 class BenchmarkNotContainsBase(BenchmarkBase[bool]):
     def exec(self) -> bool:
         return "-651" not in self._sut
@@ -210,6 +218,14 @@ class SqliteCollectionsDictBenchmarkNotContains(SqliteCollectionsDictBenchmarkBa
     pass
 
 
+class BuiltinDictBenchmarkIter(BuiltinDictBenchmarkBase, BenchmarkIterBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkIter(SqliteCollectionsDictBenchmarkBase, BenchmarkIterBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -239,3 +255,4 @@ if __name__ == "__main__":
             SqliteCollectionsDictBenchmarkNotContains(),
         )().dict()
     )
+    print(Comparison("`__iter__`", BuiltinDictBenchmarkIter(), SqliteCollectionsDictBenchmarkIter())().dict())
