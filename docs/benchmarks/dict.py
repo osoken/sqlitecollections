@@ -150,6 +150,15 @@ class BenchmarkIterBase(BenchmarkBase[Set[target_dict_key_t]]):
         return result == set(target_dict)
 
 
+class BenchmarkClearBase(BenchmarkBase[target_dict_t]):
+    def exec(self) -> target_dict_t:
+        self._sut.clear()
+        return self._sut
+
+    def assertion(self, result: target_dict_t) -> bool:
+        return len(result) == 0
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -226,6 +235,14 @@ class SqliteCollectionsDictBenchmarkIter(SqliteCollectionsDictBenchmarkBase, Ben
     pass
 
 
+class BuiltinDictBenchmarkClear(BuiltinDictBenchmarkBase, BenchmarkClearBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkClear(SqliteCollectionsDictBenchmarkBase, BenchmarkClearBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -256,3 +273,4 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`__iter__`", BuiltinDictBenchmarkIter(), SqliteCollectionsDictBenchmarkIter())().dict())
+    print(Comparison("`clear`", BuiltinDictBenchmarkClear(), SqliteCollectionsDictBenchmarkClear())().dict())
