@@ -159,6 +159,14 @@ class BenchmarkClearBase(BenchmarkBase[target_dict_t]):
         return len(result) == 0
 
 
+class BenchmarkCopyBase(BenchmarkBase[target_dict_t]):
+    def exec(self) -> target_dict_t:
+        return self._sut.copy()
+
+    def assertion(self, result: target_dict_t) -> bool:
+        return len(result) == target_dict_len and all((result[k] == target_dict[k] for k in target_dict))
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -243,6 +251,14 @@ class SqliteCollectionsDictBenchmarkClear(SqliteCollectionsDictBenchmarkBase, Be
     pass
 
 
+class BuiltinDictBenchmarkCopy(BuiltinDictBenchmarkBase, BenchmarkCopyBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkCopy(SqliteCollectionsDictBenchmarkBase, BenchmarkCopyBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -274,3 +290,4 @@ if __name__ == "__main__":
     )
     print(Comparison("`__iter__`", BuiltinDictBenchmarkIter(), SqliteCollectionsDictBenchmarkIter())().dict())
     print(Comparison("`clear`", BuiltinDictBenchmarkClear(), SqliteCollectionsDictBenchmarkClear())().dict())
+    print(Comparison("`copy`", BuiltinDictBenchmarkCopy(), SqliteCollectionsDictBenchmarkCopy())().dict())
