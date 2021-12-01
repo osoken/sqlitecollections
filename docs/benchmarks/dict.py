@@ -193,6 +193,22 @@ class SqliteCollectionsDictBenchmarkInit(SqliteCollectionsDictBenchmarkBase, Ben
         return Dict[target_dict_key_t, target_dict_value_t](data=target_dict.items())
 
 
+class BenchmarkItemsBase(BenchmarkBase[Set[Tuple[target_dict_key_t, target_dict_value_t]]]):
+    def exec(self) -> Set[Tuple[target_dict_key_t, target_dict_value_t]]:
+        return set(self._sut.items())
+
+    def assertion(self, result: Set[Tuple[target_dict_key_t, target_dict_value_t]]) -> bool:
+        return result == set(target_dict.items())
+
+
+class BenchmarkKeysBase(BenchmarkBase[Set[target_dict_key_t]]):
+    def exec(self) -> Set[target_dict_key_t]:
+        return set(self._sut.keys())
+
+    def assertion(self, result: Set[target_dict_key_t]) -> bool:
+        return result == set(target_dict.keys())
+
+
 class BuiltinDictBenchmarkLen(BuiltinDictBenchmarkBase, BenchmarkLenBase):
     pass
 
@@ -291,6 +307,22 @@ class SqliteCollectionsDictBenchmarkGetDefault(SqliteCollectionsDictBenchmarkBas
     pass
 
 
+class BuiltinDictBenchmarkItems(BuiltinDictBenchmarkBase, BenchmarkItemsBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkItems(SqliteCollectionsDictBenchmarkBase, BenchmarkItemsBase):
+    pass
+
+
+class BuiltinDictBenchmarkKeys(BuiltinDictBenchmarkBase, BenchmarkKeysBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkKeys(SqliteCollectionsDictBenchmarkBase, BenchmarkKeysBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -329,3 +361,5 @@ if __name__ == "__main__":
             "`get (unsuccessful search)`", BuiltinDictBenchmarkGetDefault(), SqliteCollectionsDictBenchmarkGetDefault()
         )().dict()
     )
+    print(Comparison("`items`", BuiltinDictBenchmarkItems(), SqliteCollectionsDictBenchmarkItems())().dict())
+    print(Comparison("`keys`", BuiltinDictBenchmarkKeys(), SqliteCollectionsDictBenchmarkKeys())().dict())
