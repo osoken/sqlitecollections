@@ -199,6 +199,24 @@ class BenchmarkKeysBase(BenchmarkBase[Set[target_dict_key_t]]):
         return result == set(target_dict.keys())
 
 
+class BenchmarkPopBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_value_t]]):
+    def exec(self) -> Tuple[target_dict_value_t, target_dict_value_t]:
+        val = self._sut.pop("651")
+        return (val, self._sut)
+
+    def assertion(self, result: Tuple[target_dict_value_t, target_dict_value_t]) -> bool:
+        return result[0] == 651 and len(result[1]) == (target_dict_len - 1) and "651" not in result[1]
+
+
+class BenchmarkPopDefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_value_t]]):
+    def exec(self) -> Tuple[target_dict_value_t, target_dict_value_t]:
+        val = self._sut.pop("-1", -1)
+        return (val, self._sut)
+
+    def assertion(self, result: Tuple[target_dict_value_t, target_dict_value_t]) -> bool:
+        return result[0] == -1 and len(result[1]) == target_dict_len
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -323,6 +341,22 @@ class SqliteCollectionsDictBenchmarkKeys(SqliteCollectionsDictBenchmarkBase, Ben
     pass
 
 
+class BuiltinDictBenchmarkPop(BuiltinDictBenchmarkBase, BenchmarkPopBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkPop(SqliteCollectionsDictBenchmarkBase, BenchmarkPopBase):
+    pass
+
+
+class BuiltinDictBenchmarkPopDefault(BuiltinDictBenchmarkBase, BenchmarkPopDefaultBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkPopDefault(SqliteCollectionsDictBenchmarkBase, BenchmarkPopDefaultBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -363,3 +397,9 @@ if __name__ == "__main__":
     )
     print(Comparison("`items`", BuiltinDictBenchmarkItems(), SqliteCollectionsDictBenchmarkItems())().dict())
     print(Comparison("`keys`", BuiltinDictBenchmarkKeys(), SqliteCollectionsDictBenchmarkKeys())().dict())
+    print(Comparison("`pop`", BuiltinDictBenchmarkPop(), SqliteCollectionsDictBenchmarkPop())().dict())
+    print(
+        Comparison(
+            "`pop (unsuccessful search)`", BuiltinDictBenchmarkPopDefault(), SqliteCollectionsDictBenchmarkPopDefault()
+        )().dict()
+    )
