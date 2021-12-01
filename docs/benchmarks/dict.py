@@ -183,16 +183,6 @@ class BenchmarkGetDefaultBase(BenchmarkBase[target_dict_value_t]):
         return result == -1
 
 
-class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
-    def exec(self) -> target_dict_t:
-        return dict(target_dict.items())
-
-
-class SqliteCollectionsDictBenchmarkInit(SqliteCollectionsDictBenchmarkBase, BenchmarkInitBase):
-    def exec(self) -> target_dict_t:
-        return Dict[target_dict_key_t, target_dict_value_t](data=target_dict.items())
-
-
 class BenchmarkItemsBase(BenchmarkBase[Set[Tuple[target_dict_key_t, target_dict_value_t]]]):
     def exec(self) -> Set[Tuple[target_dict_key_t, target_dict_value_t]]:
         return set(self._sut.items())
@@ -207,6 +197,16 @@ class BenchmarkKeysBase(BenchmarkBase[Set[target_dict_key_t]]):
 
     def assertion(self, result: Set[target_dict_key_t]) -> bool:
         return result == set(target_dict.keys())
+
+
+class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
+    def exec(self) -> target_dict_t:
+        return dict(target_dict.items())
+
+
+class SqliteCollectionsDictBenchmarkInit(SqliteCollectionsDictBenchmarkBase, BenchmarkInitBase):
+    def exec(self) -> target_dict_t:
+        return Dict[target_dict_key_t, target_dict_value_t](data=target_dict.items())
 
 
 class BuiltinDictBenchmarkLen(BuiltinDictBenchmarkBase, BenchmarkLenBase):
