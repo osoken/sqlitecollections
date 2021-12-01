@@ -167,6 +167,22 @@ class BenchmarkCopyBase(BenchmarkBase[target_dict_t]):
         return len(result) == target_dict_len and all((result[k] == target_dict[k] for k in target_dict))
 
 
+class BenchmarkGetBase(BenchmarkBase[target_dict_value_t]):
+    def exec(self) -> target_dict_value_t:
+        return self._sut.get("651")
+
+    def assertion(self, result: target_dict_value_t) -> bool:
+        return result == 651
+
+
+class BenchmarkGetDefaultBase(BenchmarkBase[target_dict_value_t]):
+    def exec(self) -> target_dict_value_t:
+        return self._sut.get("-1", -1)
+
+    def assertion(self, result: target_dict_value_t) -> bool:
+        return result == -1
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -259,6 +275,22 @@ class SqliteCollectionsDictBenchmarkCopy(SqliteCollectionsDictBenchmarkBase, Ben
     pass
 
 
+class BuiltinDictBenchmarkGet(BuiltinDictBenchmarkBase, BenchmarkGetBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkGet(SqliteCollectionsDictBenchmarkBase, BenchmarkGetBase):
+    pass
+
+
+class BuiltinDictBenchmarkGetDefault(BuiltinDictBenchmarkBase, BenchmarkGetDefaultBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkGetDefault(SqliteCollectionsDictBenchmarkBase, BenchmarkGetDefaultBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -291,3 +323,9 @@ if __name__ == "__main__":
     print(Comparison("`__iter__`", BuiltinDictBenchmarkIter(), SqliteCollectionsDictBenchmarkIter())().dict())
     print(Comparison("`clear`", BuiltinDictBenchmarkClear(), SqliteCollectionsDictBenchmarkClear())().dict())
     print(Comparison("`copy`", BuiltinDictBenchmarkCopy(), SqliteCollectionsDictBenchmarkCopy())().dict())
+    print(Comparison("`get`", BuiltinDictBenchmarkGet(), SqliteCollectionsDictBenchmarkGet())().dict())
+    print(
+        Comparison(
+            "`get (unsuccessful search)`", BuiltinDictBenchmarkGetDefault(), SqliteCollectionsDictBenchmarkGetDefault()
+        )().dict()
+    )
