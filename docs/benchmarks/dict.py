@@ -74,6 +74,7 @@ class BenchmarkInitBase(BenchmarkBase[target_dict_t]):
 
 class BenchmarkLenBase(BenchmarkBase[target_dict_value_t]):
     def exec(self) -> target_dict_value_t:
+        self._sut: target_dict_t
         return len(self._sut)
 
     def assertion(self, result: target_dict_value_t) -> bool:
@@ -82,6 +83,7 @@ class BenchmarkLenBase(BenchmarkBase[target_dict_value_t]):
 
 class BenchmarkGetitemBase(BenchmarkBase[target_dict_value_t]):
     def exec(self) -> target_dict_value_t:
+        self._sut: target_dict_t
         return self._sut["651"]
 
     def assertion(self, result: target_dict_value_t) -> bool:
@@ -90,6 +92,7 @@ class BenchmarkGetitemBase(BenchmarkBase[target_dict_value_t]):
 
 class BenchmarkSetitemReplaceBase(BenchmarkBase[target_dict_t]):
     def exec(self) -> target_dict_t:
+        self._sut: target_dict_t
         self._sut["651"] = -651
         return self._sut
 
@@ -103,6 +106,7 @@ class BenchmarkSetitemReplaceBase(BenchmarkBase[target_dict_t]):
 
 class BenchmarkSetitemAddNewItemBase(BenchmarkBase[target_dict_t]):
     def exec(self) -> target_dict_t:
+        self._sut: target_dict_t
         self._sut["-651"] = -651
         return self._sut
 
@@ -117,6 +121,7 @@ class BenchmarkSetitemAddNewItemBase(BenchmarkBase[target_dict_t]):
 
 class BenchmarkDelitemBase(BenchmarkBase[target_dict_t]):
     def exec(self) -> target_dict_t:
+        self._sut: target_dict_t
         del self._sut["651"]
         return self._sut
 
@@ -128,6 +133,7 @@ class BenchmarkDelitemBase(BenchmarkBase[target_dict_t]):
 
 class BenchmarkContainsBase(BenchmarkBase[bool]):
     def exec(self) -> bool:
+        self._sut: target_dict_t
         return "651" in self._sut
 
     def assertion(self, result: bool) -> bool:
@@ -136,6 +142,7 @@ class BenchmarkContainsBase(BenchmarkBase[bool]):
 
 class BenchmarkNotContainsBase(BenchmarkBase[bool]):
     def exec(self) -> bool:
+        self._sut: target_dict_t
         return "-651" not in self._sut
 
     def assertion(self, result: bool) -> bool:
@@ -144,6 +151,7 @@ class BenchmarkNotContainsBase(BenchmarkBase[bool]):
 
 class BenchmarkIterBase(BenchmarkBase[Set[target_dict_key_t]]):
     def exec(self) -> Set[target_dict_key_t]:
+        self._sut: target_dict_t
         return set(self._sut)
 
     def assertion(self, result: Set[target_dict_key_t]) -> bool:
@@ -152,6 +160,7 @@ class BenchmarkIterBase(BenchmarkBase[Set[target_dict_key_t]]):
 
 class BenchmarkClearBase(BenchmarkBase[target_dict_t]):
     def exec(self) -> target_dict_t:
+        self._sut: target_dict_t
         self._sut.clear()
         return self._sut
 
@@ -161,7 +170,9 @@ class BenchmarkClearBase(BenchmarkBase[target_dict_t]):
 
 class BenchmarkCopyBase(BenchmarkBase[target_dict_t]):
     def exec(self) -> target_dict_t:
-        return self._sut.copy()
+        self._sut: target_dict_t
+        retval = self._sut.copy()
+        return retval
 
     def assertion(self, result: target_dict_t) -> bool:
         return len(result) == target_dict_len and all((result[k] == target_dict[k] for k in target_dict))
@@ -169,7 +180,8 @@ class BenchmarkCopyBase(BenchmarkBase[target_dict_t]):
 
 class BenchmarkGetBase(BenchmarkBase[target_dict_value_t]):
     def exec(self) -> target_dict_value_t:
-        return self._sut.get("651")
+        self._sut: target_dict_t
+        return cast(target_dict_value_t, self._sut.get("651"))
 
     def assertion(self, result: target_dict_value_t) -> bool:
         return result == 651
@@ -177,6 +189,7 @@ class BenchmarkGetBase(BenchmarkBase[target_dict_value_t]):
 
 class BenchmarkGetDefaultBase(BenchmarkBase[target_dict_value_t]):
     def exec(self) -> target_dict_value_t:
+        self._sut: target_dict_t
         return self._sut.get("-1", -1)
 
     def assertion(self, result: target_dict_value_t) -> bool:
@@ -185,6 +198,7 @@ class BenchmarkGetDefaultBase(BenchmarkBase[target_dict_value_t]):
 
 class BenchmarkItemsBase(BenchmarkBase[Set[Tuple[target_dict_key_t, target_dict_value_t]]]):
     def exec(self) -> Set[Tuple[target_dict_key_t, target_dict_value_t]]:
+        self._sut: target_dict_t
         return set(self._sut.items())
 
     def assertion(self, result: Set[Tuple[target_dict_key_t, target_dict_value_t]]) -> bool:
@@ -193,36 +207,40 @@ class BenchmarkItemsBase(BenchmarkBase[Set[Tuple[target_dict_key_t, target_dict_
 
 class BenchmarkKeysBase(BenchmarkBase[Set[target_dict_key_t]]):
     def exec(self) -> Set[target_dict_key_t]:
+        self._sut: target_dict_t
         return set(self._sut.keys())
 
     def assertion(self, result: Set[target_dict_key_t]) -> bool:
         return result == set(target_dict.keys())
 
 
-class BenchmarkPopBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_value_t]]):
-    def exec(self) -> Tuple[target_dict_value_t, target_dict_value_t]:
+class BenchmarkPopBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]]):
+    def exec(self) -> Tuple[target_dict_value_t, target_dict_t]:
+        self._sut: target_dict_t
         val = self._sut.pop("651")
         return (val, self._sut)
 
-    def assertion(self, result: Tuple[target_dict_value_t, target_dict_value_t]) -> bool:
+    def assertion(self, result: Tuple[target_dict_value_t, target_dict_t]) -> bool:
         return result[0] == 651 and len(result[1]) == (target_dict_len - 1) and "651" not in result[1]
 
 
-class BenchmarkPopDefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_value_t]]):
-    def exec(self) -> Tuple[target_dict_value_t, target_dict_value_t]:
+class BenchmarkPopDefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]]):
+    def exec(self) -> Tuple[target_dict_value_t, target_dict_t]:
+        self._sut: target_dict_t
         val = self._sut.pop("-1", -1)
         return (val, self._sut)
 
-    def assertion(self, result: Tuple[target_dict_value_t, target_dict_value_t]) -> bool:
+    def assertion(self, result: Tuple[target_dict_value_t, target_dict_t]) -> bool:
         return result[0] == -1 and len(result[1]) == target_dict_len
 
 
 class BenchmarkPopitemBase(BenchmarkBase[Tuple[Tuple[target_dict_key_t, target_dict_value_t], target_dict_t]]):
-    def exec(self) -> Tuple[target_dict_key_t, target_dict_value_t]:
+    def exec(self) -> Tuple[Tuple[target_dict_key_t, target_dict_value_t], target_dict_t]:
+        self._sut: target_dict_t
         retval = self._sut.popitem()
         return (retval, self._sut)
 
-    def assertion(self, result: Tuple[Tuple[target_dict_key_t, target_dict_value_t], target_dict_t]):
+    def assertion(self, result: Tuple[Tuple[target_dict_key_t, target_dict_value_t], target_dict_t]) -> bool:
         return len(result[1]) == (target_dict_len - 1) and result[0][0] not in result
 
 
