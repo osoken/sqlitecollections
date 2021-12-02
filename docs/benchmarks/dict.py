@@ -217,6 +217,15 @@ class BenchmarkPopDefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_di
         return result[0] == -1 and len(result[1]) == target_dict_len
 
 
+class BenchmarkPopitemBase(BenchmarkBase[Tuple[Tuple[target_dict_key_t, target_dict_value_t], target_dict_t]]):
+    def exec(self) -> Tuple[target_dict_key_t, target_dict_value_t]:
+        retval = self._sut.popitem()
+        return (retval, self._sut)
+
+    def assertion(self, result: Tuple[Tuple[target_dict_key_t, target_dict_value_t], target_dict_t]):
+        return len(result[1]) == (target_dict_len - 1) and result[0][0] not in result
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -357,6 +366,14 @@ class SqliteCollectionsDictBenchmarkPopDefault(SqliteCollectionsDictBenchmarkBas
     pass
 
 
+class BuiltinDictBenchmarkPopitem(BuiltinDictBenchmarkBase, BenchmarkPopitemBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkPopitem(SqliteCollectionsDictBenchmarkBase, BenchmarkPopitemBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -403,3 +420,4 @@ if __name__ == "__main__":
             "`pop (unsuccessful search)`", BuiltinDictBenchmarkPopDefault(), SqliteCollectionsDictBenchmarkPopDefault()
         )().dict()
     )
+    print(Comparison("`popitem`", BuiltinDictBenchmarkPopitem(), SqliteCollectionsDictBenchmarkPopitem())().dict())
