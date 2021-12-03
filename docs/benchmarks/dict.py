@@ -6,7 +6,13 @@ from typing import Any, cast
 if sys.version_info > (3, 9):
     from collections.abc import MutableMapping, Set, Tuple
 else:
-    from typing import MutableMapping, Tuple, Set
+    from typing import MutableMapping, Set, Tuple
+
+if sys.version_info >= (3, 8):
+    if sys.version_info > (3, 9):
+        from collections.abc import Sequence
+    else:
+        from typing import Sequence
 
 from sqlitecollections import Dict
 
@@ -244,6 +250,16 @@ class BenchmarkPopitemBase(BenchmarkBase[Tuple[Tuple[target_dict_key_t, target_d
         return len(result[1]) == (target_dict_len - 1) and result[0][0] not in result
 
 
+class BenchmarkReversedBase(BenchmarkBase[Sequence[target_dict_key_t]]):
+    def exec(self) -> Sequence[target_dict_key_t]:
+        retkeys = list(reversed(self._sut))
+        return retkeys
+
+    def assertion(self, result: Sequence[target_dict_key_t]):
+        keys = list(target_dict)
+        return len(result) == len(keys) and all((a == b for a, b in zip(result, keys[::-1])))
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -392,6 +408,14 @@ class SqliteCollectionsDictBenchmarkPopitem(SqliteCollectionsDictBenchmarkBase, 
     pass
 
 
+class BuiltinDictBenchmarkReversed(BuiltinDictBenchmarkBase, BenchmarkReversedBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkReversed(SqliteCollectionsDictBenchmarkBase, BenchmarkReversedBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -439,3 +463,4 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`popitem`", BuiltinDictBenchmarkPopitem(), SqliteCollectionsDictBenchmarkPopitem())().dict())
+    print(Comparison("`reversed`", BuiltinDictBenchmarkReversed(), SqliteCollectionsDictBenchmarkReversed())().dict())
