@@ -250,14 +250,16 @@ class BenchmarkPopitemBase(BenchmarkBase[Tuple[Tuple[target_dict_key_t, target_d
         return len(result[1]) == (target_dict_len - 1) and result[0][0] not in result
 
 
-class BenchmarkReversedBase(BenchmarkBase[Sequence[target_dict_key_t]]):
-    def exec(self) -> Sequence[target_dict_key_t]:
-        retkeys = list(reversed(self._sut))
-        return retkeys
+if sys.version_info >= (3, 8):
 
-    def assertion(self, result: Sequence[target_dict_key_t]):
-        keys = list(target_dict)
-        return len(result) == len(keys) and all((a == b for a, b in zip(result, keys[::-1])))
+    class BenchmarkReversedBase(BenchmarkBase[Sequence[target_dict_key_t]]):
+        def exec(self) -> Sequence[target_dict_key_t]:
+            retkeys = list(reversed(self._sut))
+            return retkeys
+
+        def assertion(self, result: Sequence[target_dict_key_t]):
+            keys = list(target_dict)
+            return len(result) == len(keys) and all((a == b for a, b in zip(result, keys[::-1])))
 
 
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
@@ -408,12 +410,13 @@ class SqliteCollectionsDictBenchmarkPopitem(SqliteCollectionsDictBenchmarkBase, 
     pass
 
 
-class BuiltinDictBenchmarkReversed(BuiltinDictBenchmarkBase, BenchmarkReversedBase):
-    pass
+if sys.version_info >= (3, 8):
 
+    class BuiltinDictBenchmarkReversed(BuiltinDictBenchmarkBase, BenchmarkReversedBase):
+        pass
 
-class SqliteCollectionsDictBenchmarkReversed(SqliteCollectionsDictBenchmarkBase, BenchmarkReversedBase):
-    pass
+    class SqliteCollectionsDictBenchmarkReversed(SqliteCollectionsDictBenchmarkBase, BenchmarkReversedBase):
+        pass
 
 
 if __name__ == "__main__":
@@ -463,4 +466,7 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`popitem`", BuiltinDictBenchmarkPopitem(), SqliteCollectionsDictBenchmarkPopitem())().dict())
-    print(Comparison("`reversed`", BuiltinDictBenchmarkReversed(), SqliteCollectionsDictBenchmarkReversed())().dict())
+    if sys.version_info >= (3, 8):
+        print(
+            Comparison("`reversed`", BuiltinDictBenchmarkReversed(), SqliteCollectionsDictBenchmarkReversed())().dict()
+        )
