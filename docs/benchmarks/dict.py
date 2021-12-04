@@ -254,6 +254,7 @@ if sys.version_info >= (3, 8):
 
     class BenchmarkReversedBase(BenchmarkBase[Sequence[target_dict_key_t]]):
         def exec(self) -> Sequence[target_dict_key_t]:
+            self._sut: target_dict_t
             retkeys = list(reversed(self._sut))
             return retkeys
 
