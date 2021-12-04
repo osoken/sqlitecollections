@@ -263,6 +263,26 @@ if sys.version_info >= (3, 8):
             return len(result) == len(keys) and all((a == b for a, b in zip(result, keys[::-1])))
 
 
+class BenchmarkSetdefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]]):
+    def exec(self) -> Tuple[target_dict_value_t, target_dict_t]:
+        self._sut: target_dict_t
+        retval = self._sut.setdefault("651")
+        return (retval, self._sut)
+
+    def assertion(self, result: Tuple[target_dict_value_t, target_dict_t]) -> bool:
+        return len(result[1]) == target_dict_len and result[0] == 651
+
+
+class BenchmarkSetdefaultAddItemBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]]):
+    def exec(self) -> Tuple[target_dict_value_t, target_dict_t]:
+        self._sut: target_dict_t
+        retval = self._sut.setdefault("-1", -1)
+        return (retval, self._sut)
+
+    def assertion(self, result: Tuple[target_dict_value_t, target_dict_t]) -> bool:
+        return len(result[1]) == (target_dict_len + 1) and result[0] == -1 and result[1]["-1"] == -1
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -411,6 +431,24 @@ class SqliteCollectionsDictBenchmarkPopitem(SqliteCollectionsDictBenchmarkBase, 
     pass
 
 
+class BuiltinDictBenchmarkSetdefault(BuiltinDictBenchmarkBase, BenchmarkSetdefaultBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkSetdefault(SqliteCollectionsDictBenchmarkBase, BenchmarkSetdefaultBase):
+    pass
+
+
+class BuiltinDictBenchmarkSetdefaultAddItem(BuiltinDictBenchmarkBase, BenchmarkSetdefaultAddItemBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkSetdefaultAddItem(
+    SqliteCollectionsDictBenchmarkBase, BenchmarkSetdefaultAddItemBase
+):
+    pass
+
+
 if sys.version_info >= (3, 8):
 
     class BuiltinDictBenchmarkReversed(BuiltinDictBenchmarkBase, BenchmarkReversedBase):
@@ -471,3 +509,15 @@ if __name__ == "__main__":
         print(
             Comparison("`reversed`", BuiltinDictBenchmarkReversed(), SqliteCollectionsDictBenchmarkReversed())().dict()
         )
+    print(
+        Comparison(
+            "`setdefault`", BuiltinDictBenchmarkSetdefault(), SqliteCollectionsDictBenchmarkSetdefault()
+        )().dict()
+    )
+    print(
+        Comparison(
+            "`setdefault (unsuccessful search)`",
+            BuiltinDictBenchmarkSetdefaultAddItem(),
+            SqliteCollectionsDictBenchmarkSetdefaultAddItem(),
+        )().dict()
+    )
