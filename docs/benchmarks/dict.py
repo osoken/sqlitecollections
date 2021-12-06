@@ -292,6 +292,15 @@ class BenchmarkUpdateBase(BenchmarkBase[target_dict_t]):
         return len(self._sut) == (target_dict_len + 1) and self._sut["-1"] == -1
 
 
+class BenchmarkUpdateManyBase(BenchmarkBase[target_dict_t]):
+    def exec(self) -> target_dict_t:
+        self._sut.update((str(-v), -v) for v in target_dict.values())
+        return self._sut
+
+    def assertion(self, result: target_dict_t) -> bool:
+        return len(self._sut) == (target_dict_len * 2 - 1) and self._sut["-1"] == -1
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -475,6 +484,14 @@ class SqliteCollectionsDictBenchmarkUpdate(SqliteCollectionsDictBenchmarkBase, B
     pass
 
 
+class BuiltinDictBenchmarkUpdateMany(BuiltinDictBenchmarkBase, BenchmarkUpdateManyBase):
+    pass
+
+
+class SqliteCollectionsDictBenchmarkUpdateMany(SqliteCollectionsDictBenchmarkBase, BenchmarkUpdateManyBase):
+    pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -539,3 +556,8 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`update`", BuiltinDictBenchmarkUpdate(), SqliteCollectionsDictBenchmarkUpdate())().dict())
+    print(
+        Comparison(
+            "`update` (many)", BuiltinDictBenchmarkUpdateMany(), SqliteCollectionsDictBenchmarkUpdateMany()
+        )().dict()
+    )
