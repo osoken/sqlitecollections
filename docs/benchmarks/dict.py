@@ -328,6 +328,22 @@ if sys.version_info >= (3, 9):
         def assertion(self, result: target_dict_t) -> bool:
             return len(result) == (target_dict_len * 2 - 1) and result["-1"] == -1
 
+    class BenchmarkIorBase(BenchmarkBase[target_dict_t]):
+        def exec(self) -> target_dict_t:
+            self._sut |= {"-1": -1}
+            return self._sut
+
+        def assertion(self, result: target_dict_t) -> bool:
+            return len(result) == (target_dict_len + 1) and result["-1"] == -1
+
+    class BenchmarkIorManyBase(BenchmarkBase[target_dict_t]):
+        def exec(self) -> target_dict_t:
+            self._sut |= {str(-v): -v for v in target_dict.values()}
+            return self._sut
+
+        def assertion(self, result: target_dict_t) -> bool:
+            return len(result) == (target_dict_len * 2 - 1) and result["-1"] == -1
+
 
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
@@ -542,6 +558,18 @@ if sys.version_info >= (3, 9):
     class SqliteCollectionsDictBenchmarkOrMany(SqliteCollectionsDictBenchmarkBase, BenchmarkOrManyBase):
         pass
 
+    class BuiltinDictBenchmarkIor(BuiltinDictBenchmarkBase, BenchmarkIorBase):
+        pass
+
+    class SqliteCollectionsDictBenchmarkIor(SqliteCollectionsDictBenchmarkBase, BenchmarkIorBase):
+        pass
+
+    class BuiltinDictBenchmarkIorMany(BuiltinDictBenchmarkBase, BenchmarkIorManyBase):
+        pass
+
+    class SqliteCollectionsDictBenchmarkIorMany(SqliteCollectionsDictBenchmarkBase, BenchmarkIorManyBase):
+        pass
+
 
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
@@ -617,4 +645,10 @@ if __name__ == "__main__":
         print(Comparison("`__or__`", BuiltinDictBenchmarkOr(), SqliteCollectionsDictBenchmarkOr())().dict())
         print(
             Comparison("`__or__` (many)", BuiltinDictBenchmarkOrMany(), SqliteCollectionsDictBenchmarkOrMany())().dict()
+        )
+        print(Comparison("`__ior__`", BuiltinDictBenchmarkIor(), SqliteCollectionsDictBenchmarkIor())().dict())
+        print(
+            Comparison(
+                "`__ior__` (many)", BuiltinDictBenchmarkIorMany(), SqliteCollectionsDictBenchmarkIorMany()
+            )().dict()
         )
