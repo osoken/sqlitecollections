@@ -4,9 +4,11 @@ import sys
 from typing import Any, cast
 
 if sys.version_info > (3, 9):
-    from collections.abc import MutableMapping, Set, Tuple
+    from collections.abc import MutableMapping, Set
 else:
-    from typing import MutableMapping, Set, Tuple
+    from typing import MutableMapping, Set
+
+from typing import Tuple
 
 if sys.version_info >= (3, 8):
     if sys.version_info > (3, 9):
@@ -310,6 +312,23 @@ class BenchmarkValuesBase(BenchmarkBase[Set[target_dict_value_t]]):
         return result == set(target_dict.values())
 
 
+if sys.version_info >= (3, 9):
+
+    class BenchmarkOrBase(BenchmarkBase[target_dict_t]):
+        def exec(self) -> target_dict_t:
+            return self._sut | {"-1": -1}
+
+        def assertion(self, result: target_dict_t) -> bool:
+            return len(result) == (target_dict_len + 1) and result["-1"] == -1
+
+    class BenchmarkOrManyBase(BenchmarkBase[target_dict_t]):
+        def exec(self) -> target_dict_t:
+            return self._sut | {str(-v): -v for v in target_dict.values()}
+
+        def assertion(self, result: target_dict_t) -> bool:
+            return len(result) == (target_dict_len * 2 - 1) and result["-1"] == -1
+
+
 class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
         return dict(target_dict.items())
@@ -509,6 +528,21 @@ class SqliteCollectionsDictBenchmarkValues(SqliteCollectionsDictBenchmarkBase, B
     pass
 
 
+if sys.version_info >= (3, 9):
+
+    class BuiltinDictBenchmarkOr(BuiltinDictBenchmarkBase, BenchmarkOrBase):
+        pass
+
+    class SqliteCollectionsDictBenchmarkOr(SqliteCollectionsDictBenchmarkBase, BenchmarkOrBase):
+        pass
+
+    class BuiltinDictBenchmarkOrMany(BuiltinDictBenchmarkBase, BenchmarkOrManyBase):
+        pass
+
+    class SqliteCollectionsDictBenchmarkOrMany(SqliteCollectionsDictBenchmarkBase, BenchmarkOrManyBase):
+        pass
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
@@ -579,3 +613,8 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`values`", BuiltinDictBenchmarkValues(), SqliteCollectionsDictBenchmarkValues())().dict())
+    if sys.version_info >= (3, 9):
+        print(Comparison("`__or__`", BuiltinDictBenchmarkOr(), SqliteCollectionsDictBenchmarkOr())().dict())
+        print(
+            Comparison("`__or__` (many)", BuiltinDictBenchmarkOrMany(), SqliteCollectionsDictBenchmarkOrMany())().dict()
+        )
