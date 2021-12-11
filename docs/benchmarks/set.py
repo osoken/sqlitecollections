@@ -71,6 +71,14 @@ class BenchmarkInitBase(BenchmarkBase[target_set_t]):
         return len(result) == len(target_set) and all(d in target_set for d in result)
 
 
+class BenchmarkLenBase(BenchmarkBase[int]):
+    def exec(self) -> int:
+        return len(self._sut)
+
+    def assertion(self, result: int) -> bool:
+        return result == target_set_len
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -81,5 +89,14 @@ class SqliteCollectionsSetBenchmarkInit(SqliteCollectionsSetBenchmarkBase, Bench
         return Set[target_set_item_t](data=(s for s in target_set))
 
 
+class BuiltinSetBenchmarkLen(BuiltinSetBenchmarkBase, BenchmarkLenBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkLen(SqliteCollectionsSetBenchmarkBase, BenchmarkLenBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
+    print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
