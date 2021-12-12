@@ -79,6 +79,24 @@ class BenchmarkLenBase(BenchmarkBase[int]):
         return result == target_set_len
 
 
+class BenchmarkContainsBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return "651" in self._sut
+
+    def assertion(self, result: bool) -> bool:
+        return result
+
+
+class BenchmarkNotContainsBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return "-651" not in self._sut
+
+    def assertion(self, result: bool) -> bool:
+        return result
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -97,6 +115,30 @@ class SqliteCollectionsSetBenchmarkLen(SqliteCollectionsSetBenchmarkBase, Benchm
     ...
 
 
+class BuiltinSetBenchmarkContains(BuiltinSetBenchmarkBase, BenchmarkContainsBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkContains(SqliteCollectionsSetBenchmarkBase, BenchmarkContainsBase):
+    ...
+
+
+class BuiltinSetBenchmarkNotContains(BuiltinSetBenchmarkBase, BenchmarkNotContainsBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkNotContains(SqliteCollectionsSetBenchmarkBase, BenchmarkNotContainsBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
+    print(Comparison("`__contains__`", BuiltinSetBenchmarkContains(), SqliteCollectionsSetBenchmarkContains())().dict())
+    print(
+        Comparison(
+            "`__contains__` (unsuccessful search)",
+            BuiltinSetBenchmarkNotContains(),
+            SqliteCollectionsSetBenchmarkNotContains(),
+        )().dict()
+    )
