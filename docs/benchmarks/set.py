@@ -97,6 +97,24 @@ class BenchmarkNotContainsBase(BenchmarkBase[bool]):
         return result
 
 
+class BenchmarkIsdisjointBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut.isdisjoint({"-1"})
+
+    def assertion(self, result: bool) -> bool:
+        return result
+
+
+class BenchmarkIsdisjointNotBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut.isdisjoint({"1"})
+
+    def assertion(self, result: bool) -> bool:
+        return not result
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -131,6 +149,22 @@ class SqliteCollectionsSetBenchmarkNotContains(SqliteCollectionsSetBenchmarkBase
     ...
 
 
+class BuiltinSetBenchmarkIsdisjoint(BuiltinSetBenchmarkBase, BenchmarkIsdisjointBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIsdisjoint(SqliteCollectionsSetBenchmarkBase, BenchmarkIsdisjointBase):
+    ...
+
+
+class BuiltinSetBenchmarkIsdisjointNot(BuiltinSetBenchmarkBase, BenchmarkIsdisjointNotBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIsdisjointNot(SqliteCollectionsSetBenchmarkBase, BenchmarkIsdisjointNotBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -140,5 +174,15 @@ if __name__ == "__main__":
             "`__contains__` (unsuccessful search)",
             BuiltinSetBenchmarkNotContains(),
             SqliteCollectionsSetBenchmarkNotContains(),
+        )().dict()
+    )
+    print(
+        Comparison("`isdisjoint`", BuiltinSetBenchmarkIsdisjoint(), SqliteCollectionsSetBenchmarkIsdisjoint())().dict()
+    )
+    print(
+        Comparison(
+            "`isdisjoint` (not disjoint)",
+            BuiltinSetBenchmarkIsdisjointNot(),
+            SqliteCollectionsSetBenchmarkIsdisjointNot(),
         )().dict()
     )
