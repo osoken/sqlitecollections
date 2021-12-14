@@ -115,6 +115,24 @@ class BenchmarkIsdisjointNotBase(BenchmarkBase[bool]):
         return not result
 
 
+class BenchmarkIssubsetBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut.issubset(iter(target_set))
+
+    def assertion(self, result: bool) -> bool:
+        return result
+
+
+class BenchmarkIssubsetNotBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut.issubset(iter([]))
+
+    def assertion(self, result: bool) -> bool:
+        return not result
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -165,6 +183,22 @@ class SqliteCollectionsSetBenchmarkIsdisjointNot(SqliteCollectionsSetBenchmarkBa
     ...
 
 
+class BuiltinSetBenchmarkIssubset(BuiltinSetBenchmarkBase, BenchmarkIssubsetBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIssubset(SqliteCollectionsSetBenchmarkBase, BenchmarkIssubsetBase):
+    ...
+
+
+class BuiltinSetBenchmarkIssubsetNot(BuiltinSetBenchmarkBase, BenchmarkIssubsetNotBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIssubsetNot(SqliteCollectionsSetBenchmarkBase, BenchmarkIssubsetNotBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -184,5 +218,13 @@ if __name__ == "__main__":
             "`isdisjoint` (not disjoint)",
             BuiltinSetBenchmarkIsdisjointNot(),
             SqliteCollectionsSetBenchmarkIsdisjointNot(),
+        )().dict()
+    )
+    print(Comparison("`issubset`", BuiltinSetBenchmarkIssubset(), SqliteCollectionsSetBenchmarkIssubset())().dict())
+    print(
+        Comparison(
+            "`issubset` (not subset)",
+            BuiltinSetBenchmarkIssubsetNot(),
+            SqliteCollectionsSetBenchmarkIssubsetNot(),
         )().dict()
     )
