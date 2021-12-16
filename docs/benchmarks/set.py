@@ -171,6 +171,24 @@ class BenchmarkLtNotBase(BenchmarkBase[bool]):
         return not result
 
 
+class BenchmarkIssupersetBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut.issuperset(iter(target_set))
+
+    def assertion(self, result: bool) -> bool:
+        return result
+
+
+class BenchmarkIssupersetNotBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut.issuperset(iter(larger_set))
+
+    def assertion(self, result: bool) -> bool:
+        return not result
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -269,6 +287,22 @@ class SqliteCollectionsSetBenchmarkLtNot(SqliteCollectionsSetBenchmarkBase, Benc
     ...
 
 
+class BuiltinSetBenchmarkIssuperset(BuiltinSetBenchmarkBase, BenchmarkIssupersetBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIssuperset(SqliteCollectionsSetBenchmarkBase, BenchmarkIssupersetBase):
+    ...
+
+
+class BuiltinSetBenchmarkIssupersetNot(BuiltinSetBenchmarkBase, BenchmarkIssupersetNotBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIssupersetNot(SqliteCollectionsSetBenchmarkBase, BenchmarkIssupersetNotBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -312,5 +346,15 @@ if __name__ == "__main__":
             "`__lt__` (not less than)",
             BuiltinSetBenchmarkLtNot(),
             SqliteCollectionsSetBenchmarkLtNot(),
+        )().dict()
+    )
+    print(
+        Comparison("`issuperset`", BuiltinSetBenchmarkIssuperset(), SqliteCollectionsSetBenchmarkIssuperset())().dict()
+    )
+    print(
+        Comparison(
+            "`issuperset` (not superset)",
+            BuiltinSetBenchmarkIssupersetNot(),
+            SqliteCollectionsSetBenchmarkIssupersetNot(),
         )().dict()
     )
