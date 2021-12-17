@@ -16,8 +16,10 @@ benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 
 target_set_len = 100000
 larger_set_diff = 100
+smaller_set_diff = -99900
 target_set = set(str(i) for i in range(target_set_len))
 larger_set = set(str(i) for i in range(target_set_len + larger_set_diff))
+smaller_set = set(str(i) for i in range(target_set_len + smaller_set_diff))
 target_set_item_t = str
 target_set_t = MutableSet[target_set_item_t]
 
@@ -189,6 +191,42 @@ class BenchmarkIssupersetNotBase(BenchmarkBase[bool]):
         return not result
 
 
+class BenchmarkGeBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut >= set()
+
+    def assertion(self, result: bool) -> bool:
+        return result
+
+
+class BenchmarkGeNotBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut >= larger_set
+
+    def assertion(self, result: bool) -> bool:
+        return not result
+
+
+class BenchmarkGtBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut > smaller_set
+
+    def assertion(self, result: bool) -> bool:
+        return result
+
+
+class BenchmarkGtNotBase(BenchmarkBase[bool]):
+    def exec(self) -> bool:
+        self._sut: target_set_t
+        return self._sut > target_set
+
+    def assertion(self, result: bool) -> bool:
+        return not result
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -303,6 +341,38 @@ class SqliteCollectionsSetBenchmarkIssupersetNot(SqliteCollectionsSetBenchmarkBa
     ...
 
 
+class BuiltinSetBenchmarkGe(BuiltinSetBenchmarkBase, BenchmarkGeBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkGe(SqliteCollectionsSetBenchmarkBase, BenchmarkGeBase):
+    ...
+
+
+class BuiltinSetBenchmarkGeNot(BuiltinSetBenchmarkBase, BenchmarkGeNotBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkGeNot(SqliteCollectionsSetBenchmarkBase, BenchmarkGeNotBase):
+    ...
+
+
+class BuiltinSetBenchmarkGt(BuiltinSetBenchmarkBase, BenchmarkGtBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkGt(SqliteCollectionsSetBenchmarkBase, BenchmarkGtBase):
+    ...
+
+
+class BuiltinSetBenchmarkGtNot(BuiltinSetBenchmarkBase, BenchmarkGtNotBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkGtNot(SqliteCollectionsSetBenchmarkBase, BenchmarkGtNotBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -356,5 +426,21 @@ if __name__ == "__main__":
             "`issuperset` (not superset)",
             BuiltinSetBenchmarkIssupersetNot(),
             SqliteCollectionsSetBenchmarkIssupersetNot(),
+        )().dict()
+    )
+    print(Comparison("`__ge__`", BuiltinSetBenchmarkGe(), SqliteCollectionsSetBenchmarkGe())().dict())
+    print(
+        Comparison(
+            "`__ge__` (not greater than or equals to)",
+            BuiltinSetBenchmarkGeNot(),
+            SqliteCollectionsSetBenchmarkGeNot(),
+        )().dict()
+    )
+    print(Comparison("`__gt__`", BuiltinSetBenchmarkGt(), SqliteCollectionsSetBenchmarkGt())().dict())
+    print(
+        Comparison(
+            "`__gt__` (not greater than)",
+            BuiltinSetBenchmarkGtNot(),
+            SqliteCollectionsSetBenchmarkGtNot(),
         )().dict()
     )
