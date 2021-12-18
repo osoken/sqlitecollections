@@ -20,6 +20,7 @@ smaller_set_diff = -99900
 target_set = set(str(i) for i in range(target_set_len))
 larger_set = set(str(i) for i in range(target_set_len + larger_set_diff))
 smaller_set = set(str(i) for i in range(target_set_len + smaller_set_diff))
+larger_target_diff = set(str(i) for i in range(target_set_len, target_set_len + larger_set_diff))
 target_set_item_t = str
 target_set_t = MutableSet[target_set_item_t]
 
@@ -227,6 +228,14 @@ class BenchmarkGtNotBase(BenchmarkBase[bool]):
         return not result
 
 
+class BenchmarkUnionBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        return self._sut.union(larger_target_diff)
+
+    def assertion(self, result: target_set_t):
+        return result == larger_set
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -373,6 +382,14 @@ class SqliteCollectionsSetBenchmarkGtNot(SqliteCollectionsSetBenchmarkBase, Benc
     ...
 
 
+class BuiltinSetBenchmarkUnion(BuiltinSetBenchmarkBase, BenchmarkUnionBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkUnion(SqliteCollectionsSetBenchmarkBase, BenchmarkUnionBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -444,3 +461,4 @@ if __name__ == "__main__":
             SqliteCollectionsSetBenchmarkGtNot(),
         )().dict()
     )
+    print(Comparison("`union`", BuiltinSetBenchmarkUnion(), SqliteCollectionsSetBenchmarkUnion())().dict())
