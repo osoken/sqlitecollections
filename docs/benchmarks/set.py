@@ -231,7 +231,7 @@ class BenchmarkGtNotBase(BenchmarkBase[bool]):
 class BenchmarkUnionBase(BenchmarkBase[target_set_t]):
     def exec(self) -> target_set_t:
         self._sut: target_set_t
-        return self._sut.union(larger_target_diff)
+        return self._sut.union(iter(larger_target_diff))
 
     def assertion(self, result: target_set_t):
         return result == larger_set
@@ -244,6 +244,24 @@ class BenchmarkOrBase(BenchmarkBase[target_set_t]):
 
     def assertion(self, result: target_set_t):
         return result == larger_set
+
+
+class BenchmarkIntersectionBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        return self._sut.intersection(iter(smaller_set))
+
+    def assertion(self, result: target_set_t):
+        return result == smaller_set
+
+
+class BenchmarkAndBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        return self._sut & smaller_set
+
+    def assertion(self, result: target_set_t):
+        return result == smaller_set
 
 
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
@@ -408,6 +426,22 @@ class SqliteCollectionsSetBenchmarkOr(SqliteCollectionsSetBenchmarkBase, Benchma
     ...
 
 
+class BuiltinSetBenchmarkIntersection(BuiltinSetBenchmarkBase, BenchmarkIntersectionBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIntersection(SqliteCollectionsSetBenchmarkBase, BenchmarkIntersectionBase):
+    ...
+
+
+class BuiltinSetBenchmarkAnd(BuiltinSetBenchmarkBase, BenchmarkAndBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkAnd(SqliteCollectionsSetBenchmarkBase, BenchmarkAndBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -481,3 +515,9 @@ if __name__ == "__main__":
     )
     print(Comparison("`union`", BuiltinSetBenchmarkUnion(), SqliteCollectionsSetBenchmarkUnion())().dict())
     print(Comparison("`__or__`", BuiltinSetBenchmarkOr(), SqliteCollectionsSetBenchmarkOr())().dict())
+    print(
+        Comparison(
+            "`intersection`", BuiltinSetBenchmarkIntersection(), SqliteCollectionsSetBenchmarkIntersection()
+        )().dict()
+    )
+    print(Comparison("`__and__`", BuiltinSetBenchmarkAnd(), SqliteCollectionsSetBenchmarkAnd())().dict())
