@@ -14,9 +14,9 @@ from common import BenchmarkBase, Comparison
 
 benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 
-target_set_len = 100000
+target_set_len = 10000
 larger_set_diff = 100
-smaller_set_diff = -99900
+smaller_set_diff = -9900
 target_set = set(str(i) for i in range(target_set_len))
 larger_set = set(str(i) for i in range(target_set_len + larger_set_diff))
 smaller_set = set(str(i) for i in range(target_set_len + smaller_set_diff))
