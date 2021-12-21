@@ -282,6 +282,24 @@ class BenchmarkSubBase(BenchmarkBase[target_set_t]):
         return len(result) == (len(target_set) - len(smaller_set)) and all(d not in smaller_set for d in result)
 
 
+class BenchmarkSymmetricDifferenceBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        return self._sut.symmetric_difference(iter(larger_set))
+
+    def assertion(self, result: target_set_t) -> bool:
+        return result == larger_target_diff
+
+
+class BenchmarkXorBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        return self._sut ^ larger_set
+
+    def assertion(self, result: target_set_t) -> bool:
+        return result == larger_target_diff
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -476,6 +494,24 @@ class SqliteCollectionsSetBenchmarkSub(SqliteCollectionsSetBenchmarkBase, Benchm
     ...
 
 
+class BuiltinSetBenchmarkSymmetricDifference(BuiltinSetBenchmarkBase, BenchmarkSymmetricDifferenceBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkSymmetricDifference(
+    SqliteCollectionsSetBenchmarkBase, BenchmarkSymmetricDifferenceBase
+):
+    ...
+
+
+class BuiltinSetBenchmarkXor(BuiltinSetBenchmarkBase, BenchmarkXorBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkXor(SqliteCollectionsSetBenchmarkBase, BenchmarkXorBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -559,3 +595,11 @@ if __name__ == "__main__":
         Comparison("`difference`", BuiltinSetBenchmarkDifference(), SqliteCollectionsSetBenchmarkDifference())().dict()
     )
     print(Comparison("`__sub__`", BuiltinSetBenchmarkSub(), SqliteCollectionsSetBenchmarkSub())().dict())
+    print(
+        Comparison(
+            "`symmetric_difference`",
+            BuiltinSetBenchmarkSymmetricDifference(),
+            SqliteCollectionsSetBenchmarkSymmetricDifference(),
+        )().dict()
+    )
+    print(Comparison("`__xor__`", BuiltinSetBenchmarkXor(), SqliteCollectionsSetBenchmarkXor())().dict())
