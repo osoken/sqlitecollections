@@ -300,6 +300,15 @@ class BenchmarkXorBase(BenchmarkBase[target_set_t]):
         return result == larger_target_diff
 
 
+class BenchmarkCopyBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        return self._sut.copy()
+
+    def assertion(self, result: target_set_t) -> bool:
+        return result == target_set
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -512,6 +521,14 @@ class SqliteCollectionsSetBenchmarkXor(SqliteCollectionsSetBenchmarkBase, Benchm
     ...
 
 
+class BuiltinSetBenchmarkCopy(BuiltinSetBenchmarkBase, BenchmarkCopyBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkCopy(SqliteCollectionsSetBenchmarkBase, BenchmarkCopyBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -603,3 +620,4 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`__xor__`", BuiltinSetBenchmarkXor(), SqliteCollectionsSetBenchmarkXor())().dict())
+    print(Comparison("`copy`", BuiltinSetBenchmarkCopy(), SqliteCollectionsSetBenchmarkCopy())().dict())
