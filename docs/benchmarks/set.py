@@ -273,6 +273,15 @@ class BenchmarkDifferenceBase(BenchmarkBase[target_set_t]):
         return len(result) == (len(target_set) - len(smaller_set)) and all(d not in smaller_set for d in result)
 
 
+class BenchmarkSubBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        return self._sut - smaller_set
+
+    def assertion(self, result: target_set_t) -> bool:
+        return len(result) == (len(target_set) - len(smaller_set)) and all(d not in smaller_set for d in result)
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -459,6 +468,14 @@ class SqliteCollectionsSetBenchmarkDifference(SqliteCollectionsSetBenchmarkBase,
     ...
 
 
+class BuiltinSetBenchmarkSub(BuiltinSetBenchmarkBase, BenchmarkSubBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkSub(SqliteCollectionsSetBenchmarkBase, BenchmarkSubBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -541,3 +558,4 @@ if __name__ == "__main__":
     print(
         Comparison("`difference`", BuiltinSetBenchmarkDifference(), SqliteCollectionsSetBenchmarkDifference())().dict()
     )
+    print(Comparison("`__sub__`", BuiltinSetBenchmarkSub(), SqliteCollectionsSetBenchmarkSub())().dict())
