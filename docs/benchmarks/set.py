@@ -329,6 +329,16 @@ class BenchmarkIorBase(BenchmarkBase[target_set_t]):
         return result == larger_set
 
 
+class BenchmarkIntersectionUpdateBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        self._sut.intersection_update(smaller_set)
+        return self._sut
+
+    def assertion(self, result: target_set_t) -> bool:
+        return result == smaller_set
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -565,6 +575,16 @@ class SqliteCollectionsSetBenchmarkIor(SqliteCollectionsSetBenchmarkBase, Benchm
     ...
 
 
+class BuiltinSetBenchmarkIntersectionUpdate(BuiltinSetBenchmarkBase, BenchmarkIntersectionUpdateBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIntersectionUpdate(
+    SqliteCollectionsSetBenchmarkBase, BenchmarkIntersectionUpdateBase
+):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -659,3 +679,10 @@ if __name__ == "__main__":
     print(Comparison("`copy`", BuiltinSetBenchmarkCopy(), SqliteCollectionsSetBenchmarkCopy())().dict())
     print(Comparison("`update`", BuiltinSetBenchmarkUpdate(), SqliteCollectionsSetBenchmarkUpdate())().dict())
     print(Comparison("`__ior__`", BuiltinSetBenchmarkIor(), SqliteCollectionsSetBenchmarkIor())().dict())
+    print(
+        Comparison(
+            "`intersection_update`",
+            BuiltinSetBenchmarkIntersectionUpdate(),
+            SqliteCollectionsSetBenchmarkIntersectionUpdate(),
+        )().dict()
+    )
