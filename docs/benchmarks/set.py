@@ -339,6 +339,16 @@ class BenchmarkIntersectionUpdateBase(BenchmarkBase[target_set_t]):
         return result == smaller_set
 
 
+class BenchmarkIandBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        self._sut &= smaller_set
+        return self._sut
+
+    def assertion(self, result: target_set_t) -> bool:
+        return result == smaller_set
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -585,6 +595,14 @@ class SqliteCollectionsSetBenchmarkIntersectionUpdate(
     ...
 
 
+class BuiltinSetBenchmarkIand(BuiltinSetBenchmarkBase, BenchmarkIandBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIand(SqliteCollectionsSetBenchmarkBase, BenchmarkIandBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -686,3 +704,4 @@ if __name__ == "__main__":
             SqliteCollectionsSetBenchmarkIntersectionUpdate(),
         )().dict()
     )
+    print(Comparison("`__iand__`", BuiltinSetBenchmarkIand(), SqliteCollectionsSetBenchmarkIand())().dict())
