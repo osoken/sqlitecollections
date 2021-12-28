@@ -359,6 +359,16 @@ class BenchmarkSymmetricDifferenceUpdateBase(BenchmarkBase[target_set_t]):
         return result == larger_target_diff
 
 
+class BenchmarkIxorBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        self._sut ^= larger_set
+        return self._sut
+
+    def assertion(self, result: target_set_t) -> bool:
+        return result == larger_target_diff
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -623,6 +633,14 @@ class SqliteCollectionsSetBenchmarkSymmetricDifferenceUpdate(
     ...
 
 
+class BuiltinSetBenchmarkIxor(BuiltinSetBenchmarkBase, BenchmarkIxorBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkIxor(SqliteCollectionsSetBenchmarkBase, BenchmarkIxorBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -732,3 +750,4 @@ if __name__ == "__main__":
             SqliteCollectionsSetBenchmarkSymmetricDifferenceUpdate(),
         )().dict()
     )
+    print(Comparison("`__ixor__`", BuiltinSetBenchmarkIxor(), SqliteCollectionsSetBenchmarkIxor())().dict())
