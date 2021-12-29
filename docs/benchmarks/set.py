@@ -369,6 +369,26 @@ class BenchmarkIxorBase(BenchmarkBase[target_set_t]):
         return result == larger_target_diff
 
 
+class BenchmarkAddExistingItemBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        self._sut.add("651")
+        return self._sut
+
+    def assertion(self, result: target_set_t) -> bool:
+        return result == target_set
+
+
+class BenchmarkAddNewItemBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        self._sut.add("-1")
+        return self._sut
+
+    def assertion(self, result: target_set_t) -> bool:
+        return len(result) == (target_set_len + 1) and "-1" in result and target_set < result
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -641,6 +661,22 @@ class SqliteCollectionsSetBenchmarkIxor(SqliteCollectionsSetBenchmarkBase, Bench
     ...
 
 
+class BuiltinSetBenchmarkAddExistingItem(BuiltinSetBenchmarkBase, BenchmarkAddExistingItemBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkAddExistingItem(SqliteCollectionsSetBenchmarkBase, BenchmarkAddExistingItemBase):
+    ...
+
+
+class BuiltinSetBenchmarkAddNewItem(BuiltinSetBenchmarkBase, BenchmarkAddNewItemBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkAddNewItem(SqliteCollectionsSetBenchmarkBase, BenchmarkAddNewItemBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -751,3 +787,15 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`__ixor__`", BuiltinSetBenchmarkIxor(), SqliteCollectionsSetBenchmarkIxor())().dict())
+    print(
+        Comparison(
+            "`add (existing item)`",
+            BuiltinSetBenchmarkAddExistingItem(),
+            SqliteCollectionsSetBenchmarkAddExistingItem(),
+        )().dict()
+    )
+    print(
+        Comparison(
+            "`add (new item)`", BuiltinSetBenchmarkAddNewItem(), SqliteCollectionsSetBenchmarkAddNewItem()
+        )().dict()
+    )
