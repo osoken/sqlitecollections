@@ -431,6 +431,16 @@ class BenchmarkPopBase(BenchmarkBase[Tuple[target_set_t, target_set_item_t]]):
         return len(result[0]) == (target_set_len - 1) and result[1] in target_set and result[1] not in result[0]
 
 
+class BenchmarkClearBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        self._sut.clear()
+        return self._sut
+
+    def assertion(self, result: target_set_t) -> bool:
+        return len(result) == 0
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -751,6 +761,14 @@ class SqliteCollectionsSetBenchmarkPop(SqliteCollectionsSetBenchmarkBase, Benchm
     ...
 
 
+class BuiltinSetBenchmarkClear(BuiltinSetBenchmarkBase, BenchmarkClearBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkClear(SqliteCollectionsSetBenchmarkBase, BenchmarkClearBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -883,3 +901,4 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`pop`", BuiltinSetBenchmarkPop(), SqliteCollectionsSetBenchmarkPop())().dict())
+    print(Comparison("`clear`", BuiltinSetBenchmarkClear(), SqliteCollectionsSetBenchmarkClear())().dict())
