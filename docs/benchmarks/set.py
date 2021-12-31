@@ -399,6 +399,26 @@ class BenchmarkRemoveBase(BenchmarkBase[target_set_t]):
         return len(result) == (target_set_len - 1) and "651" not in result
 
 
+class BenchmarkDiscardBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        self._sut.discard("651")
+        return self._sut
+
+    def assertion(self, result: target_set_t) -> bool:
+        return len(result) == (target_set_len - 1) and "651" not in result
+
+
+class BenchmarkDiscardNoChangesBase(BenchmarkBase[target_set_t]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        self._sut.discard("-1")
+        return self._sut
+
+    def assertion(self, result: target_set_t) -> bool:
+        return result == target_set
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -695,6 +715,22 @@ class SqliteCollectionsSetBenchmarkRemove(SqliteCollectionsSetBenchmarkBase, Ben
     ...
 
 
+class BuiltinSetBenchmarkDiscard(BuiltinSetBenchmarkBase, BenchmarkDiscardBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkDiscard(SqliteCollectionsSetBenchmarkBase, BenchmarkDiscardBase):
+    ...
+
+
+class BuiltinSetBenchmarkDiscardNoChanges(BuiltinSetBenchmarkBase, BenchmarkDiscardNoChangesBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkDiscardNoChanges(SqliteCollectionsSetBenchmarkBase, BenchmarkDiscardNoChangesBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -818,3 +854,11 @@ if __name__ == "__main__":
         )().dict()
     )
     print(Comparison("`remove`", BuiltinSetBenchmarkRemove(), SqliteCollectionsSetBenchmarkRemove())().dict())
+    print(Comparison("`discard`", BuiltinSetBenchmarkDiscard(), SqliteCollectionsSetBenchmarkDiscard())().dict())
+    print(
+        Comparison(
+            "`discard (no changes)`",
+            BuiltinSetBenchmarkDiscardNoChanges(),
+            SqliteCollectionsSetBenchmarkDiscardNoChanges(),
+        )().dict()
+    )
