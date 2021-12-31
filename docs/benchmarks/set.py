@@ -8,6 +8,8 @@ if sys.version_info > (3, 9):
 else:
     from typing import MutableSet
 
+from typing import Tuple
+
 from sqlitecollections import Set
 
 from common import BenchmarkBase, Comparison
@@ -419,6 +421,16 @@ class BenchmarkDiscardNoChangesBase(BenchmarkBase[target_set_t]):
         return result == target_set
 
 
+class BenchmarkPopBase(BenchmarkBase[Tuple[target_set_t, target_set_item_t]]):
+    def exec(self) -> target_set_t:
+        self._sut: target_set_t
+        ret = self._sut.pop()
+        return (self._sut, ret)
+
+    def assertion(self, result: Tuple[target_set_t, target_set_item_t]) -> bool:
+        return len(result[0]) == (target_set_len - 1) and result[1] in target_set and result[1] not in result[0]
+
+
 class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
         return set(s for s in target_set)
@@ -731,6 +743,14 @@ class SqliteCollectionsSetBenchmarkDiscardNoChanges(SqliteCollectionsSetBenchmar
     ...
 
 
+class BuiltinSetBenchmarkPop(BuiltinSetBenchmarkBase, BenchmarkPopBase):
+    ...
+
+
+class SqliteCollectionsSetBenchmarkPop(SqliteCollectionsSetBenchmarkBase, BenchmarkPopBase):
+    ...
+
+
 if __name__ == "__main__":
     print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
     print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
@@ -862,3 +882,4 @@ if __name__ == "__main__":
             SqliteCollectionsSetBenchmarkDiscardNoChanges(),
         )().dict()
     )
+    print(Comparison("`pop`", BuiltinSetBenchmarkPop(), SqliteCollectionsSetBenchmarkPop())().dict())
