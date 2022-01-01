@@ -2,12 +2,12 @@ import gc
 import os
 import random
 import sys
-from typing import Any, cast
+from typing import Any, Tuple
 
 if sys.version_info > (3, 9):
-    from collections.abc import MutableSequence, Tuple
+    from collections.abc import MutableSequence
 else:
-    from typing import MutableSequence, Tuple
+    from typing import MutableSequence
 
 from sqlitecollections import List
 
