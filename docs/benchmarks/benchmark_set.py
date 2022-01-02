@@ -58,7 +58,7 @@ class SqliteCollectionsSetBenchmarkBase:
 
     @property
     def name(self) -> str:
-        return "`sqlitecollections.set`"
+        return "`sqlitecollections.Set`"
 
     def setup(self) -> None:
         gc.collect()
@@ -74,11 +74,19 @@ class SqliteCollectionsSetBenchmarkBase:
 
 
 class BenchmarkInitBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`__init__`"
+
     def assertion(self, result: target_set_t) -> bool:
         return len(result) == len(target_set) and all(d in target_set for d in result)
 
 
 class BenchmarkLenBase(BenchmarkBase[int]):
+    @property
+    def subject(self) -> str:
+        return "`__len__`"
+
     def exec(self) -> int:
         return len(self._sut)
 
@@ -87,6 +95,10 @@ class BenchmarkLenBase(BenchmarkBase[int]):
 
 
 class BenchmarkContainsBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__contains__`"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return "651" in self._sut
@@ -96,6 +108,10 @@ class BenchmarkContainsBase(BenchmarkBase[bool]):
 
 
 class BenchmarkNotContainsBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__contains__` (unsuccessful search)"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return "-651" not in self._sut
@@ -105,6 +121,10 @@ class BenchmarkNotContainsBase(BenchmarkBase[bool]):
 
 
 class BenchmarkIsdisjointBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`isdisjoint`"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut.isdisjoint({"-1"})
@@ -114,6 +134,10 @@ class BenchmarkIsdisjointBase(BenchmarkBase[bool]):
 
 
 class BenchmarkIsdisjointNotBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`isdisjoint` (not disjoint)"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut.isdisjoint({"1"})
@@ -123,6 +147,10 @@ class BenchmarkIsdisjointNotBase(BenchmarkBase[bool]):
 
 
 class BenchmarkIssubsetBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`issubset`"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut.issubset(iter(target_set))
@@ -132,6 +160,10 @@ class BenchmarkIssubsetBase(BenchmarkBase[bool]):
 
 
 class BenchmarkIssubsetNotBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`issubset` (not subset)"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut.issubset(iter([]))
@@ -141,6 +173,10 @@ class BenchmarkIssubsetNotBase(BenchmarkBase[bool]):
 
 
 class BenchmarkLeBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__le__`"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut <= target_set
@@ -150,6 +186,10 @@ class BenchmarkLeBase(BenchmarkBase[bool]):
 
 
 class BenchmarkLeNotBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__le__` (not less than or equals to)"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut <= set()
@@ -159,6 +199,10 @@ class BenchmarkLeNotBase(BenchmarkBase[bool]):
 
 
 class BenchmarkLtBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__lt__`"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut < larger_set
@@ -168,6 +212,10 @@ class BenchmarkLtBase(BenchmarkBase[bool]):
 
 
 class BenchmarkLtNotBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__lt__` (not less than)"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut < target_set
@@ -177,6 +225,10 @@ class BenchmarkLtNotBase(BenchmarkBase[bool]):
 
 
 class BenchmarkIssupersetBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`issuperset`"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut.issuperset(iter(target_set))
@@ -186,6 +238,10 @@ class BenchmarkIssupersetBase(BenchmarkBase[bool]):
 
 
 class BenchmarkIssupersetNotBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`issuperset` (not superset)"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut.issuperset(iter(larger_set))
@@ -195,6 +251,10 @@ class BenchmarkIssupersetNotBase(BenchmarkBase[bool]):
 
 
 class BenchmarkGeBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__ge__`"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut >= set()
@@ -204,6 +264,10 @@ class BenchmarkGeBase(BenchmarkBase[bool]):
 
 
 class BenchmarkGeNotBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__ge__` (not greater than or equals to)"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut >= larger_set
@@ -213,6 +277,10 @@ class BenchmarkGeNotBase(BenchmarkBase[bool]):
 
 
 class BenchmarkGtBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__gt__`"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut > smaller_set
@@ -222,6 +290,10 @@ class BenchmarkGtBase(BenchmarkBase[bool]):
 
 
 class BenchmarkGtNotBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__gt__` (not greater than)"
+
     def exec(self) -> bool:
         self._sut: target_set_t
         return self._sut > target_set
@@ -231,6 +303,10 @@ class BenchmarkGtNotBase(BenchmarkBase[bool]):
 
 
 class BenchmarkUnionBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`union`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut.union(iter(larger_target_diff))
@@ -240,6 +316,10 @@ class BenchmarkUnionBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkOrBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`__or__`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut | larger_target_diff
@@ -249,6 +329,10 @@ class BenchmarkOrBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkIntersectionBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`intersection`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut.intersection(iter(smaller_set))
@@ -258,6 +342,10 @@ class BenchmarkIntersectionBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkAndBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`__and__`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut & smaller_set
@@ -267,6 +355,10 @@ class BenchmarkAndBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkDifferenceBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`difference`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut.difference(iter(smaller_set))
@@ -276,6 +368,10 @@ class BenchmarkDifferenceBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkSubBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`__sub__`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut - smaller_set
@@ -285,6 +381,10 @@ class BenchmarkSubBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkSymmetricDifferenceBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`symmetric_difference`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut.symmetric_difference(iter(larger_set))
@@ -294,6 +394,10 @@ class BenchmarkSymmetricDifferenceBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkXorBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`__xor__`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut ^ larger_set
@@ -303,6 +407,10 @@ class BenchmarkXorBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkCopyBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`copy`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         return self._sut.copy()
@@ -312,6 +420,10 @@ class BenchmarkCopyBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkUpdateBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`update`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.update(larger_target_diff)
@@ -322,6 +434,10 @@ class BenchmarkUpdateBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkIorBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`__ior__`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut |= larger_target_diff
@@ -332,6 +448,10 @@ class BenchmarkIorBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkIntersectionUpdateBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`intersection_update`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.intersection_update(smaller_set)
@@ -342,6 +462,10 @@ class BenchmarkIntersectionUpdateBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkIandBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`__iand__`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut &= smaller_set
@@ -352,6 +476,10 @@ class BenchmarkIandBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkSymmetricDifferenceUpdateBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`symmetric_difference_update`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.symmetric_difference_update(larger_set)
@@ -362,6 +490,10 @@ class BenchmarkSymmetricDifferenceUpdateBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkIxorBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`__ixor__`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut ^= larger_set
@@ -372,6 +504,10 @@ class BenchmarkIxorBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkAddExistingItemBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`add (existing item)`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.add("651")
@@ -382,6 +518,10 @@ class BenchmarkAddExistingItemBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkAddNewItemBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`add (new item)`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.add("-1")
@@ -392,6 +532,10 @@ class BenchmarkAddNewItemBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkRemoveBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`remove`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.remove("651")
@@ -402,6 +546,10 @@ class BenchmarkRemoveBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkDiscardBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`discard`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.discard("651")
@@ -412,6 +560,10 @@ class BenchmarkDiscardBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkDiscardNoChangesBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`discard (no changes)`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.discard("-1")
@@ -422,6 +574,10 @@ class BenchmarkDiscardNoChangesBase(BenchmarkBase[target_set_t]):
 
 
 class BenchmarkPopBase(BenchmarkBase[Tuple[target_set_t, target_set_item_t]]):
+    @property
+    def subject(self) -> str:
+        return "`pop`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         ret = self._sut.pop()
@@ -432,6 +588,10 @@ class BenchmarkPopBase(BenchmarkBase[Tuple[target_set_t, target_set_item_t]]):
 
 
 class BenchmarkClearBase(BenchmarkBase[target_set_t]):
+    @property
+    def subject(self) -> str:
+        return "`clear`"
+
     def exec(self) -> target_set_t:
         self._sut: target_set_t
         self._sut.clear()
@@ -770,135 +930,108 @@ class SqliteCollectionsSetBenchmarkClear(SqliteCollectionsSetBenchmarkBase, Benc
 
 
 if __name__ == "__main__":
-    print(Comparison("`__init__`", BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
-    print(Comparison("`__len__`", BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
-    print(Comparison("`__contains__`", BuiltinSetBenchmarkContains(), SqliteCollectionsSetBenchmarkContains())().dict())
+    print(Comparison(BuiltinSetBenchmarkInit(), SqliteCollectionsSetBenchmarkInit())().dict())
+    print(Comparison(BuiltinSetBenchmarkLen(), SqliteCollectionsSetBenchmarkLen())().dict())
+    print(Comparison(BuiltinSetBenchmarkContains(), SqliteCollectionsSetBenchmarkContains())().dict())
     print(
         Comparison(
-            "`__contains__` (unsuccessful search)",
             BuiltinSetBenchmarkNotContains(),
             SqliteCollectionsSetBenchmarkNotContains(),
         )().dict()
     )
-    print(
-        Comparison("`isdisjoint`", BuiltinSetBenchmarkIsdisjoint(), SqliteCollectionsSetBenchmarkIsdisjoint())().dict()
-    )
+    print(Comparison(BuiltinSetBenchmarkIsdisjoint(), SqliteCollectionsSetBenchmarkIsdisjoint())().dict())
     print(
         Comparison(
-            "`isdisjoint` (not disjoint)",
             BuiltinSetBenchmarkIsdisjointNot(),
             SqliteCollectionsSetBenchmarkIsdisjointNot(),
         )().dict()
     )
-    print(Comparison("`issubset`", BuiltinSetBenchmarkIssubset(), SqliteCollectionsSetBenchmarkIssubset())().dict())
+    print(Comparison(BuiltinSetBenchmarkIssubset(), SqliteCollectionsSetBenchmarkIssubset())().dict())
     print(
         Comparison(
-            "`issubset` (not subset)",
             BuiltinSetBenchmarkIssubsetNot(),
             SqliteCollectionsSetBenchmarkIssubsetNot(),
         )().dict()
     )
-    print(Comparison("`__le__`", BuiltinSetBenchmarkLe(), SqliteCollectionsSetBenchmarkLe())().dict())
+    print(Comparison(BuiltinSetBenchmarkLe(), SqliteCollectionsSetBenchmarkLe())().dict())
     print(
         Comparison(
-            "`__le__` (not less than or equals to)",
             BuiltinSetBenchmarkLeNot(),
             SqliteCollectionsSetBenchmarkLeNot(),
         )().dict()
     )
-    print(Comparison("`__lt__`", BuiltinSetBenchmarkLt(), SqliteCollectionsSetBenchmarkLt())().dict())
+    print(Comparison(BuiltinSetBenchmarkLt(), SqliteCollectionsSetBenchmarkLt())().dict())
     print(
         Comparison(
-            "`__lt__` (not less than)",
             BuiltinSetBenchmarkLtNot(),
             SqliteCollectionsSetBenchmarkLtNot(),
         )().dict()
     )
-    print(
-        Comparison("`issuperset`", BuiltinSetBenchmarkIssuperset(), SqliteCollectionsSetBenchmarkIssuperset())().dict()
-    )
+    print(Comparison(BuiltinSetBenchmarkIssuperset(), SqliteCollectionsSetBenchmarkIssuperset())().dict())
     print(
         Comparison(
-            "`issuperset` (not superset)",
             BuiltinSetBenchmarkIssupersetNot(),
             SqliteCollectionsSetBenchmarkIssupersetNot(),
         )().dict()
     )
-    print(Comparison("`__ge__`", BuiltinSetBenchmarkGe(), SqliteCollectionsSetBenchmarkGe())().dict())
+    print(Comparison(BuiltinSetBenchmarkGe(), SqliteCollectionsSetBenchmarkGe())().dict())
     print(
         Comparison(
-            "`__ge__` (not greater than or equals to)",
             BuiltinSetBenchmarkGeNot(),
             SqliteCollectionsSetBenchmarkGeNot(),
         )().dict()
     )
-    print(Comparison("`__gt__`", BuiltinSetBenchmarkGt(), SqliteCollectionsSetBenchmarkGt())().dict())
+    print(Comparison(BuiltinSetBenchmarkGt(), SqliteCollectionsSetBenchmarkGt())().dict())
     print(
         Comparison(
-            "`__gt__` (not greater than)",
             BuiltinSetBenchmarkGtNot(),
             SqliteCollectionsSetBenchmarkGtNot(),
         )().dict()
     )
-    print(Comparison("`union`", BuiltinSetBenchmarkUnion(), SqliteCollectionsSetBenchmarkUnion())().dict())
-    print(Comparison("`__or__`", BuiltinSetBenchmarkOr(), SqliteCollectionsSetBenchmarkOr())().dict())
+    print(Comparison(BuiltinSetBenchmarkUnion(), SqliteCollectionsSetBenchmarkUnion())().dict())
+    print(Comparison(BuiltinSetBenchmarkOr(), SqliteCollectionsSetBenchmarkOr())().dict())
+    print(Comparison(BuiltinSetBenchmarkIntersection(), SqliteCollectionsSetBenchmarkIntersection())().dict())
+    print(Comparison(BuiltinSetBenchmarkAnd(), SqliteCollectionsSetBenchmarkAnd())().dict())
+    print(Comparison(BuiltinSetBenchmarkDifference(), SqliteCollectionsSetBenchmarkDifference())().dict())
+    print(Comparison(BuiltinSetBenchmarkSub(), SqliteCollectionsSetBenchmarkSub())().dict())
     print(
         Comparison(
-            "`intersection`", BuiltinSetBenchmarkIntersection(), SqliteCollectionsSetBenchmarkIntersection()
-        )().dict()
-    )
-    print(Comparison("`__and__`", BuiltinSetBenchmarkAnd(), SqliteCollectionsSetBenchmarkAnd())().dict())
-    print(
-        Comparison("`difference`", BuiltinSetBenchmarkDifference(), SqliteCollectionsSetBenchmarkDifference())().dict()
-    )
-    print(Comparison("`__sub__`", BuiltinSetBenchmarkSub(), SqliteCollectionsSetBenchmarkSub())().dict())
-    print(
-        Comparison(
-            "`symmetric_difference`",
             BuiltinSetBenchmarkSymmetricDifference(),
             SqliteCollectionsSetBenchmarkSymmetricDifference(),
         )().dict()
     )
-    print(Comparison("`__xor__`", BuiltinSetBenchmarkXor(), SqliteCollectionsSetBenchmarkXor())().dict())
-    print(Comparison("`copy`", BuiltinSetBenchmarkCopy(), SqliteCollectionsSetBenchmarkCopy())().dict())
-    print(Comparison("`update`", BuiltinSetBenchmarkUpdate(), SqliteCollectionsSetBenchmarkUpdate())().dict())
-    print(Comparison("`__ior__`", BuiltinSetBenchmarkIor(), SqliteCollectionsSetBenchmarkIor())().dict())
+    print(Comparison(BuiltinSetBenchmarkXor(), SqliteCollectionsSetBenchmarkXor())().dict())
+    print(Comparison(BuiltinSetBenchmarkCopy(), SqliteCollectionsSetBenchmarkCopy())().dict())
+    print(Comparison(BuiltinSetBenchmarkUpdate(), SqliteCollectionsSetBenchmarkUpdate())().dict())
+    print(Comparison(BuiltinSetBenchmarkIor(), SqliteCollectionsSetBenchmarkIor())().dict())
     print(
         Comparison(
-            "`intersection_update`",
             BuiltinSetBenchmarkIntersectionUpdate(),
             SqliteCollectionsSetBenchmarkIntersectionUpdate(),
         )().dict()
     )
-    print(Comparison("`__iand__`", BuiltinSetBenchmarkIand(), SqliteCollectionsSetBenchmarkIand())().dict())
+    print(Comparison(BuiltinSetBenchmarkIand(), SqliteCollectionsSetBenchmarkIand())().dict())
     print(
         Comparison(
-            "`symmetric_difference_update`",
             BuiltinSetBenchmarkSymmetricDifferenceUpdate(),
             SqliteCollectionsSetBenchmarkSymmetricDifferenceUpdate(),
         )().dict()
     )
-    print(Comparison("`__ixor__`", BuiltinSetBenchmarkIxor(), SqliteCollectionsSetBenchmarkIxor())().dict())
+    print(Comparison(BuiltinSetBenchmarkIxor(), SqliteCollectionsSetBenchmarkIxor())().dict())
     print(
         Comparison(
-            "`add (existing item)`",
             BuiltinSetBenchmarkAddExistingItem(),
             SqliteCollectionsSetBenchmarkAddExistingItem(),
         )().dict()
     )
+    print(Comparison(BuiltinSetBenchmarkAddNewItem(), SqliteCollectionsSetBenchmarkAddNewItem())().dict())
+    print(Comparison(BuiltinSetBenchmarkRemove(), SqliteCollectionsSetBenchmarkRemove())().dict())
+    print(Comparison(BuiltinSetBenchmarkDiscard(), SqliteCollectionsSetBenchmarkDiscard())().dict())
     print(
         Comparison(
-            "`add (new item)`", BuiltinSetBenchmarkAddNewItem(), SqliteCollectionsSetBenchmarkAddNewItem()
-        )().dict()
-    )
-    print(Comparison("`remove`", BuiltinSetBenchmarkRemove(), SqliteCollectionsSetBenchmarkRemove())().dict())
-    print(Comparison("`discard`", BuiltinSetBenchmarkDiscard(), SqliteCollectionsSetBenchmarkDiscard())().dict())
-    print(
-        Comparison(
-            "`discard (no changes)`",
             BuiltinSetBenchmarkDiscardNoChanges(),
             SqliteCollectionsSetBenchmarkDiscardNoChanges(),
         )().dict()
     )
-    print(Comparison("`pop`", BuiltinSetBenchmarkPop(), SqliteCollectionsSetBenchmarkPop())().dict())
-    print(Comparison("`clear`", BuiltinSetBenchmarkClear(), SqliteCollectionsSetBenchmarkClear())().dict())
+    print(Comparison(BuiltinSetBenchmarkPop(), SqliteCollectionsSetBenchmarkPop())().dict())
+    print(Comparison(BuiltinSetBenchmarkClear(), SqliteCollectionsSetBenchmarkClear())().dict())

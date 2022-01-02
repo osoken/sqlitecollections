@@ -76,11 +76,19 @@ class SqliteCollectionsDictBenchmarkBase:
 
 
 class BenchmarkInitBase(BenchmarkBase[target_dict_t]):
+    @property
+    def subject(self) -> str:
+        return "`__init__`"
+
     def assertion(self, result: target_dict_t) -> bool:
         return len(result) == target_dict_len and all((result[k] == target_dict[k] for k in target_dict.keys()))
 
 
 class BenchmarkLenBase(BenchmarkBase[target_dict_value_t]):
+    @property
+    def subject(self) -> str:
+        return "`__len__`"
+
     def exec(self) -> target_dict_value_t:
         self._sut: target_dict_t
         return len(self._sut)
@@ -90,6 +98,10 @@ class BenchmarkLenBase(BenchmarkBase[target_dict_value_t]):
 
 
 class BenchmarkGetitemBase(BenchmarkBase[target_dict_value_t]):
+    @property
+    def subject(self) -> str:
+        return "`__getitem__`"
+
     def exec(self) -> target_dict_value_t:
         self._sut: target_dict_t
         return self._sut["651"]
@@ -99,6 +111,10 @@ class BenchmarkGetitemBase(BenchmarkBase[target_dict_value_t]):
 
 
 class BenchmarkSetitemReplaceBase(BenchmarkBase[target_dict_t]):
+    @property
+    def subject(self) -> str:
+        return "`__setitem__` (replace)"
+
     def exec(self) -> target_dict_t:
         self._sut: target_dict_t
         self._sut["651"] = -651
@@ -113,6 +129,10 @@ class BenchmarkSetitemReplaceBase(BenchmarkBase[target_dict_t]):
 
 
 class BenchmarkSetitemAddNewItemBase(BenchmarkBase[target_dict_t]):
+    @property
+    def subject(self) -> str:
+        return "`__setitem__` (add new item)"
+
     def exec(self) -> target_dict_t:
         self._sut: target_dict_t
         self._sut["-651"] = -651
@@ -128,6 +148,10 @@ class BenchmarkSetitemAddNewItemBase(BenchmarkBase[target_dict_t]):
 
 
 class BenchmarkDelitemBase(BenchmarkBase[target_dict_t]):
+    @property
+    def subject(self) -> str:
+        return "`__delitem__`"
+
     def exec(self) -> target_dict_t:
         self._sut: target_dict_t
         del self._sut["651"]
@@ -140,6 +164,10 @@ class BenchmarkDelitemBase(BenchmarkBase[target_dict_t]):
 
 
 class BenchmarkContainsBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__contains__`"
+
     def exec(self) -> bool:
         self._sut: target_dict_t
         return "651" in self._sut
@@ -149,6 +177,10 @@ class BenchmarkContainsBase(BenchmarkBase[bool]):
 
 
 class BenchmarkNotContainsBase(BenchmarkBase[bool]):
+    @property
+    def subject(self) -> str:
+        return "`__contains__` (unsuccessful search)"
+
     def exec(self) -> bool:
         self._sut: target_dict_t
         return "-651" not in self._sut
@@ -158,6 +190,10 @@ class BenchmarkNotContainsBase(BenchmarkBase[bool]):
 
 
 class BenchmarkIterBase(BenchmarkBase[Set[target_dict_key_t]]):
+    @property
+    def subject(self) -> str:
+        return "`__iter__`"
+
     def exec(self) -> Set[target_dict_key_t]:
         self._sut: target_dict_t
         return set(self._sut)
@@ -167,6 +203,10 @@ class BenchmarkIterBase(BenchmarkBase[Set[target_dict_key_t]]):
 
 
 class BenchmarkClearBase(BenchmarkBase[target_dict_t]):
+    @property
+    def subject(self) -> str:
+        return "`clear`"
+
     def exec(self) -> target_dict_t:
         self._sut: target_dict_t
         self._sut.clear()
@@ -177,6 +217,10 @@ class BenchmarkClearBase(BenchmarkBase[target_dict_t]):
 
 
 class BenchmarkCopyBase(BenchmarkBase[target_dict_t]):
+    @property
+    def subject(self) -> str:
+        return "`copy`"
+
     def exec(self) -> target_dict_t:
         self._sut: target_dict_t
         retval = self._sut.copy()
@@ -187,6 +231,10 @@ class BenchmarkCopyBase(BenchmarkBase[target_dict_t]):
 
 
 class BenchmarkGetBase(BenchmarkBase[target_dict_value_t]):
+    @property
+    def subject(self) -> str:
+        return "`get`"
+
     def exec(self) -> target_dict_value_t:
         self._sut: target_dict_t
         return cast(target_dict_value_t, self._sut.get("651"))
@@ -196,6 +244,10 @@ class BenchmarkGetBase(BenchmarkBase[target_dict_value_t]):
 
 
 class BenchmarkGetDefaultBase(BenchmarkBase[target_dict_value_t]):
+    @property
+    def subject(self) -> str:
+        return "`get (unsuccessful search)`"
+
     def exec(self) -> target_dict_value_t:
         self._sut: target_dict_t
         return self._sut.get("-1", -1)
@@ -205,6 +257,10 @@ class BenchmarkGetDefaultBase(BenchmarkBase[target_dict_value_t]):
 
 
 class BenchmarkItemsBase(BenchmarkBase[Set[Tuple[target_dict_key_t, target_dict_value_t]]]):
+    @property
+    def subject(self) -> str:
+        return "`items`"
+
     def exec(self) -> Set[Tuple[target_dict_key_t, target_dict_value_t]]:
         self._sut: target_dict_t
         return set(self._sut.items())
@@ -214,6 +270,10 @@ class BenchmarkItemsBase(BenchmarkBase[Set[Tuple[target_dict_key_t, target_dict_
 
 
 class BenchmarkKeysBase(BenchmarkBase[Set[target_dict_key_t]]):
+    @property
+    def subject(self) -> str:
+        return "`keys`"
+
     def exec(self) -> Set[target_dict_key_t]:
         self._sut: target_dict_t
         return set(self._sut.keys())
@@ -223,6 +283,10 @@ class BenchmarkKeysBase(BenchmarkBase[Set[target_dict_key_t]]):
 
 
 class BenchmarkPopBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]]):
+    @property
+    def subject(self) -> str:
+        return "`pop`"
+
     def exec(self) -> Tuple[target_dict_value_t, target_dict_t]:
         self._sut: target_dict_t
         val = self._sut.pop("651")
@@ -233,6 +297,10 @@ class BenchmarkPopBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]])
 
 
 class BenchmarkPopDefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]]):
+    @property
+    def subject(self) -> str:
+        return "`pop (unsuccessful search)`"
+
     def exec(self) -> Tuple[target_dict_value_t, target_dict_t]:
         self._sut: target_dict_t
         val = self._sut.pop("-1", -1)
@@ -243,6 +311,10 @@ class BenchmarkPopDefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_di
 
 
 class BenchmarkPopitemBase(BenchmarkBase[Tuple[Tuple[target_dict_key_t, target_dict_value_t], target_dict_t]]):
+    @property
+    def subject(self) -> str:
+        return "`popitem`"
+
     def exec(self) -> Tuple[Tuple[target_dict_key_t, target_dict_value_t], target_dict_t]:
         self._sut: target_dict_t
         retval = self._sut.popitem()
@@ -255,6 +327,10 @@ class BenchmarkPopitemBase(BenchmarkBase[Tuple[Tuple[target_dict_key_t, target_d
 if sys.version_info >= (3, 8):
 
     class BenchmarkReversedBase(BenchmarkBase[Sequence[target_dict_key_t]]):
+        @property
+        def subject(self) -> str:
+            return "`reversed`"
+
         def exec(self) -> Sequence[target_dict_key_t]:
             self._sut: target_dict_t
             retkeys = list(reversed(self._sut))
@@ -266,6 +342,10 @@ if sys.version_info >= (3, 8):
 
 
 class BenchmarkSetdefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]]):
+    @property
+    def subject(self) -> str:
+        return "`setdefault`"
+
     def exec(self) -> Tuple[target_dict_value_t, target_dict_t]:
         self._sut: target_dict_t
         retval = self._sut.setdefault("651")
@@ -276,6 +356,10 @@ class BenchmarkSetdefaultBase(BenchmarkBase[Tuple[target_dict_value_t, target_di
 
 
 class BenchmarkSetdefaultAddItemBase(BenchmarkBase[Tuple[target_dict_value_t, target_dict_t]]):
+    @property
+    def subject(self) -> str:
+        return "`setdefault (unsuccessful search)`"
+
     def exec(self) -> Tuple[target_dict_value_t, target_dict_t]:
         self._sut: target_dict_t
         retval = self._sut.setdefault("-1", -1)
@@ -286,6 +370,10 @@ class BenchmarkSetdefaultAddItemBase(BenchmarkBase[Tuple[target_dict_value_t, ta
 
 
 class BenchmarkUpdateBase(BenchmarkBase[target_dict_t]):
+    @property
+    def subject(self) -> str:
+        return "`update`"
+
     def exec(self) -> target_dict_t:
         self._sut.update({"-1": -1})
         return self._sut
@@ -295,6 +383,10 @@ class BenchmarkUpdateBase(BenchmarkBase[target_dict_t]):
 
 
 class BenchmarkUpdateManyBase(BenchmarkBase[target_dict_t]):
+    @property
+    def subject(self) -> str:
+        return "`update` (many)"
+
     def exec(self) -> target_dict_t:
         self._sut.update((str(-v), -v) for v in target_dict.values())
         return self._sut
@@ -304,6 +396,10 @@ class BenchmarkUpdateManyBase(BenchmarkBase[target_dict_t]):
 
 
 class BenchmarkValuesBase(BenchmarkBase[Set[target_dict_value_t]]):
+    @property
+    def subject(self) -> str:
+        return "`values`"
+
     def exec(self) -> Set[target_dict_value_t]:
         self._sut: target_dict_t
         return set(self._sut.values())
@@ -315,6 +411,10 @@ class BenchmarkValuesBase(BenchmarkBase[Set[target_dict_value_t]]):
 if sys.version_info >= (3, 9):
 
     class BenchmarkOrBase(BenchmarkBase[target_dict_t]):
+        @property
+        def subject(self) -> str:
+            return "`__or__`"
+
         def exec(self) -> target_dict_t:
             return self._sut | {"-1": -1}
 
@@ -322,6 +422,10 @@ if sys.version_info >= (3, 9):
             return len(result) == (target_dict_len + 1) and result["-1"] == -1
 
     class BenchmarkOrManyBase(BenchmarkBase[target_dict_t]):
+        @property
+        def subject(self) -> str:
+            return "`__or__` (many)"
+
         def exec(self) -> target_dict_t:
             return self._sut | {str(-v): -v for v in target_dict.values()}
 
@@ -329,6 +433,10 @@ if sys.version_info >= (3, 9):
             return len(result) == (target_dict_len * 2 - 1) and result["-1"] == -1
 
     class BenchmarkIorBase(BenchmarkBase[target_dict_t]):
+        @property
+        def subject(self) -> str:
+            return "`__ior__`"
+
         def exec(self) -> target_dict_t:
             self._sut |= {"-1": -1}
             return self._sut
@@ -337,6 +445,10 @@ if sys.version_info >= (3, 9):
             return len(result) == (target_dict_len + 1) and result["-1"] == -1
 
     class BenchmarkIorManyBase(BenchmarkBase[target_dict_t]):
+        @property
+        def subject(self) -> str:
+            return "`__ior__` (many)"
+
         def exec(self) -> target_dict_t:
             self._sut |= {str(-v): -v for v in target_dict.values()}
             return self._sut
@@ -572,83 +684,53 @@ if sys.version_info >= (3, 9):
 
 
 if __name__ == "__main__":
-    print(Comparison("`__init__`", BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
-    print(Comparison("`__len__`", BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
-    print(Comparison("`__getitem__`", BuiltinDictBenchmarkGetitem(), SqliteCollectionsDictBenchmarkGetitem())().dict())
+    print(Comparison(BuiltinDictBenchmarkInit(), SqliteCollectionsDictBenchmarkInit())().dict())
+    print(Comparison(BuiltinDictBenchmarkLen(), SqliteCollectionsDictBenchmarkLen())().dict())
+    print(Comparison(BuiltinDictBenchmarkGetitem(), SqliteCollectionsDictBenchmarkGetitem())().dict())
     print(
         Comparison(
-            "`__setitem__` (replace)",
             BuiltinDictBenchmarkSetitemReplace(),
             SqliteCollectionsDictBenchmarkSetitemReplace(),
         )().dict()
     )
     print(
         Comparison(
-            "`__setitem__` (add new item)",
             BuiltinDictBenchmarkSetitemAddNewItem(),
             SqliteCollectionsDictBenchmarkSetitemAddNewItem(),
         )().dict()
     )
-    print(Comparison("`__delitem__`", BuiltinDictBenchmarkDelitem(), SqliteCollectionsDictBenchmarkDelitem())().dict())
-    print(
-        Comparison("`__contains__`", BuiltinDictBenchmarkContains(), SqliteCollectionsDictBenchmarkContains())().dict()
-    )
+    print(Comparison(BuiltinDictBenchmarkDelitem(), SqliteCollectionsDictBenchmarkDelitem())().dict())
+    print(Comparison(BuiltinDictBenchmarkContains(), SqliteCollectionsDictBenchmarkContains())().dict())
     print(
         Comparison(
-            "`__contains__` (unsuccessful search)",
             BuiltinDictBenchmarkNotContains(),
             SqliteCollectionsDictBenchmarkNotContains(),
         )().dict()
     )
-    print(Comparison("`__iter__`", BuiltinDictBenchmarkIter(), SqliteCollectionsDictBenchmarkIter())().dict())
-    print(Comparison("`clear`", BuiltinDictBenchmarkClear(), SqliteCollectionsDictBenchmarkClear())().dict())
-    print(Comparison("`copy`", BuiltinDictBenchmarkCopy(), SqliteCollectionsDictBenchmarkCopy())().dict())
-    print(Comparison("`get`", BuiltinDictBenchmarkGet(), SqliteCollectionsDictBenchmarkGet())().dict())
-    print(
-        Comparison(
-            "`get (unsuccessful search)`", BuiltinDictBenchmarkGetDefault(), SqliteCollectionsDictBenchmarkGetDefault()
-        )().dict()
-    )
-    print(Comparison("`items`", BuiltinDictBenchmarkItems(), SqliteCollectionsDictBenchmarkItems())().dict())
-    print(Comparison("`keys`", BuiltinDictBenchmarkKeys(), SqliteCollectionsDictBenchmarkKeys())().dict())
-    print(Comparison("`pop`", BuiltinDictBenchmarkPop(), SqliteCollectionsDictBenchmarkPop())().dict())
-    print(
-        Comparison(
-            "`pop (unsuccessful search)`", BuiltinDictBenchmarkPopDefault(), SqliteCollectionsDictBenchmarkPopDefault()
-        )().dict()
-    )
-    print(Comparison("`popitem`", BuiltinDictBenchmarkPopitem(), SqliteCollectionsDictBenchmarkPopitem())().dict())
+    print(Comparison(BuiltinDictBenchmarkIter(), SqliteCollectionsDictBenchmarkIter())().dict())
+    print(Comparison(BuiltinDictBenchmarkClear(), SqliteCollectionsDictBenchmarkClear())().dict())
+    print(Comparison(BuiltinDictBenchmarkCopy(), SqliteCollectionsDictBenchmarkCopy())().dict())
+    print(Comparison(BuiltinDictBenchmarkGet(), SqliteCollectionsDictBenchmarkGet())().dict())
+    print(Comparison(BuiltinDictBenchmarkGetDefault(), SqliteCollectionsDictBenchmarkGetDefault())().dict())
+    print(Comparison(BuiltinDictBenchmarkItems(), SqliteCollectionsDictBenchmarkItems())().dict())
+    print(Comparison(BuiltinDictBenchmarkKeys(), SqliteCollectionsDictBenchmarkKeys())().dict())
+    print(Comparison(BuiltinDictBenchmarkPop(), SqliteCollectionsDictBenchmarkPop())().dict())
+    print(Comparison(BuiltinDictBenchmarkPopDefault(), SqliteCollectionsDictBenchmarkPopDefault())().dict())
+    print(Comparison(BuiltinDictBenchmarkPopitem(), SqliteCollectionsDictBenchmarkPopitem())().dict())
     if sys.version_info >= (3, 8):
-        print(
-            Comparison("`reversed`", BuiltinDictBenchmarkReversed(), SqliteCollectionsDictBenchmarkReversed())().dict()
-        )
+        print(Comparison(BuiltinDictBenchmarkReversed(), SqliteCollectionsDictBenchmarkReversed())().dict())
+    print(Comparison(BuiltinDictBenchmarkSetdefault(), SqliteCollectionsDictBenchmarkSetdefault())().dict())
     print(
         Comparison(
-            "`setdefault`", BuiltinDictBenchmarkSetdefault(), SqliteCollectionsDictBenchmarkSetdefault()
-        )().dict()
-    )
-    print(
-        Comparison(
-            "`setdefault (unsuccessful search)`",
             BuiltinDictBenchmarkSetdefaultAddItem(),
             SqliteCollectionsDictBenchmarkSetdefaultAddItem(),
         )().dict()
     )
-    print(Comparison("`update`", BuiltinDictBenchmarkUpdate(), SqliteCollectionsDictBenchmarkUpdate())().dict())
-    print(
-        Comparison(
-            "`update` (many)", BuiltinDictBenchmarkUpdateMany(), SqliteCollectionsDictBenchmarkUpdateMany()
-        )().dict()
-    )
-    print(Comparison("`values`", BuiltinDictBenchmarkValues(), SqliteCollectionsDictBenchmarkValues())().dict())
+    print(Comparison(BuiltinDictBenchmarkUpdate(), SqliteCollectionsDictBenchmarkUpdate())().dict())
+    print(Comparison(BuiltinDictBenchmarkUpdateMany(), SqliteCollectionsDictBenchmarkUpdateMany())().dict())
+    print(Comparison(BuiltinDictBenchmarkValues(), SqliteCollectionsDictBenchmarkValues())().dict())
     if sys.version_info >= (3, 9):
-        print(Comparison("`__or__`", BuiltinDictBenchmarkOr(), SqliteCollectionsDictBenchmarkOr())().dict())
-        print(
-            Comparison("`__or__` (many)", BuiltinDictBenchmarkOrMany(), SqliteCollectionsDictBenchmarkOrMany())().dict()
-        )
-        print(Comparison("`__ior__`", BuiltinDictBenchmarkIor(), SqliteCollectionsDictBenchmarkIor())().dict())
-        print(
-            Comparison(
-                "`__ior__` (many)", BuiltinDictBenchmarkIorMany(), SqliteCollectionsDictBenchmarkIorMany()
-            )().dict()
-        )
+        print(Comparison(BuiltinDictBenchmarkOr(), SqliteCollectionsDictBenchmarkOr())().dict())
+        print(Comparison(BuiltinDictBenchmarkOrMany(), SqliteCollectionsDictBenchmarkOrMany())().dict())
+        print(Comparison(BuiltinDictBenchmarkIor(), SqliteCollectionsDictBenchmarkIor())().dict())
+        print(Comparison(BuiltinDictBenchmarkIorMany(), SqliteCollectionsDictBenchmarkIorMany())().dict())
