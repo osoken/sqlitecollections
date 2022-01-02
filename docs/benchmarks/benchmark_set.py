@@ -12,7 +12,7 @@ from typing import Tuple
 
 from sqlitecollections import Set
 
-from common import BenchmarkBase, Comparison
+from .common import BenchmarkBase, Comparison
 
 benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 

@@ -18,7 +18,7 @@ if sys.version_info >= (3, 8):
 
 from sqlitecollections import Dict
 
-from common import BenchmarkBase, Comparison
+from .common import BenchmarkBase, Comparison
 
 benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 

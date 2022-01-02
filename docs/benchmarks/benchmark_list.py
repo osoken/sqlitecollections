@@ -11,7 +11,7 @@ else:
 
 from sqlitecollections import List
 
-from common import BenchmarkBase, Comparison
+from .common import BenchmarkBase, Comparison
 
 benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 
