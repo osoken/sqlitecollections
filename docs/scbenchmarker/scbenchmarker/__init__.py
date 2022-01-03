@@ -1,0 +1,5 @@
+__description__ = "A benchmark module for sqlitecollections"
+__package_name__ = "scbenchmarker"
+__version__ = "0.0.1"
+__author__ = "osoken"
+__email__ = "osoken.devel@outlook.jp"
