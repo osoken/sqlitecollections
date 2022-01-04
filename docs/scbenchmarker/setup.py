@@ -25,6 +25,6 @@ setup(
     install_requires=[
         "memory_profiler",
         "jinja2",
-        f'sqlitecollections @ file://{root_dir}',
+        f'sqlitecollections[docs] @ file://{root_dir}',
     ],
 )
