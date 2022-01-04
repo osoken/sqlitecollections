@@ -80,4 +80,4 @@ if __name__ == "__main__":
             comp = Comparison(builtin_benchmark_class(), sqlitecollections_benchmark_class())
             buf.append(comp().dict())
         with open(os.path.join(output_dir, f"{container_type_str}.md"), "w") as fout:
-            fout.write(template.render(a_variable=buf))
+            fout.write(template.render(data=buf))
