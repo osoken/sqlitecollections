@@ -1,22 +1,21 @@
 site_name: sqlitecollections
 site_description: Python collections that are backended by sqlite3 DB and are compatible with the built-in collections
 
-
 theme:
-  name: 'material'
+  name: "material"
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
       toggle:
         icon: material/toggle-switch-off-outline
         name: Switch to dark mode
-      primary: 'light blue'
+      primary: "light blue"
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
-      primary: 'indigo'
+      primary: "indigo"
 repo_name: osoken/sqlitecollections
 repo_url: https://github.com/osoken/sqlitecollections
 plugins:
@@ -24,17 +23,19 @@ plugins:
   - macros:
       module_name: docs/main
 markdown_extensions:
-- pymdownx.highlight:
-    linenums: false
-- pymdownx.superfences
-- mdx_include:
-    base_path: docs
+  - pymdownx.highlight:
+      linenums: false
+  - pymdownx.superfences
+  - mdx_include:
+      base_path: docs
+  - pymdownx.tabbed
 
 nav:
-- Overview: index.md
-- install.md
-- Usage:
-  - List: usage/list.md
-  - Dict: usage/dict.md
-  - Set: usage/set.md
-- development.md
+  - Overview: index.md
+  - install.md
+  - Usage:
+      - List: usage/list.md
+      - Dict: usage/dict.md
+      - Set: usage/set.md
+  - development.md
+  - benchmark.md

@@ -45,6 +45,11 @@ class BenchmarkBase(Generic[T], metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def subject(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
     def name(self) -> str:
         ...
 
@@ -157,8 +162,10 @@ class ComparisonResult:
 
 
 class Comparison(Generic[T]):
-    def __init__(self, subject: str, one: BenchmarkBase[T], another: BenchmarkBase[T]):
-        self._subject = subject
+    def __init__(self, one: BenchmarkBase[T], another: BenchmarkBase[T]):
+        self._subject = one.subject
+        if self._subject != another.subject:
+            raise ValueError("comparison of different subjects.")
         self._one = one
         self._another = another
 
