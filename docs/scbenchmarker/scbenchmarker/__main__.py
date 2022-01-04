@@ -33,7 +33,7 @@ def is_special_benchmark_class(x: type, base1: type, base2: type):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("prefix")
+    parser.add_argument("--prefix", default="benchmarks")
     args = parser.parse_args()
     wd = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(os.path.dirname(os.path.dirname(wd)), "benchmark_results", args.prefix)
