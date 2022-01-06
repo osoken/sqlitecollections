@@ -1,7 +1,7 @@
 import gc
 import os
 import sys
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 if sys.version_info > (3, 9):
     from collections.abc import MutableMapping, Set
@@ -30,8 +30,8 @@ target_dict_t = MutableMapping[target_dict_key_t, target_dict_value_t]
 
 
 class BuiltinDictBenchmarkBase:
-    def __init__(self) -> None:
-        super(BuiltinDictBenchmarkBase, self).__init__()
+    def __init__(self, timeout: Optional[float] = None) -> None:
+        super(BuiltinDictBenchmarkBase, self).__init__(timeout=timeout)
         self._sut_orig = target_dict.copy()
         self._sut: target_dict_t
 
@@ -53,8 +53,8 @@ class BuiltinDictBenchmarkBase:
 
 
 class SqliteCollectionsDictBenchmarkBase:
-    def __init__(self) -> None:
-        super(SqliteCollectionsDictBenchmarkBase, self).__init__()
+    def __init__(self, timeout: Optional[float] = None) -> None:
+        super(SqliteCollectionsDictBenchmarkBase, self).__init__(timeout=timeout)
         self._sut_orig = Dict[target_dict_key_t, target_dict_value_t](data=target_dict)
         self._sut: target_dict_t
 

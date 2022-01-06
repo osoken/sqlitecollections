@@ -2,7 +2,7 @@ import gc
 import os
 import random
 import sys
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 
 if sys.version_info > (3, 9):
     from collections.abc import MutableSequence
@@ -24,8 +24,8 @@ random.shuffle(target_list)
 
 
 class BuiltinListBenchmarkBase:
-    def __init__(self) -> None:
-        super(BuiltinListBenchmarkBase, self).__init__()
+    def __init__(self, timeout: Optional[float] = None) -> None:
+        super(BuiltinListBenchmarkBase, self).__init__(timeout=timeout)
         self._sut_orig = target_list.copy()
         self._sut: target_list_t
 
@@ -47,8 +47,8 @@ class BuiltinListBenchmarkBase:
 
 
 class SqliteCollectionsListBenchmarkBase:
-    def __init__(self) -> None:
-        super(SqliteCollectionsListBenchmarkBase, self).__init__()
+    def __init__(self, timeout: Optional[float] = None) -> None:
+        super(SqliteCollectionsListBenchmarkBase, self).__init__(timeout=timeout)
         self._sut_orig = List[target_list_element_t](data=target_list)
         self._sut: target_list_t
 

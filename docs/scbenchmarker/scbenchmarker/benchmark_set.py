@@ -1,7 +1,7 @@
 import gc
 import os
 import sys
-from typing import Any
+from typing import Any, Optional
 
 if sys.version_info > (3, 9):
     from collections.abc import MutableSet
@@ -28,8 +28,8 @@ target_set_t = MutableSet[target_set_item_t]
 
 
 class BuiltinSetBenchmarkBase:
-    def __init__(self) -> None:
-        super(BuiltinSetBenchmarkBase, self).__init__()
+    def __init__(self, timeout: Optional[float] = None) -> None:
+        super(BuiltinSetBenchmarkBase, self).__init__(timeout=timeout)
         self._sut_orig = target_set.copy()
         self._sut: target_set_t
 
@@ -51,8 +51,8 @@ class BuiltinSetBenchmarkBase:
 
 
 class SqliteCollectionsSetBenchmarkBase:
-    def __init__(self) -> None:
-        super(SqliteCollectionsSetBenchmarkBase, self).__init__()
+    def __init__(self, timeout: Optional[float] = None) -> None:
+        super(SqliteCollectionsSetBenchmarkBase, self).__init__(timeout=timeout)
         self._sut_orig = Set[target_set_item_t](data=target_set)
         self._sut: target_set_t
 

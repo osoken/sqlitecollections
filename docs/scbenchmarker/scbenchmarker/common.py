@@ -4,7 +4,7 @@ import sys
 import time
 from abc import ABCMeta, abstractmethod
 from timeit import timeit
-from typing import Any, Generic, Tuple, TypeVar, Union, cast
+from typing import Any, Generic, Optional, Tuple, TypeVar, Union, cast
 
 if sys.version_info > (3, 9):
     from collections.abc import Mapping
@@ -39,9 +39,10 @@ class BenchmarkResult:
 
 
 class BenchmarkBase(Generic[T], metaclass=ABCMeta):
-    def __init__(self, number: int = 16, interval: float = 0.01):
+    def __init__(self, number: int = 16, interval: float = 0.01, timeout: Optional[float] = None):
         self._number = number
         self._interval = interval
+        self._timeout = timeout
 
     @property
     @abstractmethod
@@ -76,6 +77,7 @@ class BenchmarkBase(Generic[T], metaclass=ABCMeta):
         memory_after_setup_buffer = []
         memory_during_exec_buffer = []
         timing_buffer = []
+        start_timestamp = time.time()
         for i in range(self._number):
             gc.collect()
             gc.collect()
@@ -96,6 +98,8 @@ class BenchmarkBase(Generic[T], metaclass=ABCMeta):
             timing_buffer.append(timing)
             memory_after_setup_buffer.append(memory_after_setup)
             memory_during_exec_buffer.append(memory_during_exec)
+            if self._timeout is not None and self._timeout < time.time() - start_timestamp:
+                break
         return BenchmarkResult(
             self.name,
             statistics.mean(timing_buffer),
