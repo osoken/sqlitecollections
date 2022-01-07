@@ -10,7 +10,7 @@ else:
 
 from typing import Tuple
 
-from sqlitecollections import Set
+import sqlitecollections as sc
 
 from .common import BenchmarkBase, Comparison
 
@@ -53,7 +53,7 @@ class BuiltinSetBenchmarkBase:
 class SqliteCollectionsSetBenchmarkBase:
     def __init__(self, timeout: Optional[float] = None) -> None:
         super(SqliteCollectionsSetBenchmarkBase, self).__init__(timeout=timeout)
-        self._sut_orig = Set[target_set_item_t](data=target_set)
+        self._sut_orig = sc.Set[target_set_item_t](data=target_set)
         self._sut: target_set_t
 
     @property
@@ -608,4 +608,4 @@ class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
 
 class SqliteCollectionsSetBenchmarkInit(SqliteCollectionsSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
-        return Set[target_set_item_t](data=(s for s in target_set))
+        return sc.Set[target_set_item_t](data=(s for s in target_set))

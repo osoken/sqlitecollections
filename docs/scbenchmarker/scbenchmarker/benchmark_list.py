@@ -9,7 +9,7 @@ if sys.version_info > (3, 9):
 else:
     from typing import MutableSequence
 
-from sqlitecollections import List
+import sqlitecollections as sc
 
 from .common import BenchmarkBase, Comparison
 
@@ -49,7 +49,7 @@ class BuiltinListBenchmarkBase:
 class SqliteCollectionsListBenchmarkBase:
     def __init__(self, timeout: Optional[float] = None) -> None:
         super(SqliteCollectionsListBenchmarkBase, self).__init__(timeout=timeout)
-        self._sut_orig = List[target_list_element_t](data=target_list)
+        self._sut_orig = sc.List[target_list_element_t](data=target_list)
         self._sut: target_list_t
 
     @property
@@ -484,4 +484,4 @@ class SqliteCollectionsListBenchmarkCreateWithInitialData(
     SqliteCollectionsListBenchmarkBase, BenchmarkCreateWithInitialDataBase
 ):
     def exec(self) -> Any:
-        return List[target_list_element_t](data=iter(target_list))
+        return sc.List[target_list_element_t](data=iter(target_list))

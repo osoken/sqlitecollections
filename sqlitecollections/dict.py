@@ -433,10 +433,12 @@ if sys.version_info >= (3, 9):
             self.update(other)
             return self
 
+
 elif sys.version_info >= (3, 8):
 
     class Dict(_ReversibleDict[KT, VT]):
         ...
+
 
 else:
 

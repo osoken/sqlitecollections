@@ -14,11 +14,11 @@ pip install sqlitecollections
 
 ```python
 import sqlite3
-from sqlitecollections import List, Set, Dict
+import sqlitecollections as sc
 
 conn = sqlite3.connect("collections.db")
 
-l = List[str](
+l = sc.List[str](
     connection=conn,
     table_name="list_example",
     data=["Alice", "Bob", "Carol"]
@@ -30,7 +30,7 @@ print(len(l))
 l.append("Dave")
 print(l.index("Bob"))
 #> 2
-d = Dict[str, str](
+d = sc.Dict[str, str](
     connection=conn,
     table_name="dict_example",
     data={"a": "Alice", "b": "Bob"}
@@ -42,7 +42,7 @@ print(list(d.keys()))
 #> ['a', 'b', 'c']
 print(list(d.values()))
 #> ['Alice', 'Bob', 'Carol']
-s = Set[str](
+s = sc.Set[str](
     connection=conn,
     table_name="set_example",
     data=["Alice", "Bob", "Carol", "Dave"]
@@ -59,11 +59,11 @@ The database is updated with each operation, so even if we exit from the python 
 
 ```python
 import sqlite3
-from sqlitecollections import List
+import sqlitecollections as sc
 
 conn = sqlite3.connect("collections.db")
 
-l = List[str](
+l = sc.List[str](
     connection=conn,
     table_name="list_example",
 )

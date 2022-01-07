@@ -13,7 +13,7 @@ else:
 
 from test_base import SqlTestCase
 
-from sqlitecollections import Dict, RebuildStrategy
+import sqlitecollections as sc
 
 
 class DictTestCase(SqlTestCase):
@@ -46,7 +46,7 @@ class DictTestCase(SqlTestCase):
 
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            sut = Dict[Hashable, Any](serializer=serializer)
+            sut = sc.Dict[Hashable, Any](serializer=serializer)
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[0].category, DeprecationWarning))
             self.assertEqual(
@@ -69,7 +69,7 @@ class DictTestCase(SqlTestCase):
 
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            sut = Dict[Hashable, Any](deserializer=deserializer)
+            sut = sc.Dict[Hashable, Any](deserializer=deserializer)
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[0].category, DeprecationWarning))
             self.assertEqual(
@@ -95,8 +95,8 @@ class DictTestCase(SqlTestCase):
         key_serializer = MagicMock(spec=Callable[[Hashable], bytes])
         key_deserializer = MagicMock(spec=Callable[[bytes], Hashable])
         persist = False
-        rebuild_strategy = RebuildStrategy.SKIP
-        sut = Dict[Hashable, Any](
+        rebuild_strategy = sc.RebuildStrategy.SKIP
+        sut = sc.Dict[Hashable, Any](
             connection=memory_db,
             table_name=table_name,
             value_serializer=value_serializer,
@@ -119,7 +119,7 @@ class DictTestCase(SqlTestCase):
 
     def test_initialize(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         self.assert_sql_result_equals(
             memory_db,
             "SELECT table_name, schema_version, container_type FROM metadata",
@@ -146,20 +146,20 @@ class DictTestCase(SqlTestCase):
         def deserializer(x: bytes) -> str:
             return str(x)
 
-        sut = Dict[str, str](
+        sut = sc.Dict[str, str](
             connection=memory_db,
             table_name="items",
             key_serializer=serializer,
             key_deserializer=deserializer,
             value_serializer=serializer,
             value_deserializer=deserializer,
-            rebuild_strategy=RebuildStrategy.ALWAYS,
+            rebuild_strategy=sc.RebuildStrategy.ALWAYS,
         )
         self.assert_dict_state_equals(memory_db, [(b"A", b"B", 0)])
 
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("a", 1), ("b", 2)))
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("a", 1), ("b", 2)))
         self.assert_dict_state_equals(
             memory_db,
             [
@@ -167,7 +167,7 @@ class DictTestCase(SqlTestCase):
                 (pickle.dumps("b"), pickle.dumps(2), 1),
             ],
         )
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("c", 3), ("d", 4)))
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("c", 3), ("d", 4)))
         self.assert_dict_state_equals(
             memory_db,
             [
@@ -179,7 +179,7 @@ class DictTestCase(SqlTestCase):
     def test_getitem(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/getitem.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         expected1 = 4
         actual1 = sut["a"]
         self.assertEqual(actual1, expected1)
@@ -194,7 +194,7 @@ class DictTestCase(SqlTestCase):
     def test_delitem(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/delitem.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         del sut["b"]
         self.assert_dict_state_equals(
             memory_db,
@@ -216,7 +216,7 @@ class DictTestCase(SqlTestCase):
     def test_setitem(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         self.assert_dict_state_equals(
             memory_db,
             [],
@@ -248,7 +248,7 @@ class DictTestCase(SqlTestCase):
     def test_len(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         expected = 0
         actual = len(sut)
         self.assertEqual(actual, expected)
@@ -260,7 +260,7 @@ class DictTestCase(SqlTestCase):
     def test_contains(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/contains.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         self.assertTrue("a" in sut)
         self.assertTrue(b"a" in sut)
         self.assertTrue(None in sut)
@@ -282,7 +282,7 @@ class DictTestCase(SqlTestCase):
     def test_iter(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         actual = iter(sut)
         self.assertIsInstance(actual, Iterator)
         self.assertEqual(list(actual), [])
@@ -295,12 +295,12 @@ class DictTestCase(SqlTestCase):
     def test_clear(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         self.assert_dict_state_equals(memory_db, [])
         sut.clear()
         self.assert_dict_state_equals(memory_db, [])
         self.get_fixture(memory_db, "dict/clear.sql")
-        sut = Dict(connection=memory_db, table_name="items")
+        sut = sc.Dict(connection=memory_db, table_name="items")
         self.assert_dict_state_equals(memory_db, [(pickle.dumps("a"), pickle.dumps(4), 0)])
         sut.clear()
         self.assert_dict_state_equals(memory_db, [])
@@ -308,7 +308,7 @@ class DictTestCase(SqlTestCase):
     def test_get(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/get.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         expected1 = 4
         actual1 = sut.get("a")
         self.assertEqual(actual1, expected1)
@@ -327,7 +327,7 @@ class DictTestCase(SqlTestCase):
     def test_items(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/items.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         actual = sut.items()
         self.assertIsInstance(actual, ItemsView)
         expected = [("a", 4), ("b", 2)]
@@ -336,7 +336,7 @@ class DictTestCase(SqlTestCase):
     def test_keys(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/keys.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         actual = sut.keys()
         self.assertIsInstance(actual, KeysView)
         expected = ["a", "b"]
@@ -345,7 +345,7 @@ class DictTestCase(SqlTestCase):
     def test_pop(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/pop.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         self.assert_dict_state_equals(
             memory_db,
             [
@@ -391,7 +391,7 @@ class DictTestCase(SqlTestCase):
     def test_popitem(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/popitem.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         self.assert_dict_state_equals(
             memory_db,
             [
@@ -429,7 +429,7 @@ class DictTestCase(SqlTestCase):
     def test_reversed(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/reversed.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         if sys.version_info < (3, 8):
             with self.assertRaisesRegex(TypeError, "'Dict' object is not reversible"):
                 _ = reversed(sut)  # type: ignore
@@ -442,7 +442,7 @@ class DictTestCase(SqlTestCase):
     def test_setdefault(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/setdefault.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         self.assert_dict_state_equals(
             memory_db,
             [
@@ -498,7 +498,7 @@ class DictTestCase(SqlTestCase):
     def test_update(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/update.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         sut.update({"a": 1, "e": 10})
         self.assert_dict_state_equals(
             memory_db,
@@ -512,7 +512,7 @@ class DictTestCase(SqlTestCase):
     def test_values(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/values.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         actual = sut.values()
         self.assertIsInstance(actual, ValuesView)
         expected = [4, 2]
@@ -521,7 +521,7 @@ class DictTestCase(SqlTestCase):
     def test_or(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/or.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         if sys.version_info < (3, 9):
             with self.assertRaisesRegex(
                 TypeError,
@@ -543,7 +543,7 @@ class DictTestCase(SqlTestCase):
     def test_ior(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/ior.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         if sys.version_info < (3, 9):
             with self.assertRaisesRegex(
                 TypeError,
@@ -564,7 +564,7 @@ class DictTestCase(SqlTestCase):
     def test_copy(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql", "dict/copy.sql")
-        sut = Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         actual = sut.copy()
 
         self.assert_sql_result_equals(
