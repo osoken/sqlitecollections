@@ -16,7 +16,7 @@ if sys.version_info >= (3, 8):
     else:
         from typing import Sequence
 
-from sqlitecollections import Dict
+import sqlitecollections as sc
 
 from .common import BenchmarkBase, Comparison
 
@@ -55,7 +55,7 @@ class BuiltinDictBenchmarkBase:
 class SqliteCollectionsDictBenchmarkBase:
     def __init__(self, timeout: Optional[float] = None) -> None:
         super(SqliteCollectionsDictBenchmarkBase, self).__init__(timeout=timeout)
-        self._sut_orig = Dict[target_dict_key_t, target_dict_value_t](data=target_dict)
+        self._sut_orig = sc.Dict[target_dict_key_t, target_dict_value_t](data=target_dict)
         self._sut: target_dict_t
 
     @property
@@ -464,4 +464,4 @@ class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
 
 class SqliteCollectionsDictBenchmarkInit(SqliteCollectionsDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
-        return Dict[target_dict_key_t, target_dict_value_t](data=target_dict.items())
+        return sc.Dict[target_dict_key_t, target_dict_value_t](data=target_dict.items())

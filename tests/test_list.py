@@ -12,7 +12,7 @@ else:
 
 from test_base import SqlTestCase
 
-from sqlitecollections import List, RebuildStrategy
+import sqlitecollections as sc
 
 
 class ListTestCase(SqlTestCase):
@@ -42,8 +42,8 @@ class ListTestCase(SqlTestCase):
         serializer = MagicMock(spec=Callable[[Any], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Any])
         persist = False
-        rebuild_strategy = RebuildStrategy.SKIP
-        sut = List[Any](
+        rebuild_strategy = sc.RebuildStrategy.SKIP
+        sut = sc.List[Any](
             connection=memory_db,
             table_name=table_name,
             serializer=serializer,
@@ -62,7 +62,7 @@ class ListTestCase(SqlTestCase):
 
     def test_initialize(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = List[Any](connection=memory_db, table_name="items")
+        sut = sc.List[Any](connection=memory_db, table_name="items")
         self.assert_sql_result_equals(
             memory_db,
             "SELECT table_name, schema_version, container_type FROM metadata",
@@ -72,9 +72,9 @@ class ListTestCase(SqlTestCase):
 
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = List[Any](connection=memory_db, table_name="items", data=[0])
+        sut = sc.List[Any](connection=memory_db, table_name="items", data=[0])
         self.assert_db_state_equals(memory_db, [(pickle.dumps(0), 0)])
-        sut = List[Any](connection=memory_db, table_name="items", data=[1])
+        sut = sc.List[Any](connection=memory_db, table_name="items", data=[1])
         self.assert_db_state_equals(memory_db, [(pickle.dumps(1), 0)])
 
     def test_rebuild(self) -> None:
@@ -87,12 +87,12 @@ class ListTestCase(SqlTestCase):
         def deserializer(x: bytes) -> str:
             return str(x)
 
-        sut = List[str](
+        sut = sc.List[str](
             connection=memory_db,
             table_name="items",
             serializer=serializer,
             deserializer=deserializer,
-            rebuild_strategy=RebuildStrategy.ALWAYS,
+            rebuild_strategy=sc.RebuildStrategy.ALWAYS,
         )
         self.assert_db_state_equals(
             memory_db,
@@ -111,7 +111,7 @@ class ListTestCase(SqlTestCase):
     def test_getitem_int(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/getitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = "a"
         actual = sut[0]
         self.assertEqual(actual, expected)
@@ -144,7 +144,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/getitem_slice.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected_array = [chr(i) for i in range(ord("a"), ord("z") + 1)]
 
         def generate_expectation(s: slice) -> Sequence[Tuple[bytes, int]]:
@@ -173,7 +173,7 @@ class ListTestCase(SqlTestCase):
     def test_contains(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/contains.sql")
-        sut = List[Any](connection=memory_db, table_name="items")
+        sut = sc.List[Any](connection=memory_db, table_name="items")
         self.assertTrue("a" in sut)
         self.assertTrue(b"a" in sut)
         self.assertTrue(None in sut)
@@ -193,7 +193,7 @@ class ListTestCase(SqlTestCase):
     def test_setitem_int(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/setitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut[0] = "A"
         self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
@@ -227,7 +227,7 @@ class ListTestCase(SqlTestCase):
         ):
             memory_db = sqlite3.connect(":memory:")
             self.get_fixture(memory_db, "list/base.sql", "list/setitem_slice.sql")
-            sut = List[Any](connection=memory_db, table_name="items")
+            sut = sc.List[Any](connection=memory_db, table_name="items")
             s = slice(start, stop, step)
             expected = generate_expectation(s, generate_new_value(length))
             if isinstance(expected, Exception):
@@ -242,56 +242,56 @@ class ListTestCase(SqlTestCase):
         with self.assertRaisesRegex(TypeError, "must assign iterable to extended slice"):
             memory_db = sqlite3.connect(":memory:")
             self.get_fixture(memory_db, "list/base.sql", "list/setitem_slice.sql")
-            sut = List[Any](connection=memory_db, table_name="items")
+            sut = sc.List[Any](connection=memory_db, table_name="items")
             sut[::] = 1
 
     def test_delitem_int(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         del sut[0]
         self.assert_db_state_equals(memory_db, [(pickle.dumps("b"), 0), (pickle.dumps("c"), 1)])
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[1]
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("c"), 1)])
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[2]
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1)])
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         with self.assertRaisesRegex(IndexError, "list index out of range"):
             _ = sut[3]
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[-3]
         self.assert_db_state_equals(memory_db, [(pickle.dumps("b"), 0), (pickle.dumps("c"), 1)])
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[-2]
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("c"), 1)])
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[-1]
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1)])
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         with self.assertRaisesRegex(IndexError, "list index out of range"):
             _ = sut[-4]
 
@@ -311,7 +311,7 @@ class ListTestCase(SqlTestCase):
         ):
             memory_db = sqlite3.connect(":memory:")
             self.get_fixture(memory_db, "list/base.sql", "list/delitem_slice.sql")
-            sut = List[str](connection=memory_db, table_name="items")
+            sut = sc.List[str](connection=memory_db, table_name="items")
             s = slice(start, stop, step)
             expected = generate_expectation(s)
             if isinstance(expected, Exception):
@@ -327,7 +327,7 @@ class ListTestCase(SqlTestCase):
     def test_insert(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut.insert(0, "z")
         self.assert_db_state_equals(
@@ -336,7 +336,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut.insert(2, "z")
         self.assert_db_state_equals(
@@ -345,7 +345,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut.insert(3, "z")
         self.assert_db_state_equals(
@@ -354,7 +354,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut.insert(300000, "z")
         self.assert_db_state_equals(
@@ -363,7 +363,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut.insert(-3, "z")
         self.assert_db_state_equals(
@@ -372,7 +372,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut.insert(-1, "z")
         self.assert_db_state_equals(
@@ -381,7 +381,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut.insert(-3000, "z")
         self.assert_db_state_equals(
@@ -391,7 +391,7 @@ class ListTestCase(SqlTestCase):
     def test_append(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [])
         sut.append("a")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0)])
@@ -401,13 +401,13 @@ class ListTestCase(SqlTestCase):
     def test_clear(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         sut.clear()
         self.assert_db_state_equals(memory_db, [])
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/clear.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         sut.clear()
         self.assert_db_state_equals(memory_db, [])
@@ -415,13 +415,13 @@ class ListTestCase(SqlTestCase):
     def test_copy(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         actual = sut.copy()
         self.assert_db_state_equals(memory_db, [], actual.table_name)
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/copy.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
         actual = sut.copy()
         self.assert_db_state_equals(
@@ -433,7 +433,7 @@ class ListTestCase(SqlTestCase):
     def test_extend(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         sut.extend(["a", "b", "c"])
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
 
@@ -453,7 +453,7 @@ class ListTestCase(SqlTestCase):
     def test_iadd(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         sut += ["a", "b", "c"]
         self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
 
@@ -473,7 +473,7 @@ class ListTestCase(SqlTestCase):
     def test_add(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         actual = sut + ["a", "b", "c"]
         self.assert_db_state_equals(
             memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)], actual.table_name
@@ -481,7 +481,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/add.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         actual = sut + ["a", "b", "c"]
         self.assert_db_state_equals(
             memory_db,
@@ -501,7 +501,7 @@ class ListTestCase(SqlTestCase):
     def test_imul(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         sut *= 0
         self.assert_db_state_equals(memory_db, [])
         sut *= 1
@@ -514,7 +514,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/imul.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
 
         sut *= 1
         self.assert_db_state_equals(
@@ -545,7 +545,7 @@ class ListTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/imul.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         sut *= 0
         self.assert_db_state_equals(
             memory_db,
@@ -556,7 +556,7 @@ class ListTestCase(SqlTestCase):
     def test_mul(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/mul.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         actual = sut * 0
         self.assert_db_state_equals(memory_db, [], actual.table_name)
 
@@ -600,14 +600,14 @@ class ListTestCase(SqlTestCase):
     def test_len(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = 0
         actual = len(sut)
         self.assertEqual(actual, expected)
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/len.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = 3
         actual = len(sut)
         self.assertEqual(actual, expected)
@@ -615,13 +615,13 @@ class ListTestCase(SqlTestCase):
     def test_index(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         with self.assertRaisesRegex(ValueError, "'z' is not in list"):
             sut.index("z")
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/index.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = 0
         actual = sut.index("a")
         self.assertEqual(actual, expected)
@@ -653,13 +653,13 @@ class ListTestCase(SqlTestCase):
     def test_count(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = 0
         actual = sut.count("z")
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/count.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = 0
         actual = sut.count("z")
         self.assertEqual(actual, expected)
@@ -676,7 +676,7 @@ class ListTestCase(SqlTestCase):
     def test_pop(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         with self.assertRaisesRegex(IndexError, "pop from empty list"):
             _ = sut.pop()
         with self.assertRaisesRegex(IndexError, "pop from empty list"):
@@ -688,7 +688,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/pop.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = "c"
         actual = sut.pop()
         self.assertEqual(actual, expected)
@@ -706,7 +706,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/pop.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = "b"
         actual = sut.pop(1)
         self.assertEqual(actual, expected)
@@ -717,7 +717,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/pop.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
         expected = "c"
         actual = sut.pop(-1)
         self.assertEqual(actual, expected)
@@ -729,7 +729,7 @@ class ListTestCase(SqlTestCase):
     def test_remove(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/remove.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
 
         with self.assertRaisesRegex(ValueError, "'z' is not in list"):
             sut.remove('z')
@@ -761,7 +761,7 @@ class ListTestCase(SqlTestCase):
     def test_reverse(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/reverse.sql")
-        sut = List[str](connection=memory_db, table_name="items")
+        sut = sc.List[str](connection=memory_db, table_name="items")
 
         self.assert_db_state_equals(
             memory_db,
@@ -796,7 +796,7 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        sut = List[Tuple[int, int]](connection=memory_db, table_name="items")
+        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items")
         sut.sort()
         self.assert_db_state_equals(
             memory_db,
@@ -804,7 +804,7 @@ class ListTestCase(SqlTestCase):
         )
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        sut = List[Tuple[int, int]](connection=memory_db, table_name="items")
+        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items")
         sut.sort(key=lambda x: x[1])
         self.assert_db_state_equals(
             memory_db,
@@ -812,7 +812,7 @@ class ListTestCase(SqlTestCase):
         )
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        sut = List[Tuple[int, int]](connection=memory_db, table_name="items")
+        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items")
         sut.sort(reverse=True)
         self.assert_db_state_equals(
             memory_db,
@@ -820,7 +820,7 @@ class ListTestCase(SqlTestCase):
         )
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        sut = List[Tuple[int, int]](connection=memory_db, table_name="items")
+        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items")
         sut.sort(key=lambda x: x[1], reverse=True)
         self.assert_db_state_equals(
             memory_db,
