@@ -39,10 +39,11 @@ class BenchmarkResult:
 
 
 class BenchmarkBase(Generic[T], metaclass=ABCMeta):
-    def __init__(self, number: int = 16, interval: float = 0.01, timeout: Optional[float] = None):
+    def __init__(self, number: int = 16, interval: float = 0.01, timeout: Optional[float] = None, debug: bool = False):
         self._number = number
         self._interval = interval
         self._timeout = timeout
+        self._debug = debug
 
     @property
     @abstractmethod
@@ -89,8 +90,9 @@ class BenchmarkBase(Generic[T], metaclass=ABCMeta):
                 (self.exec,), interval=self._interval, max_usage=True, retval=True, max_iterations=1
             )
             t2 = time.time()
-            if not self.assertion(result):
-                raise AssertionError()
+            if self._debug:
+                if not self.assertion(result):
+                    raise AssertionError()
             self.teardown()
             gc.collect()
             gc.collect()
