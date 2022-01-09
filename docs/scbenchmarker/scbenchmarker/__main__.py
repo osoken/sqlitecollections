@@ -35,6 +35,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--prefix", default="benchmarks")
     parser.add_argument("--timeout", default=None, type=float)
+    parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
     wd = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(os.path.dirname(os.path.dirname(wd)), "benchmark_results", args.prefix)
@@ -79,7 +80,8 @@ if __name__ == "__main__":
 
                 sqlitecollections_benchmark_class = _
             comp = Comparison(
-                builtin_benchmark_class(timeout=args.timeout), sqlitecollections_benchmark_class(timeout=args.timeout)
+                builtin_benchmark_class(timeout=args.timeout, debug=args.debug),
+                sqlitecollections_benchmark_class(timeout=args.timeout, debug=args.debug),
             )
             buf.append(comp().dict())
         with open(os.path.join(output_dir, f"{container_type_str}.md"), "w") as fout:

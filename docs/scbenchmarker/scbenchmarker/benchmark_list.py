@@ -24,8 +24,8 @@ random.shuffle(target_list)
 
 
 class BuiltinListBenchmarkBase:
-    def __init__(self, timeout: Optional[float] = None) -> None:
-        super(BuiltinListBenchmarkBase, self).__init__(timeout=timeout)
+    def __init__(self, timeout: Optional[float] = None, debug: bool = False) -> None:
+        super(BuiltinListBenchmarkBase, self).__init__(timeout=timeout, debug=debug)
         self._sut_orig = target_list.copy()
         self._sut: target_list_t
 
@@ -47,8 +47,8 @@ class BuiltinListBenchmarkBase:
 
 
 class SqliteCollectionsListBenchmarkBase:
-    def __init__(self, timeout: Optional[float] = None) -> None:
-        super(SqliteCollectionsListBenchmarkBase, self).__init__(timeout=timeout)
+    def __init__(self, timeout: Optional[float] = None, debug: bool = False) -> None:
+        super(SqliteCollectionsListBenchmarkBase, self).__init__(timeout=timeout, debug=debug)
         self._sut_orig = sc.List[target_list_element_t](data=target_list)
         self._sut: target_list_t
 
