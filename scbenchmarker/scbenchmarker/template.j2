@@ -1,0 +1,14 @@
+
+        ### timing
+
+        | subject | `builtin` | `sqlitecollections` | ratio |
+        | :------ | --------: | ------------------: | ----: |
+        {% for d in data %}| {{ d["subject"] }} | {{ d["one"]["timing"] }} | {{ d["another"]["timing"] }} | {{ d["ratio"]["timing"] }} |
+        {% endfor %}
+
+        ### approximate memory usage
+
+        | subject | `builtin` | `sqlitecollections` | ratio |
+        | :------ | --------: | ------------------: | ----: |
+        {% for d in data %}| {{ d["subject"] }} | {{ d["one"]["memory"] }} | {{ d["another"]["memory"] }} | {{ d["ratio"]["memory"] }} |
+        {% endfor %}
