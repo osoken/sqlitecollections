@@ -240,13 +240,19 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def issubset(self, other: Iterable[T]) -> bool:
         return len(self) == len(self.intersection(other))
 
-    def __lt__(self, other: Iterable[T]) -> bool:
-        return self._driver_class.is_proper_subset(
-            self.table_name, self.connection.cursor(), self.connection.cursor(), (self.serialize(d) for d in other)
-        )
+    def __lt__(self, other: AbstractSet[T]) -> bool:
+        if len(self) >= len(other):
+            return False
+        for d in self:
+            if d not in other:
+                return False
+        return True
 
-    def __le__(self, other: Iterable[T]) -> bool:
-        return self.issubset(other)
+    def __le__(self, other: AbstractSet[T]) -> bool:
+        for d in self:
+            if d not in other:
+                return False
+        return True
 
     def intersection(self, *others: Iterable[T]) -> "Set[T]":
         res = self.copy()
@@ -266,12 +272,12 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
                 return False
         return True
 
-    def __gt__(self, other: Iterable[T]) -> bool:
+    def __gt__(self, other: AbstractSet[T]) -> bool:
         return self._driver_class.is_proper_superset(
             self.table_name, self.connection.cursor(), self.connection.cursor(), (self.serialize(d) for d in other)
         )
 
-    def __ge__(self, other: Iterable[T]) -> bool:
+    def __ge__(self, other: AbstractSet[T]) -> bool:
         return self.issuperset(other)
 
     def union(self, *others: Iterable[T]) -> "Set[T]":
