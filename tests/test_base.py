@@ -272,6 +272,53 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             ],
         )
 
+    @patch("sqlitecollections.base.logger")
+    def test_warning_on_table_name_sanitization(self, logger: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="tblnm; DELETE * FROM metadata")
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "tblnmDELETEFROMmetadata",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+            ],
+        )
+        logger.warning.assert_called_once_with(
+            "The table name is changed to tblnmDELETEFROMmetadata due to illegal characters"
+        )
+
+    @patch("sqlitecollections.base.logger")
+    def test_warning_on_sanitized_table_name_on_change(self, logger: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="before")
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "before",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+            ],
+        )
+        sut.table_name = "after; DELETE * FROM metadata"
+        logger.warning.assert_called_once_with(
+            "The table name is changed to afterDELETEFROMmetadata due to illegal characters"
+        )
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "afterDELETEFROMmetadata",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+            ],
+        )
+
     def test_init_same_container_twice(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
