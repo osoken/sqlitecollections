@@ -58,6 +58,10 @@ class ConcreteSqliteCollectionDatabaseDriver(base._SqliteCollectionBaseDatabaseD
     ) -> None:
         cur.execute(f"CREATE TABLE {table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
 
+    @classmethod
+    def add(cls, table_name: str, value: bytes, cur: sqlite3.Cursor) -> None:
+        cur.execute(f"INSERT INTO {table_name} (value) VALUES (?)", (value,))
+
 
 class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
     _driver_class = ConcreteSqliteCollectionDatabaseDriver
@@ -71,6 +75,11 @@ class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
 
     def _do_rebuild(self) -> None:
         ...
+
+    def add(self, value: bytes) -> None:
+        cur = self.connection.cursor()
+        self._driver_class.add(self.table_name, value, cur)
+        self.connection.commit()
 
 
 class SqliteCollectionsBaseTestCase(SqlTestCase):
@@ -182,6 +191,85 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             memory_db,
             "SELECT 1 FROM ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
             [],
+        )
+
+    def test_change_table_name(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="before")
+        sut.add(b"before_content")
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "before",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                )
+            ],
+        )
+        self.assert_sql_result_equals(
+            memory_db,
+            "SELECT value FROM before",
+            [(b"before_content",)],
+        )
+        sut.table_name = "after"
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "after",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                )
+            ],
+        )
+        self.assert_sql_result_equals(
+            memory_db,
+            "SELECT value FROM after",
+            [(b"before_content",)],
+        )
+        with self.assertRaises(sqlite3.OperationalError):
+            self.assert_sql_result_equals(
+                memory_db,
+                "SELECT value FROM before",
+                [(b"before_content",)],
+            )
+
+    def test_error_on_change_table_name_which_already_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="before")
+        sut2 = ConcreteSqliteCollectionClass(connection=memory_db, table_name="after")
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "before",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+                (
+                    "after",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+            ],
+        )
+        with self.assertRaises(ValueError):
+            sut.table_name = "after"
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "before",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+                (
+                    "after",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+            ],
         )
 
     def test_init_same_container_twice(self) -> None:
