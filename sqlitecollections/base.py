@@ -9,6 +9,8 @@ from types import TracebackType
 from typing import Callable, Generic, Optional, Type, TypeVar, Union, cast
 from uuid import uuid4
 
+from .logger import logger
+
 if sys.version_info >= (3, 9):
     from contextlib import AbstractContextManager
 
@@ -30,7 +32,10 @@ class RebuildStrategy(Enum):
 
 
 def sanitize_table_name(table_name: str) -> str:
-    return "".join(c for c in table_name if c.isalnum() or c == "_")
+    ret = "".join(c for c in table_name if c.isalnum() or c == "_")
+    if ret != table_name:
+        logger.warning(f"The table name is changed to {ret} due to illegal characters")
+    return ret
 
 
 def create_random_name(suffix: str) -> str:
@@ -146,6 +151,11 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         )
         cur.execute(f"DROP TABLE {table_name}")
 
+    @classmethod
+    def alter_table_name(cls, table_name: str, new_table_name: str, cur: sqlite3.Cursor) -> None:
+        cur.execute("UPDATE metadata SET table_name=? WHERE table_name=?", (new_table_name, table_name))
+        cur.execute(f"ALTER TABLE {table_name} RENAME TO {new_table_name}")
+
 
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     _driver_class = _SqliteCollectionBaseDatabaseDriver
@@ -233,6 +243,16 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     @property
     def table_name(self) -> str:
         return self._table_name
+
+    @table_name.setter
+    def table_name(self, table_name: str) -> None:
+        cur = self.connection.cursor()
+        new_table_name = sanitize_table_name(table_name)
+        try:
+            self._driver_class.alter_table_name(self.table_name, new_table_name, cur)
+        except sqlite3.IntegrityError as e:
+            raise ValueError(table_name)
+        self._table_name = new_table_name
 
     @property
     def connection(self) -> sqlite3.Connection:
