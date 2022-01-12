@@ -358,7 +358,10 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
 
     def update(self, __other: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: VT) -> None:
         cur = self.connection.cursor()
-        for k, v in chain(dict({} if __other is None else __other).items(), cast(Mapping[KT, VT], kwargs).items()):
+        for k, v in chain(
+            tuple() if __other is None else __other.items() if isinstance(__other, Mapping) else __other,
+            cast(Mapping[KT, VT], kwargs).items(),
+        ):
             self._driver_class.upsert(self.table_name, cur, self.serialize_key(k), self.serialize_value(v))
         self.connection.commit()
 
