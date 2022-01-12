@@ -13,28 +13,20 @@ pip install sqlitecollections
 ## Example
 
 ```python
-import sqlite3
 import sqlitecollections as sc
 
-conn = sqlite3.connect("collections.db")
-
-l = sc.List[str](
-    connection=conn,
-    table_name="list_example",
-    data=["Alice", "Bob", "Carol"]
-)
+l = sc.List[str](data=["Alice", "Bob", "Carol"])
 print(l[2])
 #> Carol
 print(len(l))
 #> 3
 l.append("Dave")
 print(l.index("Bob"))
-#> 2
-d = sc.Dict[str, str](
-    connection=conn,
-    table_name="dict_example",
-    data={"a": "Alice", "b": "Bob"}
-)
+#> 1
+print(l.index("Dave"))
+#> 3
+
+d = sc.Dict[str, str](data={"a": "Alice", "b": "Bob"})
 print(d["a"])
 #> Alice
 d["c"] = "Carol"
@@ -42,11 +34,8 @@ print(list(d.keys()))
 #> ['a', 'b', 'c']
 print(list(d.values()))
 #> ['Alice', 'Bob', 'Carol']
-s = sc.Set[str](
-    connection=conn,
-    table_name="set_example",
-    data=["Alice", "Bob", "Carol", "Dave"]
-)
+
+s = sc.Set[str](data=["Alice", "Bob", "Carol", "Dave"])
 print("Ellen" in s)
 #> False
 print("Alice" in s)
@@ -55,22 +44,28 @@ print(list(s.intersection(["Alice", "Carol"])))
 #> ['Alice', 'Carol']
 ```
 
-The database is updated with each operation, so even if we exit from the python process at this point, the database will still be in the same state and the next time we use the same file, we will be able to use the container from the last time we terminated.
+In the above example, a temporary file is created every time a container is created, and the elements are written to the sqlite3 database created on the file, thus consuming very little RAM.
+
+If you want to reuse the container you created, you can create it by specifying the file path and table name of the sqlite3 database.
 
 ```python
-import sqlite3
 import sqlitecollections as sc
 
-conn = sqlite3.connect("collections.db")
+l = sc.List[str](connection="path/to/file.db", table_name="list_example", data=["Alice", "Bob", "Carol"])
+l.append("Dave")
+exit()
+```
 
-l = sc.List[str](
-    connection=conn,
-    table_name="list_example",
-)
+When you load it, you can restore the previous state by specifying the same file path and table name.
+
+```python
+import sqlitecollections as sc
+
+l = sc.List[str](connection="path/to/file.db", table_name="list_example")
 print(len(l))
 #> 4
-print(l[2])
-#> Carol
+print(list(l))
+#> ['Alice', 'Bob', 'Carol', 'Dave']
 ```
 
 ## Pros and cons for built-in containers
