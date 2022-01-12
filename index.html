@@ -517,35 +517,27 @@
 
 
 <h1 id="overview">Overview</h1>
-<p>Documentation for version: <code>0.8.1</code></p>
+<p>Documentation for version: <code>0.8.2</code></p>
 <p><code>sqlitecollections</code> is a sort of containers that are backended by sqlite3 DB and are compatible with corresponding built-in collections. Since containers consume disk space instead of RAM, they can handle large amounts of data even in environments with limited RAM. Migrating from existing code using the built-in container is as simple as importing the library and changing the constructor.</p>
 <p>The elements of the container are automatically serialized and stored in the sqlite3 database, and are automatically read from the sqlite3 database and deserialized when accessed. Current version supports List (mutable sequence), Dict (mutable mapping) and Set (mutable set) and almost all methods are compatible with list, dict and set respectively.</p>
 <h2 id="installation">Installation</h2>
 <div class="highlight"><pre><span></span><code>pip install sqlitecollections
 </code></pre></div>
 <h2 id="example">Example</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sqlite3</span>
-<span class="kn">import</span> <span class="nn">sqlitecollections</span> <span class="k">as</span> <span class="nn">sc</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sqlitecollections</span> <span class="k">as</span> <span class="nn">sc</span>
 
-<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;collections.db&quot;</span><span class="p">)</span>
-
-<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span>
-    <span class="n">connection</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span>
-    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;list_example&quot;</span><span class="p">,</span>
-    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">]</span>
-<span class="p">)</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 <span class="c1">#&gt; Carol</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
 <span class="c1">#&gt; 3</span>
 <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Dave&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">))</span>
-<span class="c1">#&gt; 2</span>
-<span class="n">d</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">](</span>
-    <span class="n">connection</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span>
-    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;dict_example&quot;</span><span class="p">,</span>
-    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">}</span>
-<span class="p">)</span>
+<span class="c1">#&gt; 1</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;Dave&quot;</span><span class="p">))</span>
+<span class="c1">#&gt; 3</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">](</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">})</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">])</span>
 <span class="c1">#&gt; Alice</span>
 <span class="n">d</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Carol&quot;</span>
@@ -553,11 +545,8 @@
 <span class="c1">#&gt; [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
 <span class="c1">#&gt; [&#39;Alice&#39;, &#39;Bob&#39;, &#39;Carol&#39;]</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span>
-    <span class="n">connection</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span>
-    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;set_example&quot;</span><span class="p">,</span>
-    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">,</span> <span class="s2">&quot;Dave&quot;</span><span class="p">]</span>
-<span class="p">)</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">,</span> <span class="s2">&quot;Dave&quot;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ellen&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">)</span>
 <span class="c1">#&gt; False</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Alice&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">)</span>
@@ -565,20 +554,22 @@
 <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">intersection</span><span class="p">([</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">])))</span>
 <span class="c1">#&gt; [&#39;Alice&#39;, &#39;Carol&#39;]</span>
 </code></pre></div>
-<p>The database is updated with each operation, so even if we exit from the python process at this point, the database will still be in the same state and the next time we use the same file, we will be able to use the container from the last time we terminated.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sqlite3</span>
-<span class="kn">import</span> <span class="nn">sqlitecollections</span> <span class="k">as</span> <span class="nn">sc</span>
+<p>In the above example, a temporary file is created every time a container is created, and the elements are written to the sqlite3 database created on the file, thus consuming very little RAM.</p>
+<p>If you want to reuse the container you created, you can create it by specifying the file path and table name of the sqlite3 database.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sqlitecollections</span> <span class="k">as</span> <span class="nn">sc</span>
 
-<span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s2">&quot;collections.db&quot;</span><span class="p">)</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span><span class="n">connection</span><span class="o">=</span><span class="s2">&quot;path/to/file.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;list_example&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">])</span>
+<span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Dave&quot;</span><span class="p">)</span>
+<span class="n">exit</span><span class="p">()</span>
+</code></pre></div>
+<p>When you load it, you can restore the previous state by specifying the same file path and table name.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sqlitecollections</span> <span class="k">as</span> <span class="nn">sc</span>
 
-<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span>
-    <span class="n">connection</span><span class="o">=</span><span class="n">conn</span><span class="p">,</span>
-    <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;list_example&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span><span class="n">connection</span><span class="o">=</span><span class="s2">&quot;path/to/file.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;list_example&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
 <span class="c1">#&gt; 4</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-<span class="c1">#&gt; Carol</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+<span class="c1">#&gt; [&#39;Alice&#39;, &#39;Bob&#39;, &#39;Carol&#39;, &#39;Dave&#39;]</span>
 </code></pre></div>
 <h2 id="pros-and-cons-for-built-in-containers">Pros and cons for built-in containers</h2>
 <h3 id="pros">Pros</h3>
