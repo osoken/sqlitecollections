@@ -373,6 +373,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         cur = self.connection.cursor()
         length = self._driver_class.get_max_index_plus_one(self.table_name, cur)
         self._driver_class.add_record_by_serialized_value_and_index(self.table_name, cur, self.serialize(value), length)
+        self.connection.commit()
 
     def clear(self) -> None:
         cur = self.connection.cursor()
