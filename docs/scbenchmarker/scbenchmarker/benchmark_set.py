@@ -16,9 +16,9 @@ from .common import BenchmarkBase, Comparison
 
 benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 
-target_set_len = 10000
-larger_set_diff = 100
-smaller_set_diff = -9900
+target_set_len = 500
+larger_set_diff = 50
+smaller_set_diff = -950
 target_set = set(str(i) for i in range(target_set_len))
 larger_set = set(str(i) for i in range(target_set_len + larger_set_diff))
 smaller_set = set(str(i) for i in range(target_set_len + smaller_set_diff))
@@ -101,7 +101,7 @@ class BenchmarkContainsBase(BenchmarkBase[bool]):
 
     def exec(self) -> bool:
         self._sut: target_set_t
-        return "651" in self._sut
+        return "51" in self._sut
 
     def assertion(self, result: bool) -> bool:
         return result
@@ -114,7 +114,7 @@ class BenchmarkNotContainsBase(BenchmarkBase[bool]):
 
     def exec(self) -> bool:
         self._sut: target_set_t
-        return "-651" not in self._sut
+        return "-51" not in self._sut
 
     def assertion(self, result: bool) -> bool:
         return result
@@ -510,7 +510,7 @@ class BenchmarkAddExistingItemBase(BenchmarkBase[target_set_t]):
 
     def exec(self) -> target_set_t:
         self._sut: target_set_t
-        self._sut.add("651")
+        self._sut.add("51")
         return self._sut
 
     def assertion(self, result: target_set_t) -> bool:
@@ -538,11 +538,11 @@ class BenchmarkRemoveBase(BenchmarkBase[target_set_t]):
 
     def exec(self) -> target_set_t:
         self._sut: target_set_t
-        self._sut.remove("651")
+        self._sut.remove("51")
         return self._sut
 
     def assertion(self, result: target_set_t) -> bool:
-        return len(result) == (target_set_len - 1) and "651" not in result
+        return len(result) == (target_set_len - 1) and "51" not in result
 
 
 class BenchmarkDiscardBase(BenchmarkBase[target_set_t]):
@@ -552,11 +552,11 @@ class BenchmarkDiscardBase(BenchmarkBase[target_set_t]):
 
     def exec(self) -> target_set_t:
         self._sut: target_set_t
-        self._sut.discard("651")
+        self._sut.discard("51")
         return self._sut
 
     def assertion(self, result: target_set_t) -> bool:
-        return len(result) == (target_set_len - 1) and "651" not in result
+        return len(result) == (target_set_len - 1) and "51" not in result
 
 
 class BenchmarkDiscardNoChangesBase(BenchmarkBase[target_set_t]):
