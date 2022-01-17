@@ -22,7 +22,7 @@ from .common import BenchmarkBase, Comparison
 
 benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 
-target_dict_len = 100000
+target_dict_len = 2000
 target_dict = {str(i): i for i in range(target_dict_len)}
 target_dict_key_t = str
 target_dict_value_t = int

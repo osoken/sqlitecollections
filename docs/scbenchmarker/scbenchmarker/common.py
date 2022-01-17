@@ -39,7 +39,7 @@ class BenchmarkResult:
 
 
 class BenchmarkBase(Generic[T], metaclass=ABCMeta):
-    def __init__(self, number: int = 16, interval: float = 0.01, timeout: Optional[float] = None, debug: bool = False):
+    def __init__(self, number: int = 8, interval: float = 0.01, timeout: Optional[float] = None, debug: bool = False):
         self._number = number
         self._interval = interval
         self._timeout = timeout
