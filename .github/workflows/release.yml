@@ -74,7 +74,7 @@ jobs:
       - name: Archive benchmarking result
         uses: actions/upload-artifact@v2
         with:
-          name: py$(echo ${{ matrix.python-version }} | sed 's/\.//')-benchmark
+          name: ${{ matrix.python-version }}
           path: docs/benchmark_results
 
   build-docs-and-release:
