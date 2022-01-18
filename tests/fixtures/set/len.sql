@@ -2,5 +2,5 @@
 INSERT INTO
     items (serialized_value)
 VALUES
-    ('a'),
-    ('b');
+    (X'800358010000006171002E'),
+    (X'800358010000006271002E');

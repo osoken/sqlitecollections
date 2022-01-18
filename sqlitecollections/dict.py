@@ -2,7 +2,6 @@ import sqlite3
 import sys
 import warnings
 from itertools import chain
-from pickle import dumps, loads
 from typing import Callable, Generic, Optional, Tuple, Union, cast, overload
 
 if sys.version_info >= (3, 9):
@@ -155,7 +154,7 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
             if value_serializer is not None
             else serializer
             if serializer is not None
-            else cast(Callable[[VT], bytes], dumps if key_serializer is None else key_serializer)
+            else cast(Callable[[VT], bytes], self._default_serializer if key_serializer is None else key_serializer)
         )
         if deserializer is not None:
             warnings.warn(
@@ -168,7 +167,9 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
             if value_deserializer is not None
             else deserializer
             if deserializer is not None
-            else cast(Callable[[bytes], VT], loads if key_deserializer is None else key_deserializer)
+            else cast(
+                Callable[[bytes], VT], self._default_deserializer if key_deserializer is None else key_deserializer
+            )
         )
         super(_Dict, self).__init__(
             connection=connection,

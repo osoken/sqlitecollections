@@ -1,4 +1,3 @@
-import pickle
 import sqlite3
 import sys
 import warnings
@@ -163,16 +162,32 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(1), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(1),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
             ],
         )
         sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("c", 3), ("d", 4)))
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("c"), pickle.dumps(3), 0),
-                (pickle.dumps("d"), pickle.dumps(4), 1),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(3),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("d"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    1,
+                ),
             ],
         )
 
@@ -199,7 +214,11 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
             ],
         )
         with self.assertRaisesRegex(KeyError, "b"):
@@ -224,22 +243,44 @@ class DictTestCase(SqlTestCase):
         sut["akey"] = {"a": "dict"}
         self.assert_dict_state_equals(
             memory_db,
-            [(pickle.dumps("akey"), pickle.dumps({"a": "dict"}), 0)],
+            [
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("akey"),
+                    sc.base.SqliteCollectionBase._default_serializer({"a": "dict"}),
+                    0,
+                )
+            ],
         )
         sut["anotherkey"] = ["a", "b"]
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("akey"), pickle.dumps({"a": "dict"}), 0),
-                (pickle.dumps("anotherkey"), pickle.dumps(["a", "b"]), 1),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("akey"),
+                    sc.base.SqliteCollectionBase._default_serializer({"a": "dict"}),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("anotherkey"),
+                    sc.base.SqliteCollectionBase._default_serializer(["a", "b"]),
+                    1,
+                ),
             ],
         )
         sut["akey"] = None
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("akey"), pickle.dumps(None), 0),
-                (pickle.dumps("anotherkey"), pickle.dumps(["a", "b"]), 1),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("akey"),
+                    sc.base.SqliteCollectionBase._default_serializer(None),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("anotherkey"),
+                    sc.base.SqliteCollectionBase._default_serializer(["a", "b"]),
+                    1,
+                ),
             ],
         )
         with self.assertRaisesRegex(TypeError, r"unhashable type:"):
@@ -301,7 +342,16 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(memory_db, [])
         self.get_fixture(memory_db, "dict/clear.sql")
         sut = sc.Dict(connection=memory_db, table_name="items")
-        self.assert_dict_state_equals(memory_db, [(pickle.dumps("a"), pickle.dumps(4), 0)])
+        self.assert_dict_state_equals(
+            memory_db,
+            [
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                )
+            ],
+        )
         sut.clear()
         self.assert_dict_state_equals(memory_db, [])
 
@@ -349,10 +399,26 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("c"), pickle.dumps(None), 2),
-                (pickle.dumps("d"), pickle.dumps([1, 2]), 3),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(None),
+                    2,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("d"),
+                    sc.base.SqliteCollectionBase._default_serializer([1, 2]),
+                    3,
+                ),
             ],
         )
         expected1 = 4
@@ -361,9 +427,21 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("c"), pickle.dumps(None), 2),
-                (pickle.dumps("d"), pickle.dumps([1, 2]), 3),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(None),
+                    2,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("d"),
+                    sc.base.SqliteCollectionBase._default_serializer([1, 2]),
+                    3,
+                ),
             ],
         )
         expected2 = "default"
@@ -372,9 +450,21 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("c"), pickle.dumps(None), 2),
-                (pickle.dumps("d"), pickle.dumps([1, 2]), 3),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(None),
+                    2,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("d"),
+                    sc.base.SqliteCollectionBase._default_serializer([1, 2]),
+                    3,
+                ),
             ],
         )
         with self.assertRaisesRegex(KeyError, "nonsuch"):
@@ -382,9 +472,21 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("c"), pickle.dumps(None), 2),
-                (pickle.dumps("d"), pickle.dumps([1, 2]), 3),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(None),
+                    2,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("d"),
+                    sc.base.SqliteCollectionBase._default_serializer([1, 2]),
+                    3,
+                ),
             ],
         )
 
@@ -395,8 +497,16 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
             ],
         )
         if sys.version_info < (3, 7):
@@ -414,7 +524,11 @@ class DictTestCase(SqlTestCase):
             self.assert_dict_state_equals(
                 memory_db,
                 [
-                    (pickle.dumps("a"), pickle.dumps(4), 0),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer("a"),
+                        sc.base.SqliteCollectionBase._default_serializer(4),
+                        0,
+                    ),
                 ],
             )
 
@@ -446,8 +560,16 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
             ],
         )
         expected1 = 4
@@ -456,8 +578,16 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
             ],
         )
         expected2 = None
@@ -466,9 +596,21 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("c"), pickle.dumps(None), 2),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(None),
+                    2,
+                ),
             ],
         )
         expected3 = 2
@@ -477,9 +619,21 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("c"), pickle.dumps(None), 2),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(None),
+                    2,
+                ),
             ],
         )
         expected4 = "default"
@@ -488,10 +642,26 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("c"), pickle.dumps(None), 2),
-                (pickle.dumps("d"), pickle.dumps("default"), 3),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(None),
+                    2,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("d"),
+                    sc.base.SqliteCollectionBase._default_serializer("default"),
+                    3,
+                ),
             ],
         )
 
@@ -503,9 +673,21 @@ class DictTestCase(SqlTestCase):
         self.assert_dict_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), pickle.dumps(1), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
-                (pickle.dumps("e"), pickle.dumps(10), 2),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(1),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("e"),
+                    sc.base.SqliteCollectionBase._default_serializer(10),
+                    2,
+                ),
             ],
         )
 
@@ -534,9 +716,21 @@ class DictTestCase(SqlTestCase):
                 memory_db,
                 f"SELECT serialized_key, serialized_value, item_order FROM {actual.table_name} ORDER BY item_order",
                 [
-                    (pickle.dumps("a"), pickle.dumps(1), 0),
-                    (pickle.dumps("b"), pickle.dumps(2), 1),
-                    (pickle.dumps("e"), pickle.dumps(10), 2),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer("a"),
+                        sc.base.SqliteCollectionBase._default_serializer(1),
+                        0,
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer("b"),
+                        sc.base.SqliteCollectionBase._default_serializer(2),
+                        1,
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer("e"),
+                        sc.base.SqliteCollectionBase._default_serializer(10),
+                        2,
+                    ),
                 ],
             )
 
@@ -555,9 +749,21 @@ class DictTestCase(SqlTestCase):
             self.assert_dict_state_equals(
                 memory_db,
                 [
-                    (pickle.dumps("a"), pickle.dumps(1), 0),
-                    (pickle.dumps("b"), pickle.dumps(2), 1),
-                    (pickle.dumps("e"), pickle.dumps(10), 2),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer("a"),
+                        sc.base.SqliteCollectionBase._default_serializer(1),
+                        0,
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer("b"),
+                        sc.base.SqliteCollectionBase._default_serializer(2),
+                        1,
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer("e"),
+                        sc.base.SqliteCollectionBase._default_serializer(10),
+                        2,
+                    ),
                 ],
             )
 
@@ -571,8 +777,16 @@ class DictTestCase(SqlTestCase):
             memory_db,
             f"SELECT serialized_key, serialized_value, item_order FROM {actual.table_name}",
             [
-                (pickle.dumps("a"), pickle.dumps(4), 0),
-                (pickle.dumps("b"), pickle.dumps(2), 1),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
             ],
         )
         del actual
