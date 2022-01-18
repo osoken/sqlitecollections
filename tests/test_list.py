@@ -73,9 +73,9 @@ class ListTestCase(SqlTestCase):
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         sut = sc.List[Any](connection=memory_db, table_name="items", data=[0])
-        self.assert_db_state_equals(memory_db, [(pickle.dumps(0), 0)])
+        self.assert_db_state_equals(memory_db, [(sc.base.SqliteCollectionBase._default_serializer(0), 0)])
         sut = sc.List[Any](connection=memory_db, table_name="items", data=[1])
-        self.assert_db_state_equals(memory_db, [(pickle.dumps(1), 0)])
+        self.assert_db_state_equals(memory_db, [(sc.base.SqliteCollectionBase._default_serializer(1), 0)])
 
     def test_rebuild(self) -> None:
         memory_db = sqlite3.connect(":memory:")
@@ -148,7 +148,7 @@ class ListTestCase(SqlTestCase):
         expected_array = [chr(i) for i in range(ord("a"), ord("z") + 1)]
 
         def generate_expectation(s: slice) -> Sequence[Tuple[bytes, int]]:
-            return [(pickle.dumps(c), i) for i, c in enumerate(expected_array[s])]
+            return [(sc.base.SqliteCollectionBase._default_serializer(c), i) for i, c in enumerate(expected_array[s])]
 
         for si in product(
             (None, -100, -26, -25, -20, 0, 20, 25, 26, 100),
@@ -194,17 +194,52 @@ class ListTestCase(SqlTestCase):
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/setitem_int.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut[0] = "A"
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("A"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut[-1] = "C"
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("C"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("A"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("C"), 2),
+            ],
+        )
         with self.assertRaisesRegex(IndexError, "list assignment index out of range"):
             sut[100] = "Z"
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("C"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("A"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("C"), 2),
+            ],
+        )
         with self.assertRaisesRegex(IndexError, "list assignment index out of range"):
             sut[-100] = "z"
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("A"), 0), (pickle.dumps("b"), 1), (pickle.dumps("C"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("A"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("C"), 2),
+            ],
+        )
 
     def test_setitem_slice(self) -> None:
         def generate_expectation(s: slice, t: Iterable[str]) -> Union[Exception, Sequence[Tuple[bytes, int]]]:
@@ -213,7 +248,7 @@ class ListTestCase(SqlTestCase):
                 a[s] = t
             except Exception as e:
                 return e
-            return [(pickle.dumps(c), i) for i, c in enumerate(a)]
+            return [(sc.base.SqliteCollectionBase._default_serializer(c), i) for i, c in enumerate(a)]
 
         def generate_new_value(length: int) -> Iterable[str]:
             t = [chr(ord("A") + i) for i in range(length)]
@@ -249,21 +284,46 @@ class ListTestCase(SqlTestCase):
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         del sut[0]
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("b"), 0), (pickle.dumps("c"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 1),
+            ],
+        )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[1]
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("c"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 1),
+            ],
+        )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[2]
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+            ],
+        )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
@@ -275,19 +335,37 @@ class ListTestCase(SqlTestCase):
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[-3]
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("b"), 0), (pickle.dumps("c"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 1),
+            ],
+        )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[-2]
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("c"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 1),
+            ],
+        )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
         del sut[-1]
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+            ],
+        )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/delitem_int.sql")
@@ -302,7 +380,7 @@ class ListTestCase(SqlTestCase):
                 del a[s]
             except Exception as e:
                 return e
-            return [(pickle.dumps(c), i) for i, c in enumerate(a)]
+            return [(sc.base.SqliteCollectionBase._default_serializer(c), i) for i, c in enumerate(a)]
 
         for start, stop, step in product(
             (None, -10, -8, -7, -2, -1, 0, 1, 2, 7, 8, 10),
@@ -328,64 +406,155 @@ class ListTestCase(SqlTestCase):
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut.insert(0, "z")
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("z"), 0), (pickle.dumps("a"), 1), (pickle.dumps("b"), 2), (pickle.dumps("c"), 3)]
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("z"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 3),
+            ],
         )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut.insert(2, "z")
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("z"), 2), (pickle.dumps("c"), 3)]
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("z"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 3),
+            ],
         )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut.insert(3, "z")
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2), (pickle.dumps("z"), 3)]
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("z"), 3),
+            ],
         )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut.insert(300000, "z")
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2), (pickle.dumps("z"), 3)]
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("z"), 3),
+            ],
         )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut.insert(-3, "z")
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("z"), 0), (pickle.dumps("a"), 1), (pickle.dumps("b"), 2), (pickle.dumps("c"), 3)]
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("z"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 3),
+            ],
         )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut.insert(-1, "z")
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("z"), 2), (pickle.dumps("c"), 3)]
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("z"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 3),
+            ],
         )
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/insert.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut.insert(-3000, "z")
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("z"), 0), (pickle.dumps("a"), 1), (pickle.dumps("b"), 2), (pickle.dumps("c"), 3)]
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("z"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 3),
+            ],
         )
 
     def test_append(self) -> None:
@@ -394,9 +563,15 @@ class ListTestCase(SqlTestCase):
         sut = sc.List[str](connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [])
         sut.append("a")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0)])
+        self.assert_db_state_equals(memory_db, [(sc.base.SqliteCollectionBase._default_serializer("a"), 0)])
         sut.append("z")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("z"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("z"), 1),
+            ],
+        )
 
     def test_clear(self) -> None:
         memory_db = sqlite3.connect(":memory:")
@@ -408,7 +583,14 @@ class ListTestCase(SqlTestCase):
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/clear.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         sut.clear()
         self.assert_db_state_equals(memory_db, [])
 
@@ -422,10 +604,23 @@ class ListTestCase(SqlTestCase):
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/copy.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
         actual = sut.copy()
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)], actual.table_name
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+            actual.table_name,
         )
         del actual
         self.assert_items_table_only(memory_db)
@@ -435,18 +630,25 @@ class ListTestCase(SqlTestCase):
         self.get_fixture(memory_db, "list/base.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
         sut.extend(["a", "b", "c"])
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
 
         sut.extend(["a", "b", "c"])
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
-                (pickle.dumps("a"), 3),
-                (pickle.dumps("b"), 4),
-                (pickle.dumps("c"), 5),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 4),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 5),
             ],
         )
 
@@ -455,18 +657,25 @@ class ListTestCase(SqlTestCase):
         self.get_fixture(memory_db, "list/base.sql")
         sut = sc.List[str](connection=memory_db, table_name="items")
         sut += ["a", "b", "c"]
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+        )
 
         sut += ["a", "b", "c"]
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
-                (pickle.dumps("a"), 3),
-                (pickle.dumps("b"), 4),
-                (pickle.dumps("c"), 5),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 4),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 5),
             ],
         )
 
@@ -476,7 +685,13 @@ class ListTestCase(SqlTestCase):
         sut = sc.List[str](connection=memory_db, table_name="items")
         actual = sut + ["a", "b", "c"]
         self.assert_db_state_equals(
-            memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1), (pickle.dumps("c"), 2)], actual.table_name
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+            ],
+            actual.table_name,
         )
 
         memory_db = sqlite3.connect(":memory:")
@@ -486,12 +701,12 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
-                (pickle.dumps("a"), 3),
-                (pickle.dumps("b"), 4),
-                (pickle.dumps("c"), 5),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 4),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 5),
             ],
             actual.table_name,
         )
@@ -520,21 +735,21 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
             ],
         )
         sut *= 2
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
-                (pickle.dumps("a"), 3),
-                (pickle.dumps("b"), 4),
-                (pickle.dumps("c"), 5),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 4),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 5),
             ],
         )
         sut *= -1
@@ -564,9 +779,9 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
             ],
             actual.table_name,
         )
@@ -575,12 +790,12 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
-                (pickle.dumps("a"), 3),
-                (pickle.dumps("b"), 4),
-                (pickle.dumps("c"), 5),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 4),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 5),
             ],
             actual.table_name,
         )
@@ -692,11 +907,17 @@ class ListTestCase(SqlTestCase):
         expected = "c"
         actual = sut.pop()
         self.assertEqual(actual, expected)
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+            ],
+        )
         expected = "b"
         actual = sut.pop()
         self.assertEqual(actual, expected)
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0)])
+        self.assert_db_state_equals(memory_db, [(sc.base.SqliteCollectionBase._default_serializer("a"), 0)])
         expected = "a"
         actual = sut.pop()
         self.assertEqual(actual, expected)
@@ -710,7 +931,13 @@ class ListTestCase(SqlTestCase):
         expected = "b"
         actual = sut.pop(1)
         self.assertEqual(actual, expected)
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("c"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 1),
+            ],
+        )
 
         with self.assertRaisesRegex(IndexError, "pop index out of range"):
             _ = sut.pop(3)
@@ -721,7 +948,13 @@ class ListTestCase(SqlTestCase):
         expected = "c"
         actual = sut.pop(-1)
         self.assertEqual(actual, expected)
-        self.assert_db_state_equals(memory_db, [(pickle.dumps("a"), 0), (pickle.dumps("b"), 1)])
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+            ],
+        )
 
         with self.assertRaisesRegex(IndexError, "pop index out of range"):
             _ = sut.pop(-3)
@@ -738,21 +971,21 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("b"), 0),
-                (pickle.dumps("c"), 1),
-                (pickle.dumps("a"), 2),
-                (pickle.dumps("b"), 3),
-                (pickle.dumps("c"), 4),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 4),
             ],
         )
         sut.remove("a")
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("b"), 0),
-                (pickle.dumps("c"), 1),
-                (pickle.dumps("b"), 2),
-                (pickle.dumps("c"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 3),
             ],
         )
         with self.assertRaisesRegex(ValueError, "'a' is not in list"):
@@ -766,33 +999,33 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
             ],
         )
         sut.reverse()
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("c"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("a"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 2),
             ],
         )
         sut.reverse()
         self.assert_db_state_equals(
             memory_db,
             [
-                (pickle.dumps("a"), 0),
-                (pickle.dumps("b"), 1),
-                (pickle.dumps("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
             ],
         )
 
     def test_sort(self) -> None:
         def generate_expected(l: Sequence[Tuple[int, int]]) -> Sequence[Tuple[bytes, int]]:
-            return [(pickle.dumps(d), i) for i, d in enumerate(l)]
+            return [(sc.base.SqliteCollectionBase._default_serializer(d), i) for i, d in enumerate(l)]
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")

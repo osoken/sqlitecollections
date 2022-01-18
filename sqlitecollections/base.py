@@ -160,6 +160,14 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     _driver_class = _SqliteCollectionBaseDatabaseDriver
 
+    @classmethod
+    def _default_serializer(cls, x: T) -> bytes:
+        return dumps(x, protocol=3)
+
+    @classmethod
+    def _default_deserializer(cls, x: bytes) -> T:
+        return cast(T, loads(x))
+
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
@@ -170,8 +178,8 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
     ):
         super(SqliteCollectionBase, self).__init__()
-        self._serializer = cast(Callable[[T], bytes], dumps) if serializer is None else serializer
-        self._deserializer = cast(Callable[[bytes], T], loads) if deserializer is None else deserializer
+        self._serializer = self._default_serializer if serializer is None else serializer
+        self._deserializer = self._default_deserializer if deserializer is None else deserializer
         self._persist = persist
         if connection is None:
             self._connection = sqlite3.connect(NamedTemporaryFile().name)

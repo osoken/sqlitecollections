@@ -83,20 +83,37 @@ class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
 
 
 class SqliteCollectionsBaseTestCase(SqlTestCase):
+    def test_default_serializer(self) -> None:
+        expected = b'\x80\x03X\x03\x00\x00\x00123q\x00.'
+        actual = ConcreteSqliteCollectionClass._default_serializer("123")
+        self.assertEqual(actual, expected)
+
+    def test_default_deserializer(self) -> None:
+        expected = "123"
+        actual = ConcreteSqliteCollectionClass._default_deserializer(b'\x80\x03X\x03\x00\x00\x00123q\x00.')
+        self.assertEqual(actual, expected)
+
+    @patch("sqlitecollections.base.dumps")
+    def test_protocol_is_specified_on_calling_default_serializer(self, dumps: MagicMock) -> None:
+        actual = ConcreteSqliteCollectionClass._default_serializer("x")
+        expected = dumps.return_value
+        dumps.assert_called_once_with("x", protocol=3)
+        self.assertEqual(actual, expected)
+
     @patch(
         "sqlitecollections.base.uuid4",
         return_value=uuid.UUID("4da95358-64e7-40e7-b888-31e14e1c1d09"),
     )
-    @patch("sqlitecollections.base.loads")
-    @patch("sqlitecollections.base.dumps")
+    @patch("sqlitecollections.base.SqliteCollectionBase._default_serializer")
+    @patch("sqlitecollections.base.SqliteCollectionBase._default_deserializer")
     @patch("sqlitecollections.base.sqlite3.connect")
     @patch("sqlitecollections.base.NamedTemporaryFile")
     def test_init_with_no_args(
         self,
         NamedTemporaryFile: MagicMock,
         sqlite3_connect: MagicMock,
-        dumps: MagicMock,
-        loads: MagicMock,
+        default_deserializer: MagicMock,
+        default_serializer: MagicMock,
         uuid4: MagicMock,
     ) -> None:
         memory_db = sqlite3.Connection(":memory:")
@@ -105,8 +122,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         sut = ConcreteSqliteCollectionClass()
         sqlite3_connect.assert_called_once_with("tempfilename")
         self.assertEqual(sut.connection, memory_db)
-        self.assertEqual(sut.serializer, dumps)
-        self.assertEqual(sut.deserializer, loads)
+        self.assertEqual(sut.serializer, default_serializer)
+        self.assertEqual(sut.deserializer, default_deserializer)
         self.assertEqual(sut.persist, True)
         self.assertEqual(
             sut.table_name,
