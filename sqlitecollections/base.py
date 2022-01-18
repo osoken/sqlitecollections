@@ -38,8 +38,8 @@ def sanitize_table_name(table_name: str) -> str:
     return ret
 
 
-def create_random_name(suffix: str) -> str:
-    return f"{suffix}_{str(uuid4()).replace('-', '')}"
+def create_random_name(prefix: str) -> str:
+    return f"{prefix}_{str(uuid4()).replace('-', '')}"
 
 
 def is_hashable(x: object) -> bool:
