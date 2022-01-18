@@ -15,7 +15,7 @@
     
     
       
-        <title>Development - sqlitecollections</title>
+        <title>Benchmark - sqlitecollections</title>
       
     
     
@@ -63,11 +63,6 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
-        
-        <a href="#development" class="md-skip">
-          Skip to content
-        </a>
-      
     </div>
     <div data-md-component="announce">
       
@@ -97,7 +92,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Development
+              Benchmark
             
           </span>
         </div>
@@ -333,66 +328,11 @@
 
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Development
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
         Development
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#tests-type-checking-and-linting-locally" class="md-nav__link">
-    Tests, type checking and linting locally
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-documents" class="md-nav__link">
-    Building documents
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#compatibility-policy" class="md-nav__link">
-    Compatibility policy
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -403,11 +343,19 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../benchmark/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Benchmark
       </a>
+      
     </li>
   
 
@@ -419,125 +367,19 @@
               </div>
             
             
-              
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#tests-type-checking-and-linting-locally" class="md-nav__link">
-    Tests, type checking and linting locally
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-documents" class="md-nav__link">
-    Building documents
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#compatibility-policy" class="md-nav__link">
-    Compatibility policy
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           <div class="md-content" data-md-component="content">
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/osoken/sqlitecollections/edit/master/docs/development.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/osoken/sqlitecollections/edit/master/docs/benchmark.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
-<h1 id="development">Development</h1>
-<h2 id="tests-type-checking-and-linting-locally">Tests, type checking and linting locally</h2>
-<p>To run tests, type checking and linting locally, you'll need to have <strong>python 3.6</strong>, <strong>3.7</strong>, <strong>3.8</strong>, <strong>3.9</strong> and <strong>3.10</strong> installed.
-We use <code>tox</code> to run tests and type checking on all the supported python versions.
-You can set up the development environment with the following commands:</p>
-<div class="highlight"><pre><span></span><code>git clone git@github.com:osoken/sqlitecollections.git
-cd sqlitecollections
-python -m venv .venv
-source ./.venv/bin/activate
-pip install -e .[dev]
-</code></pre></div>
-<p>Then, run tests is as easy as:</p>
-<div class="highlight"><pre><span></span><code>tox
-</code></pre></div>
-<p>After a while, you'll see the following message at the bottom of the long logs from <code>pytest</code> and others.</p>
-<div class="highlight"><pre><span></span><code>__________________ summary __________________
-  lint: commands succeeded
-  py36: commands succeeded
-  py37: commands succeeded
-  py38: commands succeeded
-  py39: commands succeeded
-  py310: commands succeeded
-  congratulations :)
-</code></pre></div>
-<h2 id="building-documents">Building documents</h2>
-<p>We use <code>mkdocs</code> to build the documentation.
-To set up the environment for building the document, run the following commands:</p>
-<div class="highlight"><pre><span></span><code>git clone git@github.com:osoken/sqlitecollections.git
-cd sqlitecollections
-python -m venv .venv
-source ./.venv/bin/activate
-pip install -e .[docs]
-</code></pre></div>
-<p>Then, building the documentation can be done by the following command:</p>
-<div class="highlight"><pre><span></span><code>mkdocs build
-</code></pre></div>
-<p>The output will be located in <code>site</code> directory in your current directory.</p>
-<p>During development, you can also run <code>mkdoc</code>'s builtin development server with hot-reloading enabled with the following command:</p>
-<div class="highlight"><pre><span></span><code>mkdocs serve
-</code></pre></div>
-<p>In that case, you can check the result on <code>http://127.0.0.1:8000</code>.</p>
-<h2 id="compatibility-policy">Compatibility policy</h2>
-<p>We aim to implement containers that are as compatible as possible with the built-in containers, but we have a few implementations that intentionally behave differently.</p>
-<ul>
-<li>Normal behavior will be compatible, but in case of errors it may be different.</li>
-<li>The constructor arguments are not compatible, as they require arguments specific to this package's container, such as sqlite3 DB file paths and serialization methods.</li>
-<li><code>copy</code> method in each container behaves similarly to deep copy, since it copies the table containing serialized elements.</li>
-<li><code>Dict</code>'s item order is guaranteed to be insertion order not only for python 3.7 and upper but for all versions.</li>
-<li><code>Dict.fromkeys</code> class method is not provided.</li>
-<li>Any member in the container cannot be mutated directly. If you want to mutate any member, mutate it via temporary variable then write it back.</li>
-</ul>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sqlitecollections</span> <span class="k">as</span> <span class="nn">sc</span>
+  <h1>Benchmark</h1>
 
-<span class="n">x</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Dict</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">[]})</span> <span class="c1"># create {&quot;a&quot;: []}</span>
-<span class="n">x</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>  <span class="c1"># try to mutate the empty list</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">])</span>  <span class="c1"># not [&quot;b&quot;] but []</span>
 
-<span class="n">temp</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span>  <span class="c1"># temporarily substitute the list to a variable</span>
-<span class="n">temp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>  <span class="c1"># mutate the temporary variable</span>
-<span class="n">x</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>  <span class="c1"># then, write it back</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">])</span>  <span class="c1"># now, we get [&quot;b&quot;]</span>
-</code></pre></div>
 
               
             </article>
@@ -551,7 +393,7 @@ pip install -e .[docs]
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../usage/set/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Set" rel="prev">
+        <a href="../development/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Development" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -560,26 +402,11 @@ pip install -e .[docs]
               <span class="md-footer__direction">
                 Previous
               </span>
-              Set
+              Development
             </div>
           </div>
         </a>
       
-      
-        
-        <a href="../benchmark/" class="md-footer__link md-footer__link--next" aria-label="Next: Benchmark" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Benchmark
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-          </div>
-        </a>
       
     </nav>
   

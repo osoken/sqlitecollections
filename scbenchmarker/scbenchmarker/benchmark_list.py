@@ -15,7 +15,7 @@ from .common import BenchmarkBase, Comparison
 
 benchmarks_dir = os.path.dirname(os.path.abspath(__file__))
 
-target_list_len = 100000
+target_list_len = 2000
 target_list = list([str(i) for i in range(target_list_len)])
 target_list_element_t = str
 target_list_t = MutableSequence[target_list_element_t]
@@ -76,14 +76,14 @@ class BenchmarkDelitemBase(BenchmarkBase[target_list_t]):
 
     def exec(self) -> target_list_t:
         self._sut: target_list_t
-        del self._sut[5000]
+        del self._sut[1000]
         return self._sut
 
     def assertion(self, result: target_list_t) -> bool:
         return (
             len(result) == (target_list_len - 1)
-            and result[4999] == target_list[4999]
-            and result[5000] == target_list[5001]
+            and result[999] == target_list[999]
+            and result[1000] == target_list[1001]
         )
 
 
@@ -94,10 +94,10 @@ class BenchmarkGetitemBase(BenchmarkBase[target_list_element_t]):
 
     def exec(self) -> target_list_element_t:
         self._sut: target_list_t
-        return self._sut[5000]
+        return self._sut[1000]
 
     def assertion(self, result: target_list_element_t) -> bool:
-        return result == target_list[5000]
+        return result == target_list[1000]
 
 
 class BenchmarkGetitemSliceBase(BenchmarkBase[target_list_t]):
@@ -107,10 +107,10 @@ class BenchmarkGetitemSliceBase(BenchmarkBase[target_list_t]):
 
     def exec(self) -> target_list_t:
         self._sut: target_list_t
-        return self._sut[10:5010]
+        return self._sut[10:1010]
 
     def assertion(self, result: target_list_t) -> bool:
-        return all([a == b for a, b in zip(target_list[10:5010], result)])
+        return all([a == b for a, b in zip(target_list[10:1010], result)])
 
 
 class BenchmarkCreateWithInitialDataBase(BenchmarkBase[target_list_t]):
@@ -430,15 +430,15 @@ class BenchmarkPopBase(BenchmarkBase[Tuple[target_list_t, str]]):
         return "`pop`"
 
     def exec(self) -> target_list_t:
-        retval = self._sut.pop(5000)
+        retval = self._sut.pop(1000)
         return (self._sut, retval)
 
     def assertion(self, result: Tuple[target_list_t, str]) -> bool:
         return (
             len(result[0]) == (target_list_len - 1)
-            and result[0][4999] == target_list[4999]
-            and result[0][5000] == target_list[5001]
-            and result[1] == target_list[5000]
+            and result[0][999] == target_list[999]
+            and result[0][1000] == target_list[1001]
+            and result[1] == target_list[1000]
         )
 
 
