@@ -104,22 +104,19 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch("sqlitecollections.base.create_random_name", return_value="ConcreteSqliteCollectionClass_4da95")
     @patch("sqlitecollections.base.SqliteCollectionBase._default_serializer")
     @patch("sqlitecollections.base.SqliteCollectionBase._default_deserializer")
-    @patch("sqlitecollections.base.sqlite3.connect")
-    @patch("sqlitecollections.base.create_temporary_db_file")
+    @patch("sqlitecollections.base.create_tempfile_connection")
     def test_init_with_no_args(
         self,
-        create_temporary_db_file: MagicMock,
-        sqlite3_connect: MagicMock,
+        create_tempfile_connection: MagicMock,
         default_deserializer: MagicMock,
         default_serializer: MagicMock,
         create_random_name: MagicMock,
         sanitize_table_name: MagicMock,
     ) -> None:
         memory_db = sqlite3.Connection(":memory:")
-        create_temporary_db_file.return_value.name = "tempfilename"
-        sqlite3_connect.return_value = memory_db
+        create_tempfile_connection.return_value = memory_db
         sut = ConcreteSqliteCollectionClass()
-        sqlite3_connect.assert_called_once_with("tempfilename")
+        create_tempfile_connection.assert_called_once_with()
         self.assertEqual(sut.connection, memory_db)
         self.assertEqual(sut.serializer, default_serializer)
         self.assertEqual(sut.deserializer, default_deserializer)
@@ -562,3 +559,14 @@ class CreateTemporaryDbFileTestCase(TestCase):
         actual = base.create_temporary_db_file()
         self.assertEqual(actual, expected)
         NamedTemporaryFile.assert_called_once_with(suffix=".db", prefix="sc_")
+
+
+class CreateTempfileConnectionTestCase(TestCase):
+    @patch("sqlitecollections.base.sqlite3.connect")
+    @patch("sqlitecollections.base.create_temporary_db_file")
+    def test_create_tempfile_connection(self, create_temporary_db_file: MagicMock, connect: MagicMock) -> None:
+        expected = connect.return_value
+        actual = base.create_tempfile_connection()
+        self.assertEqual(actual, expected)
+        create_temporary_db_file.assert_called_once_with()
+        connect.assert_called_once_with(create_temporary_db_file.return_value.name)
