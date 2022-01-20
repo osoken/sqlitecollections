@@ -6,7 +6,7 @@ from enum import Enum
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
 from types import TracebackType
-from typing import Callable, Generic, Optional, Type, TypeVar, Union, cast
+from typing import IO, Callable, Generic, Optional, Type, TypeVar, Union, cast
 from uuid import uuid4
 
 from .logger import logger
@@ -44,6 +44,10 @@ def create_random_name(prefix: str) -> str:
 
 def is_hashable(x: object) -> bool:
     return isinstance(x, Hashable)
+
+
+def create_temporary_db_file() -> IO[bytes]:
+    return NamedTemporaryFile(prefix="sc_", suffix=".db")
 
 
 class TemporaryTableContext(ContextManager[str]):
@@ -182,7 +186,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         self._deserializer = self._default_deserializer if deserializer is None else deserializer
         self._persist = persist
         if connection is None:
-            self._connection = sqlite3.connect(NamedTemporaryFile().name)
+            self._connection = sqlite3.connect(create_temporary_db_file().name)
         elif isinstance(connection, str):
             self._connection = sqlite3.connect(connection)
         elif isinstance(connection, sqlite3.Connection):
