@@ -50,6 +50,10 @@ def create_temporary_db_file() -> IO[bytes]:
     return NamedTemporaryFile(prefix="sc_", suffix=".db")
 
 
+def create_tempfile_connection() -> sqlite3.Connection:
+    return sqlite3.connect(create_temporary_db_file().name)
+
+
 class TemporaryTableContext(ContextManager[str]):
     def __init__(self, cur: sqlite3.Cursor, reference_table_name: str):
         self._cursor = cur
@@ -186,7 +190,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         self._deserializer = self._default_deserializer if deserializer is None else deserializer
         self._persist = persist
         if connection is None:
-            self._connection = sqlite3.connect(create_temporary_db_file().name)
+            self._connection = create_tempfile_connection()
         elif isinstance(connection, str):
             self._connection = sqlite3.connect(connection)
         elif isinstance(connection, sqlite3.Connection):
