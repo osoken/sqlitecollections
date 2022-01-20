@@ -105,10 +105,10 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch("sqlitecollections.base.SqliteCollectionBase._default_serializer")
     @patch("sqlitecollections.base.SqliteCollectionBase._default_deserializer")
     @patch("sqlitecollections.base.sqlite3.connect")
-    @patch("sqlitecollections.base.NamedTemporaryFile")
+    @patch("sqlitecollections.base.create_temporary_db_file")
     def test_init_with_no_args(
         self,
-        NamedTemporaryFile: MagicMock,
+        create_temporary_db_file: MagicMock,
         sqlite3_connect: MagicMock,
         default_deserializer: MagicMock,
         default_serializer: MagicMock,
@@ -116,7 +116,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         sanitize_table_name: MagicMock,
     ) -> None:
         memory_db = sqlite3.Connection(":memory:")
-        NamedTemporaryFile.return_value.name = "tempfilename"
+        create_temporary_db_file.return_value.name = "tempfilename"
         sqlite3_connect.return_value = memory_db
         sut = ConcreteSqliteCollectionClass()
         sqlite3_connect.assert_called_once_with("tempfilename")
@@ -553,3 +553,12 @@ class SanitizeTableNameTestCase(TestCase):
         expected = "prefix_123"
         actual = base.sanitize_table_name("+123", "prefix")
         self.assertEqual(actual, expected)
+
+
+class CreateTemporaryDbFileTestCase(TestCase):
+    @patch("sqlitecollections.base.NamedTemporaryFile")
+    def test_create_temporary_db_file(self, NamedTemporaryFile: MagicMock) -> None:
+        expected = NamedTemporaryFile.return_value
+        actual = base.create_temporary_db_file()
+        self.assertEqual(actual, expected)
+        NamedTemporaryFile.assert_called_once_with(suffix=".db", prefix="sc_")
