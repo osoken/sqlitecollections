@@ -33,6 +33,8 @@ class RebuildStrategy(Enum):
 
 def sanitize_table_name(table_name: str, prefix: str) -> str:
     ret = "".join(c for c in table_name if c.isalnum() or c == "_")
+    if len(ret) == 0:
+        ret = create_random_name(prefix)
     if ret != table_name:
         logger.warning(f"The table name is changed to {ret} due to illegal characters")
     return ret
