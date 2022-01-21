@@ -6,7 +6,7 @@ import uuid
 from collections.abc import Hashable
 from typing import Any
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 if sys.version_info > (3, 9):
     from collections.abc import Callable
@@ -100,10 +100,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         dumps.assert_called_once_with("x", protocol=3)
         self.assertEqual(actual, expected)
 
-    @patch(
-        "sqlitecollections.base.uuid4",
-        return_value=uuid.UUID("4da95358-64e7-40e7-b888-31e14e1c1d09"),
-    )
+    @patch("sqlitecollections.base.sanitize_table_name", return_value="ConcreteSqliteCollectionClass_4da95_sanitized")
+    @patch("sqlitecollections.base.create_random_name", return_value="ConcreteSqliteCollectionClass_4da95")
     @patch("sqlitecollections.base.SqliteCollectionBase._default_serializer")
     @patch("sqlitecollections.base.SqliteCollectionBase._default_deserializer")
     @patch("sqlitecollections.base.sqlite3.connect")
@@ -114,7 +112,8 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         sqlite3_connect: MagicMock,
         default_deserializer: MagicMock,
         default_serializer: MagicMock,
-        uuid4: MagicMock,
+        create_random_name: MagicMock,
+        sanitize_table_name: MagicMock,
     ) -> None:
         memory_db = sqlite3.Connection(":memory:")
         NamedTemporaryFile.return_value.name = "tempfilename"
@@ -127,13 +126,13 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         self.assertEqual(sut.persist, True)
         self.assertEqual(
             sut.table_name,
-            "ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
+            "ConcreteSqliteCollectionClass_4da95_sanitized",
         )
         self.assert_metadata_state_equals(
             memory_db,
             [
                 (
-                    "ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
+                    "ConcreteSqliteCollectionClass_4da95_sanitized",
                     "test_0",
                     "ConcreteSqliteCollectionClass",
                 )
@@ -141,13 +140,16 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         )
         self.assert_sql_result_equals(
             memory_db,
-            "SELECT 1 FROM ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
+            "SELECT 1 FROM ConcreteSqliteCollectionClass_4da95_sanitized",
             [],
         )
         self.assertFalse(hasattr(sut, "rebuild_strategy"))
+        create_random_name.assert_called_once_with(sut.container_type_name)
+        sanitize_table_name.assert_called_once_with(create_random_name.return_value, sut.container_type_name)
 
+    @patch("sqlitecollections.base.sanitize_table_name", return_value="sanitized_tablename")
     @patch("sqlitecollections.base.sqlite3.connect")
-    def test_init_with_args(self, sqlite3_connect: MagicMock) -> None:
+    def test_init_with_args(self, sqlite3_connect: MagicMock, sanize_table_name: MagicMock) -> None:
         memory_db = sqlite3.Connection(":memory:")
         sqlite3_connect.return_value = memory_db
         serializer = MagicMock(spec=Callable[[Any], bytes])
@@ -168,14 +170,14 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         self.assertEqual(sut.deserializer, deserializer)
         self.assertEqual(
             sut.table_name,
-            "tablename",
+            "sanitized_tablename",
         )
         self.assertEqual(sut.persist, persist)
         self.assert_metadata_state_equals(
             memory_db,
             [
                 (
-                    "tablename",
+                    "sanitized_tablename",
                     "test_0",
                     "ConcreteSqliteCollectionClass",
                 )
@@ -183,9 +185,10 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         )
         self.assert_sql_result_equals(
             memory_db,
-            "SELECT 1 FROM tablename",
+            "SELECT 1 FROM sanitized_tablename",
             [],
         )
+        sanize_table_name.assert_called_once_with("tablename", sut.container_type_name)
 
     @patch(
         "sqlitecollections.base.uuid4",
@@ -305,6 +308,15 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         )
         logger.warning.assert_called_once_with(
             "The table name is changed to tblnmDELETEFROMmetadata due to illegal characters"
+        )
+
+    @patch("sqlitecollections.base.sanitize_table_name", side_effect=["before_sanitized", "after_sanitized"])
+    def test_sanitize_table_name_is_called_on_table_name_change(self, sanitize_table_name: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="before")
+        sut.table_name = "after"
+        sanitize_table_name.assert_has_calls(
+            [call("before", sut.container_type_name), call("after", sut.container_type_name)]
         )
 
     @patch("sqlitecollections.base.logger")
@@ -481,3 +493,15 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         )
         _rebuild_check_with_first_element.assert_not_called()
         _do_rebuild.assert_not_called()
+
+
+class SanitizeTableNameTestCase(TestCase):
+    def test_sanitize_table_name(self) -> None:
+        expected = "_qwerty01234abc"
+        actual = base.sanitize_table_name("~!@#$%^&*()_+-=qwerty{}|[]\\;:'\"<>?,./01234abc", "sc")
+        self.assertEqual(actual, expected)
+
+    def test_sanitize_table_name_accepts_prefix_but_ignore_if_table_name_is_valid(self) -> None:
+        expected = "abc"
+        actual = base.sanitize_table_name("abc", "list")
+        self.assertEqual(actual, expected)

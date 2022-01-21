@@ -31,7 +31,7 @@ class RebuildStrategy(Enum):
     SKIP = 3
 
 
-def sanitize_table_name(table_name: str) -> str:
+def sanitize_table_name(table_name: str, prefix: str) -> str:
     ret = "".join(c for c in table_name if c.isalnum() or c == "_")
     if ret != table_name:
         logger.warning(f"The table name is changed to {ret} due to illegal characters")
@@ -192,9 +192,9 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
                 f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
             )
         self._table_name = (
-            sanitize_table_name(create_random_name(self.container_type_name))
+            sanitize_table_name(create_random_name(self.container_type_name), self.container_type_name)
             if table_name is None
-            else sanitize_table_name(table_name)
+            else sanitize_table_name(table_name, self.container_type_name)
         )
         self._initialize(rebuild_strategy=rebuild_strategy)
 
@@ -255,7 +255,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     @table_name.setter
     def table_name(self, table_name: str) -> None:
         cur = self.connection.cursor()
-        new_table_name = sanitize_table_name(table_name)
+        new_table_name = sanitize_table_name(table_name, self.container_type_name)
         try:
             self._driver_class.alter_table_name(self.table_name, new_table_name, cur)
         except sqlite3.IntegrityError as e:
