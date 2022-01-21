@@ -31,7 +31,7 @@ class RebuildStrategy(Enum):
     SKIP = 3
 
 
-def sanitize_table_name(table_name: str) -> str:
+def sanitize_table_name(table_name: str, prefix: str = "sc") -> str:
     ret = "".join(c for c in table_name if c.isalnum() or c == "_")
     if ret != table_name:
         logger.warning(f"The table name is changed to {ret} due to illegal characters")

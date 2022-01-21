@@ -481,3 +481,15 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         )
         _rebuild_check_with_first_element.assert_not_called()
         _do_rebuild.assert_not_called()
+
+
+class SanitizeTableNameTestCase(TestCase):
+    def test_sanitize_table_name(self):
+        expected = "_qwerty01234abc"
+        actual = base.sanitize_table_name("~!@#$%^&*()_+-=qwerty{}|[]\\;:'\"<>?,./01234abc")
+        self.assertEqual(actual, expected)
+
+    def test_sanitize_table_name_accepts_prefix_but_ignore_if_table_name_is_valid(self):
+        expected = "abc"
+        actual = base.sanitize_table_name("abc", prefix="list")
+        self.assertEqual(actual, expected)
