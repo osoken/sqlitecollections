@@ -523,3 +523,8 @@ class SanitizeTableNameTestCase(TestCase):
         actual = base.sanitize_table_name(";;;;;", "prefix")
         self.assertEqual(actual, expected)
         create_random_name.assert_called_once_with("prefix")
+
+    def test_add_prefix_when_table_name_with_leading_digit(self) -> None:
+        expected = "prefix_123"
+        actual = base.sanitize_table_name("+123", "prefix")
+        self.assertEqual(actual, expected)
