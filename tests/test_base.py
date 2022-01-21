@@ -505,3 +505,21 @@ class SanitizeTableNameTestCase(TestCase):
         expected = "abc"
         actual = base.sanitize_table_name("abc", "list")
         self.assertEqual(actual, expected)
+
+    @patch("sqlitecollections.base.create_random_name", return_value="generated_random_name")
+    def test_sanitize_table_name_generate_random_name_when_table_name_is_empty(
+        self, create_random_name: MagicMock
+    ) -> None:
+        expected = "generated_random_name"
+        actual = base.sanitize_table_name("", "prefix")
+        self.assertEqual(actual, expected)
+        create_random_name.assert_called_once_with("prefix")
+
+    @patch("sqlitecollections.base.create_random_name", return_value="generated_random_name")
+    def test_sanitize_table_name_generate_random_name_when_sanitized_table_name_is_empty(
+        self, create_random_name: MagicMock
+    ) -> None:
+        expected = "generated_random_name"
+        actual = base.sanitize_table_name(";;;;;", "prefix")
+        self.assertEqual(actual, expected)
+        create_random_name.assert_called_once_with("prefix")
