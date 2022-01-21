@@ -292,6 +292,31 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             ],
         )
 
+    def test_table_alteration_doesnt_occur_on_same_table_name(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="before")
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "before",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+            ],
+        )
+        sut.table_name = "before"
+        self.assert_metadata_state_equals(
+            memory_db,
+            [
+                (
+                    "before",
+                    "test_0",
+                    "ConcreteSqliteCollectionClass",
+                ),
+            ],
+        )
+
     @patch("sqlitecollections.base.logger")
     def test_warning_on_table_name_sanitization(self, logger: MagicMock) -> None:
         memory_db = sqlite3.connect(":memory:")
