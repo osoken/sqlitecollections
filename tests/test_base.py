@@ -552,6 +552,21 @@ class SanitizeTableNameTestCase(TestCase):
         self.assertEqual(actual, expected)
 
 
+class IsHashableTestCase(TestCase):
+    def test_is_hashable(self):
+        self.assertTrue(base.is_hashable((1, 2)))
+        self.assertTrue(base.is_hashable(1))
+        self.assertTrue(base.is_hashable(None))
+        self.assertTrue(base.is_hashable(True))
+        self.assertTrue(base.is_hashable(False))
+        self.assertTrue(base.is_hashable(b"123"))
+        self.assertTrue(base.is_hashable("123"))
+        self.assertTrue(base.is_hashable(frozenset([1, 2, 3])))
+        self.assertFalse(base.is_hashable([1, 2]))
+        self.assertFalse(base.is_hashable({1, 2, 3}))
+        self.assertFalse(base.is_hashable({"a": 1}))
+
+
 class CreateTemporaryDbFileTestCase(TestCase):
     @patch("sqlitecollections.base.NamedTemporaryFile")
     def test_create_temporary_db_file(self, NamedTemporaryFile: MagicMock) -> None:
