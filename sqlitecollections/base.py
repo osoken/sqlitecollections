@@ -260,11 +260,12 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     def table_name(self, table_name: str) -> None:
         cur = self.connection.cursor()
         new_table_name = sanitize_table_name(table_name, self.container_type_name)
-        try:
-            self._driver_class.alter_table_name(self.table_name, new_table_name, cur)
-        except sqlite3.IntegrityError as e:
-            raise ValueError(table_name)
-        self._table_name = new_table_name
+        if self._table_name != new_table_name:
+            try:
+                self._driver_class.alter_table_name(self.table_name, new_table_name, cur)
+            except sqlite3.IntegrityError as e:
+                raise ValueError(table_name)
+            self._table_name = new_table_name
 
     @property
     def connection(self) -> sqlite3.Connection:
