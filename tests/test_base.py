@@ -6,7 +6,7 @@ import uuid
 from collections.abc import Hashable
 from typing import Any
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 if sys.version_info > (3, 9):
     from collections.abc import Callable
@@ -308,6 +308,15 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         )
         logger.warning.assert_called_once_with(
             "The table name is changed to tblnmDELETEFROMmetadata due to illegal characters"
+        )
+
+    @patch("sqlitecollections.base.sanitize_table_name", side_effect=["before_sanitized", "after_sanitized"])
+    def test_sanitize_table_name_is_called_on_table_name_change(self, sanitize_table_name: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="before")
+        sut.table_name = "after"
+        sanitize_table_name.assert_has_calls(
+            [call("before", sut.container_type_name), call("after", sut.container_type_name)]
         )
 
     @patch("sqlitecollections.base.logger")
