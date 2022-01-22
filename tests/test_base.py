@@ -553,7 +553,7 @@ class SanitizeTableNameTestCase(TestCase):
 
 
 class IsHashableTestCase(TestCase):
-    def test_is_hashable(self):
+    def test_is_hashable(self) -> None:
         self.assertTrue(base.is_hashable((1, 2)))
         self.assertTrue(base.is_hashable(1))
         self.assertTrue(base.is_hashable(None))
