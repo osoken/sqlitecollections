@@ -1,6 +1,6 @@
 import sqlite3
 import sys
-from typing import Optional, Union
+from typing import Any, Optional, Union
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -9,13 +9,17 @@ if sys.version_info > (3, 9):
 else:
     from typing import Callable, Iterable
 
-from sqlitecollections import base, factory
-
 from test_base import ConcreteSqliteCollectionClass
 
+from sqlitecollections import base, factory
 
-class ConcreteFactory(factory.FactoryBase[str]):
-    _container_class = ConcreteSqliteCollectionClass
+
+class ConcreteFactory(factory.FactoryBase[Any]):
+    @classmethod
+    def _get_container_class(
+        cls,
+    ) -> Callable[..., ConcreteSqliteCollectionClass,]:
+        return ConcreteSqliteCollectionClass
 
 
 class FactoryBaseTestCase(TestCase):
@@ -38,28 +42,27 @@ class FactoryBaseTestCase(TestCase):
         self.assertEqual(sut.deserializer, deserializer)
         tidy_connection.assert_called_once_with(connection)
 
-    @patch.object(ConcreteFactory, "_container_class")
+    @patch.object(ConcreteFactory, "_get_container_class")
     @patch("sqlitecollections.factory.tidy_connection")
-    def test_create(self, _: MagicMock, ConcreteFactory_container_class: MagicMock) -> None:
+    def test_create(self, _: MagicMock, ConcreteFactory_get_container_class: MagicMock) -> None:
         sut = ConcreteFactory()
-        expected = ConcreteFactory._container_class.return_value
+        expected = ConcreteFactory_get_container_class.return_value.return_value
         actual = sut.create()
         self.assertEqual(actual, expected)
-        ConcreteFactory_container_class.assert_called_once_with(
+        ConcreteFactory_get_container_class.return_value.assert_called_once_with(
             connection=sut.connection, serializer=sut.serializer, deserializer=sut.deserializer
         )
 
-    @patch.object(ConcreteFactory, "_container_class")
+    @patch.object(ConcreteFactory, "_get_container_class")
     @patch("sqlitecollections.factory.tidy_connection")
-    def test_create_with_data(self, _: MagicMock, ConcreteFactory_container_class: MagicMock) -> None:
+    def test_create_with_data(self, _: MagicMock, ConcreteFactory_get_container_class: MagicMock) -> None:
         sut = ConcreteFactory()
         data = ["a", "b", "c"]
-        expected = ConcreteFactory._container_class.return_value
+        expected = ConcreteFactory_get_container_class.return_value.return_value
         actual = sut.create(data)
         self.assertEqual(actual, expected)
-        ConcreteFactory_container_class.assert_called_once_with(
-            data=data,
-            connection=sut.connection, serializer=sut.serializer, deserializer=sut.deserializer
+        ConcreteFactory_get_container_class.return_value.assert_called_once_with(
+            data=data, connection=sut.connection, serializer=sut.serializer, deserializer=sut.deserializer
         )
 
     @patch("sqlitecollections.factory.FactoryBase.create")

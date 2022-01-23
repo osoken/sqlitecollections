@@ -1,6 +1,6 @@
 import sqlite3
 import sys
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import Generic, Optional, Union
 
 if sys.version_info > (3, 9):
@@ -12,8 +12,6 @@ from .base import SqliteCollectionBase, T, tidy_connection
 
 
 class FactoryBase(Generic[T], metaclass=ABCMeta):
-    _container_class = SqliteCollectionBase
-
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
@@ -36,14 +34,21 @@ class FactoryBase(Generic[T], metaclass=ABCMeta):
     def deserializer(self) -> Callable[[bytes], T]:
         return self._deserializer
 
-    def create(self, __data: Optional[Iterable[T]] = None):
+    @classmethod
+    @abstractmethod
+    def _get_container_class(
+        cls,
+    ) -> Callable[..., SqliteCollectionBase[T],]:
+        ...
+
+    def create(self, __data: Optional[Iterable[T]] = None) -> SqliteCollectionBase[T]:
         if __data is None:
-            return self._container_class(
+            return self._get_container_class()(
                 connection=self.connection, serializer=self.serializer, deserializer=self.deserializer
             )
-        return self._container_class(
+        return self._get_container_class()(
             data=__data, connection=self.connection, serializer=self.serializer, deserializer=self.deserializer
         )
 
-    def __call__(self, __data: Optional[Iterable[T]] = None):
+    def __call__(self, __data: Optional[Iterable[T]] = None) -> SqliteCollectionBase[T]:
         return self.create(__data)
