@@ -58,6 +58,19 @@ def create_tempfile_connection() -> sqlite3.Connection:
     return sqlite3.connect(create_temporary_db_file().name)
 
 
+def tidy_connection(connection: Optional[Union[str, sqlite3.Connection]] = None) -> sqlite3.Connection:
+    if connection is None:
+        return create_tempfile_connection()
+    elif isinstance(connection, str):
+        return sqlite3.connect(connection)
+    elif isinstance(connection, sqlite3.Connection):
+        return connection
+    else:
+        raise TypeError(
+            f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
+        )
+
+
 class TemporaryTableContext(ContextManager[str]):
     def __init__(self, cur: sqlite3.Cursor, reference_table_name: str):
         self._cursor = cur
@@ -192,17 +205,8 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         super(SqliteCollectionBase, self).__init__()
         self._serializer = self._default_serializer if serializer is None else serializer
         self._deserializer = self._default_deserializer if deserializer is None else deserializer
+        self._connection = tidy_connection(connection)
         self._persist = persist
-        if connection is None:
-            self._connection = create_tempfile_connection()
-        elif isinstance(connection, str):
-            self._connection = sqlite3.connect(connection)
-        elif isinstance(connection, sqlite3.Connection):
-            self._connection = connection
-        else:
-            raise TypeError(
-                f"connection argument must be None or a string or a sqlite3.Connection, not '{type(connection)}'"
-            )
         self._table_name = (
             sanitize_table_name(create_random_name(self.container_type_name), self.container_type_name)
             if table_name is None
