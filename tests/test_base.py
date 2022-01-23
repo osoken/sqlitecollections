@@ -614,4 +614,4 @@ class TidyConnectionTestCase(TestCase):
         with self.assertRaisesRegex(
             TypeError, r"connection argument must be None or a string or a sqlite3.Connection, not .*"
         ):
-            _ = base.tidy_connection(123)
+            _ = base.tidy_connection(123)  # type: ignore
