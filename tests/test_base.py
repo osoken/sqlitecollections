@@ -104,22 +104,19 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch("sqlitecollections.base.create_random_name", return_value="ConcreteSqliteCollectionClass_4da95")
     @patch("sqlitecollections.base.SqliteCollectionBase._default_serializer")
     @patch("sqlitecollections.base.SqliteCollectionBase._default_deserializer")
-    @patch("sqlitecollections.base.sqlite3.connect")
-    @patch("sqlitecollections.base.NamedTemporaryFile")
+    @patch("sqlitecollections.base.tidy_connection")
     def test_init_with_no_args(
         self,
-        NamedTemporaryFile: MagicMock,
-        sqlite3_connect: MagicMock,
+        tidy_connection: MagicMock,
         default_deserializer: MagicMock,
         default_serializer: MagicMock,
         create_random_name: MagicMock,
         sanitize_table_name: MagicMock,
     ) -> None:
         memory_db = sqlite3.Connection(":memory:")
-        NamedTemporaryFile.return_value.name = "tempfilename"
-        sqlite3_connect.return_value = memory_db
+        tidy_connection.return_value = memory_db
         sut = ConcreteSqliteCollectionClass()
-        sqlite3_connect.assert_called_once_with("tempfilename")
+        tidy_connection.assert_called_once_with(None)
         self.assertEqual(sut.connection, memory_db)
         self.assertEqual(sut.serializer, default_serializer)
         self.assertEqual(sut.deserializer, default_deserializer)
@@ -148,10 +145,10 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         sanitize_table_name.assert_called_once_with(create_random_name.return_value, sut.container_type_name)
 
     @patch("sqlitecollections.base.sanitize_table_name", return_value="sanitized_tablename")
-    @patch("sqlitecollections.base.sqlite3.connect")
-    def test_init_with_args(self, sqlite3_connect: MagicMock, sanize_table_name: MagicMock) -> None:
+    @patch("sqlitecollections.base.tidy_connection")
+    def test_init_with_args(self, tidy_connection: MagicMock, sanize_table_name: MagicMock) -> None:
         memory_db = sqlite3.Connection(":memory:")
-        sqlite3_connect.return_value = memory_db
+        tidy_connection.return_value = memory_db
         serializer = MagicMock(spec=Callable[[Any], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Any])
         persist = False
@@ -164,7 +161,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        sqlite3_connect.assert_called_once_with("connection")
+        tidy_connection.assert_called_once_with("connection")
         self.assertEqual(sut.connection, memory_db)
         self.assertEqual(sut.serializer, serializer)
         self.assertEqual(sut.deserializer, deserializer)
@@ -553,3 +550,68 @@ class SanitizeTableNameTestCase(TestCase):
         expected = "prefix_123"
         actual = base.sanitize_table_name("+123", "prefix")
         self.assertEqual(actual, expected)
+
+
+class IsHashableTestCase(TestCase):
+    def test_is_hashable(self) -> None:
+        self.assertTrue(base.is_hashable((1, 2)))
+        self.assertTrue(base.is_hashable(1))
+        self.assertTrue(base.is_hashable(None))
+        self.assertTrue(base.is_hashable(True))
+        self.assertTrue(base.is_hashable(False))
+        self.assertTrue(base.is_hashable(b"123"))
+        self.assertTrue(base.is_hashable("123"))
+        self.assertTrue(base.is_hashable(frozenset([1, 2, 3])))
+        self.assertFalse(base.is_hashable([1, 2]))
+        self.assertFalse(base.is_hashable({1, 2, 3}))
+        self.assertFalse(base.is_hashable({"a": 1}))
+
+
+class CreateTemporaryDbFileTestCase(TestCase):
+    @patch("sqlitecollections.base.NamedTemporaryFile")
+    def test_create_temporary_db_file(self, NamedTemporaryFile: MagicMock) -> None:
+        expected = NamedTemporaryFile.return_value
+        actual = base.create_temporary_db_file()
+        self.assertEqual(actual, expected)
+        NamedTemporaryFile.assert_called_once_with(suffix=".db", prefix="sc_")
+
+
+class CreateTempfileConnectionTestCase(TestCase):
+    @patch("sqlitecollections.base.sqlite3.connect")
+    @patch("sqlitecollections.base.create_temporary_db_file")
+    def test_create_tempfile_connection(self, create_temporary_db_file: MagicMock, connect: MagicMock) -> None:
+        expected = connect.return_value
+        actual = base.create_tempfile_connection()
+        self.assertEqual(actual, expected)
+        create_temporary_db_file.assert_called_once_with()
+        connect.assert_called_once_with(create_temporary_db_file.return_value.name)
+
+
+class TidyConnectionTestCase(TestCase):
+    @patch("sqlitecollections.base.create_tempfile_connection")
+    def test_tidy_connection_calls_create_tempfile_connection_if_none(
+        self, create_tempfile_connection: MagicMock
+    ) -> None:
+        expected = create_tempfile_connection.return_value
+        actual = base.tidy_connection(None)
+        self.assertEqual(actual, expected)
+        create_tempfile_connection.assert_called_once_with()
+
+    @patch("sqlitecollections.base.sqlite3")
+    def test_tidy_connection_calls_sqlite3_connection_if_str(self, sqlite3: MagicMock) -> None:
+        expected = sqlite3.connect.return_value
+        actual = base.tidy_connection("somestring")
+        self.assertEqual(actual, expected)
+        sqlite3.connect.assert_called_once_with("somestring")
+
+    def test_tidy_connection_do_nothing_with_sqlite3(self) -> None:
+        arg = MagicMock(spec=sqlite3.Connection)
+        expected = arg
+        actual = base.tidy_connection(arg)
+        self.assertEqual(actual, expected)
+
+    def test_tidy_conneciton_raises_type_error_for_wrong_types(self) -> None:
+        with self.assertRaisesRegex(
+            TypeError, r"connection argument must be None or a string or a sqlite3.Connection, not .*"
+        ):
+            _ = base.tidy_connection(123)  # type: ignore
