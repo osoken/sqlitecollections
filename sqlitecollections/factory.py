@@ -45,6 +45,8 @@ class FactoryBase(Generic[T], metaclass=ABCMeta):
     ) -> Callable[..., SqliteCollectionBase[T]]:
         ...
 
+
+class SequenceFactoryBase(FactoryBase[T]):
     def create(self, __data: Optional[Iterable[T]] = None) -> SqliteCollectionBase[T]:
         if __data is None:
             return self._get_container_class()(
@@ -58,13 +60,13 @@ class FactoryBase(Generic[T], metaclass=ABCMeta):
         return self.create(__data)
 
 
-class SetFactory(FactoryBase[T]):
+class SetFactory(SequenceFactoryBase[T]):
     @classmethod
     def _get_container_class(cls) -> Callable[..., Set[T]]:
         return Set[T]
 
 
-class ListFactory(FactoryBase[T]):
+class ListFactory(SequenceFactoryBase[T]):
     @classmethod
     def _get_container_class(cls) -> Callable[..., List[T]]:
         return List[T]
@@ -110,7 +112,7 @@ class DictFactory(Generic[KT, VT], FactoryBase[KT]):
         return self._value_deserializer
 
     def create(
-        self, __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: Mapping[KT, VT]
+        self, __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: VT
     ) -> Dict[KT, VT]:
         if __data is None:
             if len(kwargs) == 0:
@@ -139,6 +141,6 @@ class DictFactory(Generic[KT, VT], FactoryBase[KT]):
         )
 
     def __call__(
-        self, __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: Mapping[KT, VT]
+        self, __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: VT
     ) -> Dict[KT, VT]:
         return self.create(__data, **kwargs)

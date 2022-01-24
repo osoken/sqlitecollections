@@ -14,12 +14,12 @@ from test_base import ConcreteSqliteCollectionClass
 from sqlitecollections import base, factory
 
 
-class ConcreteFactory(factory.FactoryBase[Any]):
+class ConcreteFactory(factory.SequenceFactoryBase[str]):
     @classmethod
     def _get_container_class(
         cls,
-    ) -> Callable[..., ConcreteSqliteCollectionClass,]:
-        return ConcreteSqliteCollectionClass[Any]
+    ) -> Callable[..., ConcreteSqliteCollectionClass]:
+        return ConcreteSqliteCollectionClass
 
 
 class FactoryBaseTestCase(TestCase):
@@ -42,6 +42,8 @@ class FactoryBaseTestCase(TestCase):
         self.assertEqual(sut.deserializer, deserializer)
         tidy_connection.assert_called_once_with(connection)
 
+
+class SequenceFactoryBaseTestCase(TestCase):
     @patch.object(ConcreteFactory, "_get_container_class")
     @patch("sqlitecollections.factory.tidy_connection")
     def test_create(self, _: MagicMock, ConcreteFactory_get_container_class: MagicMock) -> None:
@@ -65,7 +67,7 @@ class FactoryBaseTestCase(TestCase):
             data=data, connection=sut.connection, serializer=sut.serializer, deserializer=sut.deserializer
         )
 
-    @patch("sqlitecollections.factory.FactoryBase.create")
+    @patch("sqlitecollections.factory.SequenceFactoryBase.create")
     @patch("sqlitecollections.factory.tidy_connection")
     def test_call_is_alias_of_create(self, _: MagicMock, create: MagicMock) -> None:
         sut = ConcreteFactory()
@@ -97,10 +99,10 @@ class SetFactoryTestCase(TestCase):
         deserializer = MagicMock(spec=Callable[[bytes], str])
         sut = factory.SetFactory[str](connection=conn, serializer=serializer, deserializer=deserializer)
         expected = Set.__getitem__.return_value.return_value
-        actual = sut([1, 2, 3])
+        actual = sut(["1", "2", "3"])
         self.assertEqual(actual, expected)
         Set.__getitem__.return_value.assert_called_once_with(
-            data=[1, 2, 3], connection=conn, serializer=serializer, deserializer=deserializer
+            data=["1", "2", "3"], connection=conn, serializer=serializer, deserializer=deserializer
         )
 
 
@@ -125,10 +127,10 @@ class ListFactoryTestCase(TestCase):
         deserializer = MagicMock(spec=Callable[[bytes], str])
         sut = factory.ListFactory[str](connection=conn, serializer=serializer, deserializer=deserializer)
         expected = List.__getitem__.return_value.return_value
-        actual = sut([1, 2, 3])
+        actual = sut(["1", "2", "3"])
         self.assertEqual(actual, expected)
         List.__getitem__.return_value.assert_called_once_with(
-            data=[1, 2, 3], connection=conn, serializer=serializer, deserializer=deserializer
+            data=["1", "2", "3"], connection=conn, serializer=serializer, deserializer=deserializer
         )
 
 
