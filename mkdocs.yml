@@ -37,5 +37,6 @@ nav:
       - List: usage/list.md
       - Dict: usage/dict.md
       - Set: usage/set.md
+      - factory: usage/factory.md
   - development.md
   - benchmark.md
