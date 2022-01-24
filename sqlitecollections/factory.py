@@ -9,6 +9,7 @@ else:
     from typing import Callable, Iterable
 
 from .base import SqliteCollectionBase, T, tidy_connection
+from .set import Set
 
 
 class FactoryBase(Generic[T], metaclass=ABCMeta):
@@ -38,7 +39,7 @@ class FactoryBase(Generic[T], metaclass=ABCMeta):
     @abstractmethod
     def _get_container_class(
         cls,
-    ) -> Callable[..., SqliteCollectionBase[T],]:
+    ) -> Callable[..., SqliteCollectionBase[T]]:
         ...
 
     def create(self, __data: Optional[Iterable[T]] = None) -> SqliteCollectionBase[T]:
@@ -52,3 +53,9 @@ class FactoryBase(Generic[T], metaclass=ABCMeta):
 
     def __call__(self, __data: Optional[Iterable[T]] = None) -> SqliteCollectionBase[T]:
         return self.create(__data)
+
+
+class SetFactory(FactoryBase[T]):
+    @classmethod
+    def _get_container_class(cls) -> Callable[..., Set[T]]:
+        return Set[T]

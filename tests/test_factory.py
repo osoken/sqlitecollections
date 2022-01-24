@@ -9,9 +9,9 @@ if sys.version_info > (3, 9):
 else:
     from typing import Callable, Iterable
 
-from test_base import ConcreteSqliteCollectionClass
-
 from sqlitecollections import base, factory
+
+from test_base import ConcreteSqliteCollectionClass
 
 
 class ConcreteFactory(factory.FactoryBase[Any]):
@@ -19,7 +19,7 @@ class ConcreteFactory(factory.FactoryBase[Any]):
     def _get_container_class(
         cls,
     ) -> Callable[..., ConcreteSqliteCollectionClass,]:
-        return ConcreteSqliteCollectionClass
+        return ConcreteSqliteCollectionClass[Any]
 
 
 class FactoryBaseTestCase(TestCase):
@@ -74,3 +74,31 @@ class FactoryBaseTestCase(TestCase):
         actual = sut(data)
         self.assertEqual(actual, expected)
         create.assert_called_once_with(data)
+
+
+class SetFactoryTestCase(TestCase):
+    @patch("sqlitecollections.factory.Set")
+    def test_call_with_no_arg(self, Set: MagicMock) -> None:
+        conn = MagicMock(spec=sqlite3.Connection)
+        serializer = MagicMock(spec=Callable[[str], bytes])
+        deserializer = MagicMock(spec=Callable[[bytes], str])
+        sut = factory.SetFactory[str](connection=conn, serializer=serializer, deserializer=deserializer)
+        expected = Set.__getitem__.return_value.return_value
+        actual = sut()
+        self.assertEqual(actual, expected)
+        Set.__getitem__.return_value.assert_called_once_with(
+            connection=conn, serializer=serializer, deserializer=deserializer
+        )
+
+    @patch("sqlitecollections.factory.Set")
+    def test_call_with_arg(self, Set: MagicMock) -> None:
+        conn = MagicMock(spec=sqlite3.Connection)
+        serializer = MagicMock(spec=Callable[[str], bytes])
+        deserializer = MagicMock(spec=Callable[[bytes], str])
+        sut = factory.SetFactory[str](connection=conn, serializer=serializer, deserializer=deserializer)
+        expected = Set.__getitem__.return_value.return_value
+        actual = sut([1, 2, 3])
+        self.assertEqual(actual, expected)
+        Set.__getitem__.return_value.assert_called_once_with(
+            data=[1, 2, 3], connection=conn, serializer=serializer, deserializer=deserializer
+        )
