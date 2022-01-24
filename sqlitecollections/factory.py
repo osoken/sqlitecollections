@@ -1,14 +1,17 @@
 import sqlite3
 import sys
 from abc import ABCMeta, abstractmethod
-from typing import Generic, Optional, Union
+from itertools import chain
+from typing import Generic, Optional, Tuple, Union, cast
 
 if sys.version_info > (3, 9):
-    from collections.abc import Callable, Iterable
+    from collections.abc import Callable, Iterable, Mapping
 else:
-    from typing import Callable, Iterable
+    from typing import Callable, Iterable, Mapping
 
-from .base import SqliteCollectionBase, T, tidy_connection
+from .base import KT, VT, SqliteCollectionBase, T, tidy_connection
+from .dict import Dict
+from .list import List
 from .set import Set
 
 
@@ -59,3 +62,83 @@ class SetFactory(FactoryBase[T]):
     @classmethod
     def _get_container_class(cls) -> Callable[..., Set[T]]:
         return Set[T]
+
+
+class ListFactory(FactoryBase[T]):
+    @classmethod
+    def _get_container_class(cls) -> Callable[..., List[T]]:
+        return List[T]
+
+
+class DictFactory(Generic[KT, VT], FactoryBase[KT]):
+    def __init__(
+        self,
+        connection: Optional[Union[str, sqlite3.Connection]] = None,
+        key_serializer: Optional[Callable[[KT], bytes]] = None,
+        key_deserializer: Optional[Callable[[bytes], KT]] = None,
+        value_serializer: Optional[Callable[[VT], bytes]] = None,
+        value_deserializer: Optional[Callable[[bytes], VT]] = None,
+    ):
+        super(DictFactory, self).__init__(
+            connection=connection, serializer=key_serializer, deserializer=key_deserializer
+        )
+        self._value_serializer = (
+            cast(Callable[[VT], bytes], self.key_serializer) if value_serializer is None else value_serializer
+        )
+        self._value_deserializer = (
+            cast(Callable[[bytes], VT], self.key_deserializer) if value_deserializer is None else value_deserializer
+        )
+
+    @classmethod
+    def _get_container_class(cls) -> Callable[..., Dict[KT, VT]]:
+        return Dict[KT, VT]
+
+    @property
+    def key_serializer(self) -> Callable[[KT], bytes]:
+        return self.serializer
+
+    @property
+    def key_deserializer(self) -> Callable[[bytes], KT]:
+        return self.deserializer
+
+    @property
+    def value_serializer(self) -> Callable[[VT], bytes]:
+        return self._value_serializer
+
+    @property
+    def value_deserializer(self) -> Callable[[bytes], VT]:
+        return self._value_deserializer
+
+    def create(
+        self, __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: Mapping[KT, VT]
+    ) -> Dict[KT, VT]:
+        if __data is None:
+            if len(kwargs) == 0:
+                return self._get_container_class()(
+                    connection=self.connection,
+                    key_serializer=self.key_serializer,
+                    key_deserializer=self.key_deserializer,
+                    value_serializer=self.value_serializer,
+                    value_deserializer=self.value_deserializer,
+                )
+            return self._get_container_class()(
+                data=kwargs,
+                connection=self.connection,
+                key_serializer=self.key_serializer,
+                key_deserializer=self.key_deserializer,
+                value_serializer=self.value_serializer,
+                value_deserializer=self.value_deserializer,
+            )
+        return self._get_container_class()(
+            data=chain(__data.items() if isinstance(__data, Mapping) else __data, kwargs.items()),
+            connection=self.connection,
+            key_serializer=self.key_serializer,
+            key_deserializer=self.key_deserializer,
+            value_serializer=self.value_serializer,
+            value_deserializer=self.value_deserializer,
+        )
+
+    def __call__(
+        self, __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: Mapping[KT, VT]
+    ) -> Dict[KT, VT]:
+        return self.create(__data, **kwargs)

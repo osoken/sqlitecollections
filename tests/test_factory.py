@@ -9,9 +9,9 @@ if sys.version_info > (3, 9):
 else:
     from typing import Callable, Iterable
 
-from sqlitecollections import base, factory
-
 from test_base import ConcreteSqliteCollectionClass
+
+from sqlitecollections import base, factory
 
 
 class ConcreteFactory(factory.FactoryBase[Any]):
@@ -101,4 +101,115 @@ class SetFactoryTestCase(TestCase):
         self.assertEqual(actual, expected)
         Set.__getitem__.return_value.assert_called_once_with(
             data=[1, 2, 3], connection=conn, serializer=serializer, deserializer=deserializer
+        )
+
+
+class ListFactoryTestCase(TestCase):
+    @patch("sqlitecollections.factory.List")
+    def test_call_with_no_arg(self, List: MagicMock) -> None:
+        conn = MagicMock(spec=sqlite3.Connection)
+        serializer = MagicMock(spec=Callable[[str], bytes])
+        deserializer = MagicMock(spec=Callable[[bytes], str])
+        sut = factory.ListFactory[str](connection=conn, serializer=serializer, deserializer=deserializer)
+        expected = List.__getitem__.return_value.return_value
+        actual = sut()
+        self.assertEqual(actual, expected)
+        List.__getitem__.return_value.assert_called_once_with(
+            connection=conn, serializer=serializer, deserializer=deserializer
+        )
+
+    @patch("sqlitecollections.factory.List")
+    def test_call_with_arg(self, List: MagicMock) -> None:
+        conn = MagicMock(spec=sqlite3.Connection)
+        serializer = MagicMock(spec=Callable[[str], bytes])
+        deserializer = MagicMock(spec=Callable[[bytes], str])
+        sut = factory.ListFactory[str](connection=conn, serializer=serializer, deserializer=deserializer)
+        expected = List.__getitem__.return_value.return_value
+        actual = sut([1, 2, 3])
+        self.assertEqual(actual, expected)
+        List.__getitem__.return_value.assert_called_once_with(
+            data=[1, 2, 3], connection=conn, serializer=serializer, deserializer=deserializer
+        )
+
+
+class DictFactoryTestCase(TestCase):
+    @patch("sqlitecollections.factory.Dict")
+    def test_call_with_no_arg(self, Dict: MagicMock) -> None:
+        conn = MagicMock(spec=sqlite3.Connection)
+        key_serializer = MagicMock(spec=Callable[[str], bytes])
+        key_deserializer = MagicMock(spec=Callable[[bytes], str])
+        value_serializer = MagicMock(spec=Callable[[int], bytes])
+        value_deserializer = MagicMock(spec=Callable[[bytes], int])
+        sut = factory.DictFactory[str, int](
+            connection=conn,
+            key_serializer=key_serializer,
+            key_deserializer=key_deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
+        )
+        expected = Dict.__getitem__.return_value.return_value
+        actual = sut()
+        self.assertEqual(actual, expected)
+        Dict.__getitem__.return_value.assert_called_once_with(
+            connection=conn,
+            key_serializer=key_serializer,
+            key_deserializer=key_deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
+        )
+
+    @patch("sqlitecollections.factory.chain")
+    @patch("sqlitecollections.factory.Dict")
+    def test_call_with_arg(self, Dict: MagicMock, chain: MagicMock) -> None:
+
+        conn = MagicMock(spec=sqlite3.Connection)
+        key_serializer = MagicMock(spec=Callable[[str], bytes])
+        key_deserializer = MagicMock(spec=Callable[[bytes], str])
+        value_serializer = MagicMock(spec=Callable[[int], bytes])
+        value_deserializer = MagicMock(spec=Callable[[bytes], int])
+        sut = factory.DictFactory[str, int](
+            connection=conn,
+            key_serializer=key_serializer,
+            key_deserializer=key_deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
+        )
+        expected = Dict.__getitem__.return_value.return_value
+        data = (("a", 1), ("b", 2))
+        actual = sut(data)
+        self.assertEqual(actual, expected)
+        Dict.__getitem__.return_value.assert_called_once_with(
+            data=chain.return_value,
+            connection=conn,
+            key_serializer=key_serializer,
+            key_deserializer=key_deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
+        )
+        chain.assert_called_once_with(data, {}.items())
+
+    @patch("sqlitecollections.factory.Dict")
+    def test_call_with_kwarg(self, Dict: MagicMock) -> None:
+        conn = MagicMock(spec=sqlite3.Connection)
+        key_serializer = MagicMock(spec=Callable[[str], bytes])
+        key_deserializer = MagicMock(spec=Callable[[bytes], str])
+        value_serializer = MagicMock(spec=Callable[[int], bytes])
+        value_deserializer = MagicMock(spec=Callable[[bytes], int])
+        sut = factory.DictFactory[str, int](
+            connection=conn,
+            key_serializer=key_serializer,
+            key_deserializer=key_deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
+        )
+        expected = Dict.__getitem__.return_value.return_value
+        actual = sut(a=1, b=2)
+        self.assertEqual(actual, expected)
+        Dict.__getitem__.return_value.assert_called_once_with(
+            data={"a": 1, "b": 2},
+            connection=conn,
+            key_serializer=key_serializer,
+            key_deserializer=key_deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
         )
