@@ -5,7 +5,7 @@ from collections.abc import Hashable
 from typing import Any
 from unittest.mock import MagicMock, patch
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import Callable, ItemsView, Iterator, KeysView, ValuesView
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable

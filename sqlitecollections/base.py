@@ -6,7 +6,7 @@ from enum import Enum
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
 from types import TracebackType
-from typing import IO, Callable, Generic, Optional, Type, TypeVar, Union, cast
+from typing import IO, Generic, Optional, Type, TypeVar, Union, cast
 from uuid import uuid4
 
 from .logger import logger
@@ -15,8 +15,9 @@ if sys.version_info >= (3, 9):
     from contextlib import AbstractContextManager
 
     ContextManager = AbstractContextManager
+    from collections.abc import Callable
 else:
-    from typing import ContextManager
+    from typing import Callable, ContextManager
 
 T = TypeVar("T")
 KT = TypeVar("KT")

@@ -3,13 +3,12 @@ import os
 import re
 import sys
 from argparse import ArgumentParser
+from typing import TypeVar
 
-if sys.version_info > (3, 9):
-    from collections.abc import Iterable
+if sys.version_info >= (3, 9):
+    from collections.abc import Callable, Iterable
 else:
-    from typing import Iterable
-
-from typing import Callable, TypeVar
+    from typing import Callable, Iterable
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 

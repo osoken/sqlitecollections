@@ -8,7 +8,7 @@ from typing import Any
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import Callable
 else:
     from typing import Callable

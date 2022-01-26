@@ -3,7 +3,7 @@ import os
 import sys
 from typing import Any, Optional
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import MutableSet
 else:
     from typing import MutableSet

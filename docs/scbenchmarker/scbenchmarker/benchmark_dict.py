@@ -3,7 +3,7 @@ import os
 import sys
 from typing import Any, Optional, cast
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import MutableMapping, Set
 else:
     from typing import MutableMapping, Set
@@ -11,7 +11,7 @@ else:
 from typing import Tuple
 
 if sys.version_info >= (3, 8):
-    if sys.version_info > (3, 9):
+    if sys.version_info >= (3, 9):
         from collections.abc import Sequence
     else:
         from typing import Sequence
