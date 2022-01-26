@@ -4,7 +4,7 @@ from typing import Any, Optional, Union
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import Callable, Iterable
 else:
     from typing import Callable, Iterable

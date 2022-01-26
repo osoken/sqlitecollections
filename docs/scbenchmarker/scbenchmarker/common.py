@@ -6,7 +6,7 @@ from abc import ABCMeta, abstractmethod
 from timeit import timeit
 from typing import Any, Generic, Optional, Tuple, TypeVar, Union, cast
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import Mapping
 else:
     from typing import Mapping

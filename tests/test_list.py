@@ -5,7 +5,7 @@ from itertools import product
 from typing import Any, Tuple, Union
 from unittest.mock import MagicMock, patch
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import Callable, Iterable, Sequence
 else:
     from typing import Callable, Sequence, Iterable

@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from itertools import chain
 from typing import Generic, Optional, Tuple, Union, cast
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import Callable, Iterable, Mapping
 else:
     from typing import Callable, Iterable, Mapping

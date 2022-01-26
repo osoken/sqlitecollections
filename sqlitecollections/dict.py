@@ -2,14 +2,22 @@ import sqlite3
 import sys
 import warnings
 from itertools import chain
-from typing import Callable, Generic, Optional, Tuple, Union, cast, overload
+from typing import Generic, Optional, Tuple, Union, cast, overload
 
 if sys.version_info >= (3, 9):
-    from collections.abc import Iterable, Iterator, Mapping, MutableMapping, Reversible
+    from collections.abc import (
+        Callable,
+        Iterable,
+        Iterator,
+        Mapping,
+        MutableMapping,
+        Reversible,
+    )
 else:
-    from typing import Iterable, Iterator, Mapping, MutableMapping
-if sys.version_info >= (3, 8):
-    from typing import Reversible
+    from typing import Callable, Iterable, Iterator, Mapping, MutableMapping
+
+    if sys.version_info >= (3, 8):
+        from typing import Reversible
 
 from . import RebuildStrategy
 from .base import (

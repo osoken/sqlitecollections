@@ -1,12 +1,12 @@
 import sqlite3
 import sys
-from typing import AbstractSet, Any, Callable, Optional, Union, cast
+from typing import AbstractSet, Any, Optional, Union, cast
 from uuid import uuid4
 
 if sys.version_info >= (3, 9):
-    from collections.abc import Iterable, Iterator, MutableSet
+    from collections.abc import Callable, Iterable, Iterator, MutableSet
 else:
-    from typing import Iterable, Iterator, MutableSet
+    from typing import Iterable, Iterator, MutableSet, Callable
 
 from . import RebuildStrategy
 from .base import (

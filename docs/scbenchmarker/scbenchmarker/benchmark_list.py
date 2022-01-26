@@ -4,7 +4,7 @@ import random
 import sys
 from typing import Any, Optional, Tuple
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     from collections.abc import MutableSequence
 else:
     from typing import MutableSequence
