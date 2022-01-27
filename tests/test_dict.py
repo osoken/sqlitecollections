@@ -791,3 +791,77 @@ class DictTestCase(SqlTestCase):
         )
         del actual
         self.assert_items_table_only(memory_db)
+
+
+class KeysViewTestCase(SqlTestCase):
+    def test_len(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        expected = 0
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+        self.get_fixture(memory_db, "dict/len.sql")
+        expected = 4
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+    def test_iter(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [])
+        self.assertEqual(list(actual), [])
+        self.get_fixture(memory_db, "dict/iter.sql")
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), ["a", "b", "c", "d"])
+        del parent["b"]
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), ["a", "c", "d"])
+
+    def test_in(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/contains.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        self.assertTrue("a" in sut)
+        self.assertTrue(b"a" in sut)
+        self.assertTrue(None in sut)
+        self.assertTrue(0 in sut)
+        self.assertFalse(100 in sut)
+        self.assertTrue(((0, 1), "a") in sut)
+        with self.assertRaisesRegex(TypeError, r"unhashable type:"):
+            _ = [0, 1] in sut  # type: ignore
+
+        self.assertFalse("a" not in sut)
+        self.assertFalse(b"a" not in sut)
+        self.assertFalse(None not in sut)
+        self.assertFalse(0 not in sut)
+        self.assertFalse(((0, 1), "a") not in sut)
+        self.assertTrue(100 not in sut)
+        with self.assertRaisesRegex(TypeError, r"unhashable type:"):
+            _ = [0, 1] not in sut  # type: ignore
+
+        del parent["a"]
+        self.assertFalse("a" in sut)
+
+    def test_reversed(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/reversed.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        if sys.version_info < (3, 8):
+            with self.assertRaisesRegex(TypeError, "'KeysView' object is not reversible"):
+                _ = reversed(sut)  # type: ignore
+        else:
+            actual = reversed(sut)
+            self.assertIsInstance(actual, Iterator)
+            expected = ["b", "a"]
+            self.assertEqual(list(actual), expected)

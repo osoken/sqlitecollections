@@ -19,6 +19,11 @@ else:
     if sys.version_info >= (3, 8):
         from typing import Reversible
 
+if sys.version_info >= (3, 9):
+    from collections.abc import KeysView as KeysViewType
+else:
+    from typing import KeysView as KeysViewType
+
 from . import RebuildStrategy
 from .base import (
     KT,
@@ -415,6 +420,9 @@ class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
             return default
         return self.deserialize_value(serialized_value)
 
+    def keys(self) -> "KeysView[KT, VT]":
+        return KeysView[KT, VT](cast(Dict[KT, VT], self))
+
 
 if sys.version_info >= (3, 8):
 
@@ -454,3 +462,22 @@ else:
 
     class Dict(_Dict[KT, VT]):
         ...
+
+
+class KeysView(KeysViewType[KT], Generic[KT, VT]):
+    def __init__(self, parent: Dict[KT, VT]):
+        self._parent = parent
+
+    def __len__(self) -> int:
+        return len(self._parent)
+
+    def __contains__(self, key: object) -> bool:
+        return key in self._parent
+
+    def __iter__(self) -> Iterator[KT]:
+        return iter(self._parent)
+
+    if sys.version_info >= (3, 8):
+
+        def __reversed__(self) -> Iterator[KT]:
+            return reversed(self._parent)
