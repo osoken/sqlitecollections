@@ -72,7 +72,7 @@ class ListFactory(SequenceFactoryBase[T]):
         return List[T]
 
 
-class DictFactory(Generic[KT, VT], FactoryBase[KT]):
+class DictFactory(FactoryBase[KT], Generic[KT, VT]):
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
