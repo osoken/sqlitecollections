@@ -139,7 +139,7 @@ class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
             yield cast(bytes, res[0])
 
 
-class _Dict(Generic[KT, VT], SqliteCollectionBase[KT], MutableMapping[KT, VT]):
+class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
     _driver_class = _DictDatabaseDriver
 
     def __init__(
