@@ -15,10 +15,12 @@ from test_base import SqlTestCase
 import sqlitecollections as sc
 
 
-class DictTestCase(SqlTestCase):
+class DictAndViewTestCase(SqlTestCase):
     def assert_items_table_only(self, conn: sqlite3.Connection) -> None:
         return self.assert_metadata_state_equals(conn, [("items", "0", "Dict")])
 
+
+class DictTestCase(DictAndViewTestCase):
     def assert_dict_state_equals(self, conn: sqlite3.Connection, expected: Any) -> None:
         return self.assert_sql_result_equals(
             conn,
@@ -793,7 +795,7 @@ class DictTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
 
-class KeysViewTestCase(SqlTestCase):
+class KeysViewTestCase(DictAndViewTestCase):
     def test_len(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "dict/base.sql")
@@ -865,3 +867,30 @@ class KeysViewTestCase(SqlTestCase):
             self.assertIsInstance(actual, Iterator)
             expected = ["b", "a"]
             self.assertEqual(list(actual), expected)
+
+    def test_and(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/keysview_and.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        actual = sut & {1, 2, 3}
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut & {"a", "b"} & {"b"}
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("b"),),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
