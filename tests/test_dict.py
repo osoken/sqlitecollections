@@ -894,3 +894,31 @@ class KeysViewTestCase(DictAndViewTestCase):
         )
         del actual
         self.assert_items_table_only(memory_db)
+
+    def test_rand(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/keysview_rand.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        actual = iter((1, 2, 3)) & sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual2 = iter(("a", "b")) & sut
+        self.assertIsInstance(actual2, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual2.table_name}",
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"),),
+                (sc.base.SqliteCollectionBase._default_serializer("b"),),
+            ],
+        )
+        del actual2
+        self.assert_items_table_only(memory_db)

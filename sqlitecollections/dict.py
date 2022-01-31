@@ -501,8 +501,14 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
             data=(d for d in o if d in self._parent),
         )
 
-    def __rand__(self, o: Iterable[_T]) -> Set[_T]:
-        ...
+    def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:
+        return sc_Set[_T](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=(d for d in o if d in self._parent),
+        )
 
     def __contains__(self, o: object) -> bool:
         return o in self._parent
