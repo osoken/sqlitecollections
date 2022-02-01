@@ -531,8 +531,8 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
             data=itertools.chain(self._parent, o),
         )
 
-    def __ror__(self, o: Iterable[_T]) -> Set[Union[_KT_co, _T]]:
-        ...
+    def __ror__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
+        return self.__or__(o)
 
     def __sub__(self, o: Iterable[Any]) -> Set[_KT_co]:
         ...
