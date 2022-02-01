@@ -1,3 +1,4 @@
+import itertools
 import sqlite3
 import sys
 import warnings
@@ -521,8 +522,14 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
         def __reversed__(self) -> Iterator[_KT_co]:
             return reversed(self._parent)
 
-    def __or__(self, o: Iterable[_T]) -> Set[Union[_KT_co, _T]]:
-        ...
+    def __or__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
+        return sc_Set[Union[_KT_co, _T]](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=itertools.chain(self._parent, o),
+        )
 
     def __ror__(self, o: Iterable[_T]) -> Set[Union[_KT_co, _T]]:
         ...

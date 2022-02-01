@@ -922,3 +922,43 @@ class KeysViewTestCase(DictAndViewTestCase):
         )
         del actual2
         self.assert_items_table_only(memory_db)
+
+    def test_or(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/keysview_or.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        actual = sut | iter((1, 2, 3))
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (sc.base.SqliteCollectionBase._default_serializer("a"),),
+                    (sc.base.SqliteCollectionBase._default_serializer("b"),),
+                    (sc.base.SqliteCollectionBase._default_serializer("c"),),
+                    (sc.base.SqliteCollectionBase._default_serializer(1),),
+                    (sc.base.SqliteCollectionBase._default_serializer(2),),
+                    (sc.base.SqliteCollectionBase._default_serializer(3),),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual2 = sut | iter(("a", "b"))
+        self.assertIsInstance(actual2, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual2.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (sc.base.SqliteCollectionBase._default_serializer("a"),),
+                    (sc.base.SqliteCollectionBase._default_serializer("b"),),
+                    (sc.base.SqliteCollectionBase._default_serializer("c"),),
+                ]
+            ),
+        )
+        del actual2
+        self.assert_items_table_only(memory_db)
