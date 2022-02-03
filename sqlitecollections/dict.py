@@ -1,8 +1,19 @@
+import itertools
 import sqlite3
 import sys
 import warnings
 from itertools import chain
-from typing import Generic, Optional, Tuple, Union, cast, overload
+from typing import (
+    AbstractSet,
+    Any,
+    Generic,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 if sys.version_info >= (3, 9):
     from collections.abc import (
@@ -12,9 +23,11 @@ if sys.version_info >= (3, 9):
         Mapping,
         MutableMapping,
         Reversible,
+        Set,
+        Sized,
     )
 else:
-    from typing import Callable, Iterable, Iterator, Mapping, MutableMapping
+    from typing import Callable, Iterable, Iterator, Mapping, MutableMapping, Set, Sized
 
     if sys.version_info >= (3, 8):
         from typing import Reversible
@@ -26,6 +39,7 @@ else:
 
 from . import RebuildStrategy
 from .base import (
+    _T,
     KT,
     VT,
     SqliteCollectionBase,
@@ -33,6 +47,9 @@ from .base import (
     _SqliteCollectionBaseDatabaseDriver,
     is_hashable,
 )
+from .set import Set as sc_Set
+
+_KT_co = TypeVar("_KT_co", covariant=True)
 
 
 class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
@@ -420,8 +437,8 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             return default
         return self.deserialize_value(serialized_value)
 
-    def keys(self) -> "KeysView[KT, VT]":
-        return KeysView[KT, VT](cast(Dict[KT, VT], self))
+    def keys(self) -> "KeysView[KT]":
+        return KeysView[KT](cast(Dict[KT, VT], self))
 
 
 if sys.version_info >= (3, 8):
@@ -464,20 +481,85 @@ else:
         ...
 
 
-class KeysView(KeysViewType[KT], Generic[KT, VT]):
-    def __init__(self, parent: Dict[KT, VT]):
-        self._parent = parent
+class MappingView(Sized):
+    def __init__(self, mapping: Dict[Any, Any]):
+        self._parent = mapping
 
     def __len__(self) -> int:
         return len(self._parent)
 
-    def __contains__(self, key: object) -> bool:
-        return key in self._parent
 
-    def __iter__(self) -> Iterator[KT]:
+class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
+    def __init__(self, mapping: Dict[_KT_co, Any]):
+        super(KeysView, self).__init__(mapping)
+
+    def __and__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:  # type: ignore[override]
+        return sc_Set[_KT_co](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=(d for d in o if d in self._parent),
+        )
+
+    def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
+        return sc_Set[_T](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=(d for d in o if d in self._parent),
+        )
+
+    def __contains__(self, o: object) -> bool:
+        return o in self._parent
+
+    def __iter__(self) -> Iterator[_KT_co]:
         return iter(self._parent)
 
     if sys.version_info >= (3, 8):
 
-        def __reversed__(self) -> Iterator[KT]:
+        def __reversed__(self) -> Iterator[_KT_co]:
             return reversed(self._parent)
+
+    def __or__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
+        return sc_Set[Union[_KT_co, _T]](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=itertools.chain(self._parent, o),
+        )
+
+    def __ror__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
+        return self.__or__(o)
+
+    def __sub__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:  # type: ignore[override]
+        return sc_Set[KT](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=self._parent,
+        ).difference(o)
+
+    def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
+        return sc_Set[_T](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=o,
+        ).difference(self._parent)
+
+    def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
+        return sc_Set[Union[KT, _T]](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=self._parent,
+        ).symmetric_difference(o)
+
+    def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
+        return self.__xor__(o)
