@@ -552,8 +552,14 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
             data=o,
         ).difference(self._parent)
 
-    def __xor__(self, o: Iterable[_T]) -> Set[Union[_KT_co, _T]]:
-        ...
+    def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
+        return sc_Set[Union[KT, _T]](
+            connection=self._parent.connection,
+            serializer=self._parent.key_serializer,
+            deserializer=self._parent.key_deserializer,
+            persist=False,
+            data=self._parent,
+        ).symmetric_difference(o)
 
-    def __rxor__(self, o: Iterable[_T]) -> Set[Union[_KT_co, _T]]:
+    def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
         ...
