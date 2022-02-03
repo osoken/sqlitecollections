@@ -489,11 +489,11 @@ class MappingView(Sized):
         return len(self._parent)
 
 
-class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
+class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
     def __init__(self, mapping: Dict[_KT_co, Any]):
         super(KeysView, self).__init__(mapping)
 
-    def __and__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:
+    def __and__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:  # type: ignore[override]
         return sc_Set[_KT_co](
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
@@ -502,7 +502,7 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
             data=(d for d in o if d in self._parent),
         )
 
-    def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:
+    def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         return sc_Set[_T](
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
@@ -522,7 +522,7 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
         def __reversed__(self) -> Iterator[_KT_co]:
             return reversed(self._parent)
 
-    def __or__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
+    def __or__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return sc_Set[Union[_KT_co, _T]](
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
@@ -531,10 +531,10 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
             data=itertools.chain(self._parent, o),
         )
 
-    def __ror__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
+    def __ror__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return self.__or__(o)
 
-    def __sub__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:
+    def __sub__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:  # type: ignore[override]
         return sc_Set[KT](
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
@@ -543,7 +543,7 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
             data=self._parent,
         ).difference(o)
 
-    def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:
+    def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         return sc_Set[_T](
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
@@ -552,7 +552,7 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
             data=o,
         ).difference(self._parent)
 
-    def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
+    def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return sc_Set[Union[KT, _T]](
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
@@ -561,5 +561,5 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
             data=self._parent,
         ).symmetric_difference(o)
 
-    def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
+    def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return self.__xor__(o)
