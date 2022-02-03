@@ -562,4 +562,4 @@ class KeysView(MappingView, AbstractSet[_KT_co], Generic[_KT_co]):
         ).symmetric_difference(o)
 
     def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:
-        ...
+        return self.__xor__(o)
