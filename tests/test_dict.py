@@ -390,7 +390,7 @@ class DictTestCase(DictAndViewTestCase):
         self.get_fixture(memory_db, "dict/base.sql", "dict/keys.sql")
         sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         actual = sut.keys()
-        # self.assertIsInstance(actual, KeysView)
+        self.assertIsInstance(actual, KeysView)
         expected = ["a", "b"]
         self.assertEqual(list(actual), expected)
 
@@ -1182,3 +1182,21 @@ class ValuesViewTestCase(DictAndViewTestCase):
         self.assertFalse(0 not in sut)
         self.assertFalse(((0, 1), "a") not in sut)
         self.assertTrue(100 not in sut)
+
+    def test_iter(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [])
+        self.assertEqual(list(actual), [])
+        self.get_fixture(memory_db, "dict/valuesview_iter.sql")
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [4, 2, None, [1, 2]])
+        del parent["b"]
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [4, None, [1, 2]])
