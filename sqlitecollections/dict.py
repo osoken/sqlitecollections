@@ -583,8 +583,8 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
         return self.__xor__(o)
 
 
-class ValuesView(MappingView, ValuesViewType[_VT_co], Iterable[_VT_co], Generic[_VT_co]):
-    def __init__(self, mapping: Mapping[Any, _VT_co]) -> None:
+class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
+    def __init__(self, mapping: Dict[Any, _VT_co]):
         super(ValuesView, self).__init__(mapping)
 
     def __contains__(self, o: object) -> bool:
