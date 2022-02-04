@@ -50,6 +50,7 @@ from .base import (
 from .set import Set as sc_Set
 
 _KT_co = TypeVar("_KT_co", covariant=True)
+_VT_co = TypeVar("_VT_co", covariant=True)
 
 
 class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
@@ -563,3 +564,19 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
 
     def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return self.__xor__(o)
+
+
+class ValuesView(MappingView, Iterable[_VT_co], Generic[_VT_co]):
+    def __init__(self, mapping: Mapping[Any, _VT_co]) -> None:
+        super(ValuesView, self).__init__(mapping)
+
+    def __contains__(self, o: object) -> bool:
+        ...
+
+    def __iter__(self) -> Iterator[_VT_co]:
+        ...
+
+    if sys.version_info >= (3, 8):
+
+        def __reversed__(self) -> Iterator[_VT_co]:
+            ...

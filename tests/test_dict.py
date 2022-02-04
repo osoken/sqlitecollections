@@ -10,9 +10,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
 
-from test_base import SqlTestCase
-
 import sqlitecollections as sc
+
+from test_base import SqlTestCase
 
 
 class DictAndViewTestCase(SqlTestCase):
@@ -1146,3 +1146,19 @@ class KeysViewTestCase(DictAndViewTestCase):
         )
         del actual2
         self.assert_items_table_only(memory_db)
+
+
+class ValuesViewTestCase(DictAndViewTestCase):
+    def test_len(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+        expected = 0
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+        self.get_fixture(memory_db, "dict/valuesview_len.sql")
+        expected = 4
+        actual = len(sut)
+        self.assertEqual(actual, expected)
