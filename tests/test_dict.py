@@ -1200,3 +1200,17 @@ class ValuesViewTestCase(DictAndViewTestCase):
         actual = iter(sut)
         self.assertIsInstance(actual, Iterator)
         self.assertEqual(list(actual), [4, None, [1, 2]])
+
+    def test_reversed(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/valuesview_reversed.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+        if sys.version_info < (3, 8):
+            with self.assertRaisesRegex(TypeError, "'ValuesView' object is not reversible"):
+                _ = reversed(sut)  # type: ignore
+        else:
+            actual = reversed(sut)
+            self.assertIsInstance(actual, Iterator)
+            expected = [2, 4]
+            self.assertEqual(list(actual), expected)

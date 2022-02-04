@@ -164,6 +164,12 @@ class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
         for res in cur:
             yield cast(bytes, res[0])
 
+    @classmethod
+    def get_reversed_serialized_values(cls, table_name: str, cur: sqlite3.Cursor) -> Iterable[bytes]:
+        cur.execute(f"SELECT serialized_value FROM {table_name} ORDER BY item_order DESC")
+        for res in cur:
+            yield cast(bytes, res[0])
+
 
 class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
     _driver_class = _DictDatabaseDriver
@@ -595,4 +601,6 @@ class ValuesView(MappingView, ValuesViewType[_VT_co], Iterable[_VT_co], Generic[
     if sys.version_info >= (3, 8):
 
         def __reversed__(self) -> Iterator[_VT_co]:
-            ...
+            cur = self._parent.connection.cursor()
+            for sv in self._parent._driver_class.get_reversed_serialized_values(self._parent.table_name, cur):
+                yield self._parent.deserialize_value(sv)
