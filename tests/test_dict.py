@@ -390,7 +390,7 @@ class DictTestCase(DictAndViewTestCase):
         self.get_fixture(memory_db, "dict/base.sql", "dict/keys.sql")
         sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
         actual = sut.keys()
-        # self.assertIsInstance(actual, KeysView)
+        self.assertIsInstance(actual, KeysView)
         expected = ["a", "b"]
         self.assertEqual(list(actual), expected)
 
@@ -1146,3 +1146,71 @@ class KeysViewTestCase(DictAndViewTestCase):
         )
         del actual2
         self.assert_items_table_only(memory_db)
+
+
+class ValuesViewTestCase(DictAndViewTestCase):
+    def test_len(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+        expected = 0
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+        self.get_fixture(memory_db, "dict/valuesview_len.sql")
+        expected = 4
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+    def test_contains(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/valuesview_contains.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+
+        self.assertTrue("a" in sut)
+        self.assertTrue(b"a" in sut)
+        self.assertTrue(None in sut)
+        self.assertTrue(0 in sut)
+        self.assertFalse(100 in sut)
+        self.assertTrue(((0, 1), "a") in sut)
+
+        self.assertFalse("a" not in sut)
+        self.assertFalse(b"a" not in sut)
+        self.assertFalse(None not in sut)
+        self.assertFalse(0 not in sut)
+        self.assertFalse(((0, 1), "a") not in sut)
+        self.assertTrue(100 not in sut)
+
+    def test_iter(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [])
+        self.assertEqual(list(actual), [])
+        self.get_fixture(memory_db, "dict/valuesview_iter.sql")
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [4, 2, None, [1, 2]])
+        del parent["b"]
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [4, None, [1, 2]])
+
+    def test_reversed(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/valuesview_reversed.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+        if sys.version_info < (3, 8):
+            with self.assertRaisesRegex(TypeError, "'ValuesView' object is not reversible"):
+                _ = reversed(sut)  # type: ignore
+        else:
+            actual = reversed(sut)
+            self.assertIsInstance(actual, Iterator)
+            expected = [2, 4]
+            self.assertEqual(list(actual), expected)

@@ -34,8 +34,10 @@ else:
 
 if sys.version_info >= (3, 9):
     from collections.abc import KeysView as KeysViewType
+    from collections.abc import ValuesView as ValuesViewType
 else:
     from typing import KeysView as KeysViewType
+    from typing import ValuesView as ValuesViewType
 
 from . import RebuildStrategy
 from .base import (
@@ -50,6 +52,7 @@ from .base import (
 from .set import Set as sc_Set
 
 _KT_co = TypeVar("_KT_co", covariant=True)
+_VT_co = TypeVar("_VT_co", covariant=True)
 
 
 class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
@@ -152,6 +155,18 @@ class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     @classmethod
     def get_reversed_serialized_keys(cls, table_name: str, cur: sqlite3.Cursor) -> Iterable[bytes]:
         cur.execute(f"SELECT serialized_key FROM {table_name} ORDER BY item_order DESC")
+        for res in cur:
+            yield cast(bytes, res[0])
+
+    @classmethod
+    def get_serialized_values(cls, table_name: str, cur: sqlite3.Cursor) -> Iterable[bytes]:
+        cur.execute(f"SELECT serialized_value FROM {table_name} ORDER BY item_order")
+        for res in cur:
+            yield cast(bytes, res[0])
+
+    @classmethod
+    def get_reversed_serialized_values(cls, table_name: str, cur: sqlite3.Cursor) -> Iterable[bytes]:
+        cur.execute(f"SELECT serialized_value FROM {table_name} ORDER BY item_order DESC")
         for res in cur:
             yield cast(bytes, res[0])
 
@@ -440,6 +455,9 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
     def keys(self) -> "KeysView[KT]":
         return KeysView[KT](cast(Dict[KT, VT], self))
 
+    def values(self) -> "ValuesView[VT]":
+        return ValuesView[VT](cast(Dict[KT, VT], self))
+
 
 if sys.version_info >= (3, 8):
 
@@ -563,3 +581,26 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
 
     def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return self.__xor__(o)
+
+
+class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
+    def __init__(self, mapping: Dict[Any, _VT_co]):
+        super(ValuesView, self).__init__(mapping)
+
+    def __contains__(self, o: object) -> bool:
+        for v in self:
+            if o == v:
+                return True
+        return False
+
+    def __iter__(self) -> Iterator[_VT_co]:
+        cur = self._parent.connection.cursor()
+        for sv in self._parent._driver_class.get_serialized_values(self._parent.table_name, cur):
+            yield self._parent.deserialize_value(sv)
+
+    if sys.version_info >= (3, 8):
+
+        def __reversed__(self) -> Iterator[_VT_co]:
+            cur = self._parent.connection.cursor()
+            for sv in self._parent._driver_class.get_reversed_serialized_values(self._parent.table_name, cur):
+                yield self._parent.deserialize_value(sv)
