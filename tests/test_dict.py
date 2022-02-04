@@ -1162,3 +1162,23 @@ class ValuesViewTestCase(DictAndViewTestCase):
         expected = 4
         actual = len(sut)
         self.assertEqual(actual, expected)
+
+    def test_contains(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/valuesview_contains.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+
+        self.assertTrue("a" in sut)
+        self.assertTrue(b"a" in sut)
+        self.assertTrue(None in sut)
+        self.assertTrue(0 in sut)
+        self.assertFalse(100 in sut)
+        self.assertTrue(((0, 1), "a") in sut)
+
+        self.assertFalse("a" not in sut)
+        self.assertFalse(b"a" not in sut)
+        self.assertFalse(None not in sut)
+        self.assertFalse(0 not in sut)
+        self.assertFalse(((0, 1), "a") not in sut)
+        self.assertTrue(100 not in sut)

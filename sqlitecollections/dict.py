@@ -571,7 +571,10 @@ class ValuesView(MappingView, Iterable[_VT_co], Generic[_VT_co]):
         super(ValuesView, self).__init__(mapping)
 
     def __contains__(self, o: object) -> bool:
-        ...
+        for v in self._parent.values():
+            if v == o:
+                return True
+        return False
 
     def __iter__(self) -> Iterator[_VT_co]:
         ...
