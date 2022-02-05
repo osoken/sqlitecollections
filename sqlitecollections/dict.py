@@ -621,10 +621,10 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
     def __init__(self, mapping: Dict[_KT_co, _VT_co]) -> None:
         super(ItemsView, self).__init__(mapping)
 
-    def __and__(self, o: Iterable[Any]) -> Set[Tuple[_KT_co, _VT_co]]:
+    def __and__(self, o: Iterable[Any]) -> sc_Set[Tuple[_KT_co, _VT_co]]:  # type: ignore[override]
         ...
 
-    def __rand__(self, o: Iterable[_T]) -> Set[_T]:
+    def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         ...
 
     def __contains__(self, o: object) -> bool:
@@ -640,20 +640,20 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         def __reversed__(self) -> Iterator[Tuple[_KT_co, _VT_co]]:
             ...
 
-    def __or__(self, o: Iterable[_T]) -> Set[Union[Tuple[_KT_co, _VT_co], _T]]:
+    def __or__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         ...
 
-    def __ror__(self, o: Iterable[_T]) -> Set[Union[Tuple[_KT_co, _VT_co], _T]]:
+    def __ror__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         ...
 
-    def __sub__(self, o: Iterable[Any]) -> Set[Tuple[_KT_co, _VT_co]]:
+    def __sub__(self, o: Iterable[Any]) -> sc_Set[Tuple[_KT_co, _VT_co]]:  # type: ignore[override]
         ...
 
-    def __rsub__(self, o: Iterable[_T]) -> Set[_T]:
+    def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         ...
 
-    def __xor__(self, o: Iterable[_T]) -> Set[Union[Tuple[_KT_co, _VT_co], _T]]:
+    def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         ...
 
-    def __rxor__(self, o: Iterable[_T]) -> Set[Union[Tuple[_KT_co, _VT_co], _T]]:
+    def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         ...
