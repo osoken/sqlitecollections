@@ -33,11 +33,13 @@ else:
         from typing import Reversible
 
 if sys.version_info >= (3, 9):
+    from collections.abc import ItemsView as ItemsViewType
     from collections.abc import KeysView as KeysViewType
     from collections.abc import ValuesView as ValuesViewType
 else:
     from typing import KeysView as KeysViewType
     from typing import ValuesView as ValuesViewType
+    from typing import ItemsView as ItemsViewType
 
 from . import RebuildStrategy
 from .base import (
@@ -169,6 +171,12 @@ class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
         cur.execute(f"SELECT serialized_value FROM {table_name} ORDER BY item_order DESC")
         for res in cur:
             yield cast(bytes, res[0])
+
+    @classmethod
+    def get_serialized_items(cls, table_name: str, cur: sqlite3.Cursor) -> Iterable[Tuple[bytes, bytes]]:
+        cur.execute(f"SELECT serialized_key, serialized_value FROM {table_name} ORDER BY item_order")
+        for res in cur:
+            yield (cast(bytes, res[0]), cast(bytes, res[1]))
 
 
 class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
@@ -458,6 +466,9 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
     def values(self) -> "ValuesView[VT]":
         return ValuesView[VT](cast(Dict[KT, VT], self))
 
+    def items(self) -> "ItemsView[KT, VT]":
+        return ItemsView[KT, VT](cast(Dict[KT, VT], self))
+
 
 if sys.version_info >= (3, 8):
 
@@ -604,3 +615,45 @@ class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
             cur = self._parent.connection.cursor()
             for sv in self._parent._driver_class.get_reversed_serialized_values(self._parent.table_name, cur):
                 yield self._parent.deserialize_value(sv)
+
+
+class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
+    def __init__(self, mapping: Dict[_KT_co, _VT_co]) -> None:
+        super(ItemsView, self).__init__(mapping)
+
+    def __and__(self, o: Iterable[Any]) -> Set[Tuple[_KT_co, _VT_co]]:
+        ...
+
+    def __rand__(self, o: Iterable[_T]) -> Set[_T]:
+        ...
+
+    def __contains__(self, o: object) -> bool:
+        ...
+
+    def __iter__(self) -> Iterator[Tuple[_KT_co, _VT_co]]:
+        cur = self._parent.connection.cursor()
+        for sk, sv in self._parent._driver_class.get_serialized_items(self._parent.table_name, cur):
+            yield self._parent.deserialize_key(sk), self._parent.deserialize_value(sv)
+
+    if sys.version_info >= (3, 8):
+
+        def __reversed__(self) -> Iterator[Tuple[_KT_co, _VT_co]]:
+            ...
+
+    def __or__(self, o: Iterable[_T]) -> Set[Union[Tuple[_KT_co, _VT_co], _T]]:
+        ...
+
+    def __ror__(self, o: Iterable[_T]) -> Set[Union[Tuple[_KT_co, _VT_co], _T]]:
+        ...
+
+    def __sub__(self, o: Iterable[Any]) -> Set[Tuple[_KT_co, _VT_co]]:
+        ...
+
+    def __rsub__(self, o: Iterable[_T]) -> Set[_T]:
+        ...
+
+    def __xor__(self, o: Iterable[_T]) -> Set[Union[Tuple[_KT_co, _VT_co], _T]]:
+        ...
+
+    def __rxor__(self, o: Iterable[_T]) -> Set[Union[Tuple[_KT_co, _VT_co], _T]]:
+        ...

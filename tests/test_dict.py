@@ -10,9 +10,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
 
-from test_base import SqlTestCase
-
 import sqlitecollections as sc
+
+from test_base import SqlTestCase
 
 
 class DictAndViewTestCase(SqlTestCase):
@@ -1214,3 +1214,37 @@ class ValuesViewTestCase(DictAndViewTestCase):
             self.assertIsInstance(actual, Iterator)
             expected = [2, 4]
             self.assertEqual(list(actual), expected)
+
+
+class ItemsViewTestCase(DictAndViewTestCase):
+    def test_len(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        expected = 0
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+        self.get_fixture(memory_db, "dict/itemsview_len.sql")
+        expected = 4
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+    def test_iter(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [])
+        self.assertEqual(list(actual), [])
+        self.get_fixture(memory_db, "dict/itemsview_iter.sql")
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [("a", 4), ("b", 2), ("c", None), ("d", [1, 2])])
+        del parent["b"]
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [("a", 4), ("c", None), ("d", [1, 2])])
