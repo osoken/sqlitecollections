@@ -618,11 +618,35 @@ class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
 
 
 class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
+    def _item_serializer(self, o: Tuple[_KT_co, _VT_co]) -> bytes:
+        if not is_hashable(o[1]):
+            raise TypeError(f"unhashable type: '{type(o[1]).__name__}'")
+        return SqliteCollectionBase[Tuple[bytes, bytes]]._default_serializer(
+            (self._parent.serialize_key(o[0]), self._parent.serialize_value(o[1]))
+        )
+
+    def _item_deserializer(self, o: bytes) -> Tuple[_KT_co, _VT_co]:
+        sk, sv = SqliteCollectionBase[Tuple[bytes, bytes]]._default_deserializer(o)
+        return (self._parent.deserialize_key(sk), self._parent.deserialize_value(sv))
+
     def __init__(self, mapping: Dict[_KT_co, _VT_co]) -> None:
         super(ItemsView, self).__init__(mapping)
 
     def __and__(self, o: Iterable[Any]) -> sc_Set[Tuple[_KT_co, _VT_co]]:  # type: ignore[override]
-        ...
+        tmp = sc_Set[Tuple[_KT_co, _VT_co]](
+            connection=self._parent.connection,
+            serializer=self._item_serializer,
+            deserializer=self._item_deserializer,
+            persist=False,
+            data=iter(self),
+        )
+        return sc_Set[Tuple[_KT_co, _VT_co]](
+            connection=self._parent.connection,
+            serializer=self._item_serializer,
+            deserializer=self._item_deserializer,
+            persist=False,
+            data=(cast(Tuple[_KT_co, _VT_co], d) for d in o if d in tmp),
+        )
 
     def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         ...

@@ -1248,3 +1248,45 @@ class ItemsViewTestCase(DictAndViewTestCase):
         actual = iter(sut)
         self.assertIsInstance(actual, Iterator)
         self.assertEqual(list(actual), [("a", 4), ("c", None), ("d", [1, 2])])
+
+    def test_and(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_and.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = sut & {("a", 1), ("b", 2)}
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut & {("a", 4), ("b", 4)} & {("b", 4)}
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (
+                    sc.base.SqliteCollectionBase._default_serializer(
+                        (
+                            sc.base.SqliteCollectionBase._default_serializer("b"),
+                            sc.base.SqliteCollectionBase._default_serializer(4),
+                        )
+                    ),
+                ),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_and_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_and_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = sut & {("a", 1)}
