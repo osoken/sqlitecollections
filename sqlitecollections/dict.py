@@ -649,7 +649,7 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         )
 
     def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
-        ...
+        return self & o
 
     def __contains__(self, o: object) -> bool:
         ...
