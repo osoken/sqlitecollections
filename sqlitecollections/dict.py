@@ -649,7 +649,7 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         )
 
     def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
-        return self & o
+        return cast(sc_Set[_T], self & o)
 
     def __contains__(self, o: object) -> bool:
         ...
@@ -665,7 +665,13 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
             ...
 
     def __or__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
-        ...
+        return sc_Set[Union[Tuple[_KT_co, _VT_co], _T]](
+            connection=self._parent.connection,
+            serializer=cast(Callable[[Union[Tuple[_KT_co, _VT_co], _T]], bytes], self._item_serializer),
+            deserializer=cast(Callable[[bytes], Union[Tuple[_KT_co, _VT_co], _T]], self._item_deserializer),
+            persist=False,
+            data=itertools.chain(self, o),
+        )
 
     def __ror__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         ...
