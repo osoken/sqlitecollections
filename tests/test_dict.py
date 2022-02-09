@@ -10,9 +10,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
 
-import sqlitecollections as sc
-
 from test_base import SqlTestCase
+
+import sqlitecollections as sc
 
 
 class DictAndViewTestCase(SqlTestCase):
@@ -1342,3 +1342,14 @@ class ItemsViewTestCase(DictAndViewTestCase):
         sut = parent.items()
         with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
             _ = iter(tuple(("a", 1))) & sut
+
+    def test_contains(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_contains.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        self.assertTrue(("a", [4, 5]) in sut)
+        self.assertFalse(("a", (4, 5)) in sut)
+        self.assertTrue(("b", 4) in sut)
+        self.assertFalse(("b", 0) in sut)
+        self.assertFalse("a" in sut)  # type: ignore

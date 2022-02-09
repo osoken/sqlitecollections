@@ -649,10 +649,12 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         )
 
     def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
-        return self & o
+        return cast(sc_Set[_T], self & o)
 
     def __contains__(self, o: object) -> bool:
-        ...
+        if not isinstance(o, tuple) or len(o) != 2 or o[0] not in self._parent:
+            return False
+        return bool(self._parent[o[0]] == o[1])
 
     def __iter__(self) -> Iterator[Tuple[_KT_co, _VT_co]]:
         cur = self._parent.connection.cursor()
