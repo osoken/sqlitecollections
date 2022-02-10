@@ -1432,3 +1432,82 @@ class ItemsViewTestCase(DictAndViewTestCase):
         sut = parent.items()
         with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
             _ = sut | iter(tuple(("a", 1)))
+
+    def test_ror(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_ror.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = iter((("a", 1), ("b", 2))) | sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(1),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("b"),
+                                sc.base.SqliteCollectionBase._default_serializer(2),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = iter((("a", 4), ("e", 10))) | sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("e"),
+                                sc.base.SqliteCollectionBase._default_serializer(10),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_ror_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_ror_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = iter(tuple(("a", 1))) | sut
