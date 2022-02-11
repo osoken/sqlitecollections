@@ -679,7 +679,15 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         return self | o
 
     def __sub__(self, o: Iterable[Any]) -> sc_Set[Tuple[_KT_co, _VT_co]]:  # type: ignore[override]
-        ...
+        tmp = sc_Set[Tuple[_KT_co, _VT_co]](
+            connection=self._parent.connection,
+            serializer=self._item_serializer,
+            deserializer=self._item_deserializer,
+            persist=False,
+            data=iter(self),
+        )
+        tmp.difference_update(o)
+        return tmp
 
     def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         ...
