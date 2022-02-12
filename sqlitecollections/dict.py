@@ -690,7 +690,18 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         return tmp
 
     def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
-        ...
+        tmp = sc_Set[Tuple[_KT_co, _VT_co]](
+            connection=self._parent.connection,
+            serializer=self._item_serializer,
+            deserializer=self._item_deserializer,
+            persist=False,
+            data=iter(self),
+        )
+        return sc_Set[_T](
+            connection=self._parent.connection,
+            persist=False,
+            data=(d for d in o if d not in tmp),
+        )
 
     def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         ...
