@@ -704,7 +704,15 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         )
 
     def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
-        ...
+        tmp = sc_Set[Union[Tuple[_KT_co, _VT_co], _T]](
+            connection=self._parent.connection,
+            serializer=cast(Callable[[Union[Tuple[_KT_co, _VT_co], _T]], bytes], self._item_serializer),
+            deserializer=cast(Callable[[bytes], Union[Tuple[_KT_co, _VT_co], _T]], self._item_deserializer),
+            persist=False,
+            data=iter(self),
+        )
+        tmp.symmetric_difference_update(o)
+        return tmp
 
     def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         ...
