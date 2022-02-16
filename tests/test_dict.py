@@ -1667,3 +1667,11 @@ class ItemsViewTestCase(DictAndViewTestCase):
         )
         del actual
         self.assert_items_table_only(memory_db)
+
+    def test_xor_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_xor_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = sut ^ iter(tuple(("a", 1)))
