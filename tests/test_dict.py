@@ -1214,3 +1214,506 @@ class ValuesViewTestCase(DictAndViewTestCase):
             self.assertIsInstance(actual, Iterator)
             expected = [2, 4]
             self.assertEqual(list(actual), expected)
+
+
+class ItemsViewTestCase(DictAndViewTestCase):
+    def test_len(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        expected = 0
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+        self.get_fixture(memory_db, "dict/itemsview_len.sql")
+        expected = 4
+        actual = len(sut)
+        self.assertEqual(actual, expected)
+
+    def test_iter(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [])
+        self.assertEqual(list(actual), [])
+        self.get_fixture(memory_db, "dict/itemsview_iter.sql")
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [("a", 4), ("b", 2), ("c", None), ("d", [1, 2])])
+        del parent["b"]
+        actual = iter(sut)
+        self.assertIsInstance(actual, Iterator)
+        self.assertEqual(list(actual), [("a", 4), ("c", None), ("d", [1, 2])])
+
+    def test_and(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_and.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = sut & {("a", 1), ("b", 2)}
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut & {("a", 4), ("b", 4)} & {("b", 4)}
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [
+                (
+                    sc.base.SqliteCollectionBase._default_serializer(
+                        (
+                            sc.base.SqliteCollectionBase._default_serializer("b"),
+                            sc.base.SqliteCollectionBase._default_serializer(4),
+                        )
+                    ),
+                ),
+            ],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_and_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_and_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = sut & {("a", 1)}
+
+    def test_rand(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_rand.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = iter((("a", 1), ("b", 2))) & sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name}",
+            [],
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = iter((("a", 4), ("b", 4))) & sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("b"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_rand_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_rand_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = iter(tuple(("a", 1))) & sut
+
+    def test_contains(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_contains.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        self.assertTrue(("a", [4, 5]) in sut)
+        self.assertFalse(("a", (4, 5)) in sut)
+        self.assertTrue(("b", 4) in sut)
+        self.assertFalse(("b", 0) in sut)
+        self.assertFalse("a" in sut)  # type: ignore
+
+    def test_or(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_or.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = sut | {("a", 1), ("b", 2)}
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(1),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("b"),
+                                sc.base.SqliteCollectionBase._default_serializer(2),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = sut | {("a", 4), ("e", 10)}
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("e"),
+                                sc.base.SqliteCollectionBase._default_serializer(10),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_or_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_or_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = sut | iter(tuple(("a", 1)))
+
+    def test_ror(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_ror.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = iter((("a", 1), ("b", 2))) | sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(1),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("b"),
+                                sc.base.SqliteCollectionBase._default_serializer(2),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual = iter((("a", 4), ("e", 10))) | sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("e"),
+                                sc.base.SqliteCollectionBase._default_serializer(10),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_ror_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_ror_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = iter(tuple(("a", 1))) | sut
+
+    def test_sub(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_sub.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = sut - iter((("a", 1), ("b", 2), ("c", 3)))
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("a"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("b"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("c"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual2 = sut - iter((("a", 4), ("b", 0)))
+        self.assertIsInstance(actual2, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual2.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("b"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("c"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual2
+        self.assert_items_table_only(memory_db)
+
+    def test_sub_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_sub_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = sut - iter(tuple(("a", 1)))
+
+    def test_rsub(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_rsub.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = iter((("a", 1), ("b", 2), ("c", 3))) - sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (sc.base.SqliteCollectionBase._default_serializer(("a", 1)),),
+                    (sc.base.SqliteCollectionBase._default_serializer(("b", 2)),),
+                    (sc.base.SqliteCollectionBase._default_serializer(("c", 3)),),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+        actual2 = iter((("a", 4), ("b", 0))) - sut
+        self.assertIsInstance(actual2, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual2.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (sc.base.SqliteCollectionBase._default_serializer(("b", 0)),),
+                ]
+            ),
+        )
+        del actual2
+        self.assert_items_table_only(memory_db)
+
+    def test_rsub_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_rsub_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = iter(tuple(("a", 1))) - sut
+
+    def test_xor(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_xor.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = sut ^ iter((("a", 4), ("b", 4), ("c", 3)))
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("c"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("c"),
+                                sc.base.SqliteCollectionBase._default_serializer(3),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_xor_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_xor_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = sut ^ iter(tuple(("a", 1)))
+
+    def test_rxor(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_rxor.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        actual = iter((("a", 4), ("b", 4), ("c", 3))) ^ sut
+        self.assertIsInstance(actual, sc.Set)
+        self.assert_sql_result_equals(
+            memory_db,
+            f"SELECT serialized_value FROM {actual.table_name} ORDER BY serialized_value",
+            sorted(
+                [
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("c"),
+                                sc.base.SqliteCollectionBase._default_serializer(4),
+                            )
+                        ),
+                    ),
+                    (
+                        sc.base.SqliteCollectionBase._default_serializer(
+                            (
+                                sc.base.SqliteCollectionBase._default_serializer("c"),
+                                sc.base.SqliteCollectionBase._default_serializer(3),
+                            )
+                        ),
+                    ),
+                ]
+            ),
+        )
+        del actual
+        self.assert_items_table_only(memory_db)
+
+    def test_rxor_fails_if_unhashable_value_exists(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_rxor_unhashable_type_error.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
+            _ = iter(tuple(("a", 1))) ^ sut
