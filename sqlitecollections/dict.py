@@ -715,4 +715,4 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         return tmp
 
     def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
-        ...
+        return self ^ o
