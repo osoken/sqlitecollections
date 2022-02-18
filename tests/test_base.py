@@ -3,6 +3,7 @@ import re
 import sqlite3
 import sys
 import uuid
+import warnings
 from collections.abc import Hashable
 from typing import Any
 from unittest import TestCase
@@ -105,8 +106,10 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch("sqlitecollections.base.SqliteCollectionBase._default_serializer")
     @patch("sqlitecollections.base.SqliteCollectionBase._default_deserializer")
     @patch("sqlitecollections.base.tidy_connection")
+    @patch("sqlitecollections.base.SqliteCollectionBase._should_rebuild")
     def test_init_with_no_args(
         self,
+        _should_rebuild: MagicMock,
         tidy_connection: MagicMock,
         default_deserializer: MagicMock,
         default_serializer: MagicMock,
@@ -141,6 +144,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             [],
         )
         self.assertFalse(hasattr(sut, "rebuild_strategy"))
+        _should_rebuild.assert_called_once_with(None)
         create_random_name.assert_called_once_with(sut.container_type_name)
         sanitize_table_name.assert_called_once_with(create_random_name.return_value, sut.container_type_name)
 
@@ -152,15 +156,24 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         serializer = MagicMock(spec=Callable[[Any], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Any])
         persist = False
-        rebuild_strategy = base.RebuildStrategy.SKIP
-        sut = ConcreteSqliteCollectionClass(
-            connection="connection",
-            table_name="tablename",
-            serializer=serializer,
-            deserializer=deserializer,
-            persist=persist,
-            rebuild_strategy=rebuild_strategy,
-        )
+        rebuild_strategy = base.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = ConcreteSqliteCollectionClass(
+                connection="connection",
+                table_name="tablename",
+                serializer=serializer,
+                deserializer=deserializer,
+                persist=persist,
+                rebuild_strategy=rebuild_strategy,
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
+            )
+
         tidy_connection.assert_called_once_with("connection")
         self.assertEqual(sut.connection, memory_db)
         self.assertEqual(sut.serializer, serializer)
@@ -490,9 +503,19 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock
     ) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items1", rebuild_strategy=base.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT
-        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = ConcreteSqliteCollectionClass(
+                connection=memory_db,
+                table_name="items1",
+                rebuild_strategy=base.RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
+            )
         _rebuild_check_with_first_element.assert_called_once_with()
         _do_rebuild.assert_called_once_with()
 
@@ -500,9 +523,17 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
     @patch.object(ConcreteSqliteCollectionClass, "_do_rebuild", return_value=None)
     def test_rebuild_always(self, _do_rebuild: MagicMock, _rebuild_check_with_first_element: MagicMock) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = ConcreteSqliteCollectionClass(
-            connection=memory_db, table_name="items1", rebuild_strategy=base.RebuildStrategy.ALWAYS
-        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = ConcreteSqliteCollectionClass(
+                connection=memory_db, table_name="items1", rebuild_strategy=base.RebuildStrategy.ALWAYS
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
+            )
         _rebuild_check_with_first_element.assert_not_called()
         _do_rebuild.assert_called_once_with()
 

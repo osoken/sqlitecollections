@@ -1,6 +1,7 @@
 import pickle
 import sqlite3
 import sys
+import warnings
 from itertools import product
 from typing import Any, Tuple, Union
 from unittest.mock import MagicMock, patch
@@ -87,13 +88,21 @@ class ListTestCase(SqlTestCase):
         def deserializer(x: bytes) -> str:
             return str(x)
 
-        sut = sc.List[str](
-            connection=memory_db,
-            table_name="items",
-            serializer=serializer,
-            deserializer=deserializer,
-            rebuild_strategy=sc.RebuildStrategy.ALWAYS,
-        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = sc.List[str](
+                connection=memory_db,
+                table_name="items",
+                serializer=serializer,
+                deserializer=deserializer,
+                rebuild_strategy=sc.RebuildStrategy.ALWAYS,
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
+            )
         self.assert_db_state_equals(
             memory_db,
             [

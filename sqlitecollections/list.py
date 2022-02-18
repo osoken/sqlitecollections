@@ -212,7 +212,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
-        rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
+        rebuild_strategy: Optional[RebuildStrategy] = None,
         data: Optional[Iterable[T]] = None,
     ) -> None:
         super(List, self).__init__(

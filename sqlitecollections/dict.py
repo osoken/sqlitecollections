@@ -193,7 +193,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
         serializer: Optional[Callable[[VT], bytes]] = None,
         deserializer: Optional[Callable[[bytes], VT]] = None,
         persist: bool = True,
-        rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
+        rebuild_strategy: Optional[RebuildStrategy] = None,
         data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
     ) -> None:
         if serializer is not None:
