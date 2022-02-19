@@ -184,6 +184,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
 
     def __init__(
         self,
+        __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
         table_name: Optional[str] = None,
         key_serializer: Optional[Callable[[KT], bytes]] = None,
@@ -232,9 +233,17 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        if data is not None:
+        if data is not None or __data is not None:
             self.clear()
-            self.update(data)
+            if data is not None:
+                warnings.warn(
+                    "data keyword argument is deprecated and will be removed in version 1.0.0",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                self.update(data)
+            if __data is not None:
+                self.update(__data)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:
@@ -347,6 +356,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
     ) -> "Dict[KT, VT]":
 
         return Dict[KT, VT](
+            (self if data is None else data),
             connection=self.connection,
             key_serializer=self.key_serializer,
             key_deserializer=self.key_deserializer,
@@ -354,7 +364,6 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             value_deserializer=self.value_deserializer,
             rebuild_strategy=RebuildStrategy.SKIP,
             persist=False,
-            data=(self if data is None else data),
         )
 
     def copy(self) -> "Dict[KT, VT]":
@@ -484,13 +493,13 @@ if sys.version_info >= (3, 9):
     class Dict(_ReversibleDict[KT, VT]):
         def __or__(self, other: Mapping[KT, VT]) -> "Dict[KT, VT]":
             tmp = Dict(
+                self,
                 connection=self.connection,
                 key_serializer=self.key_serializer,
                 key_deserializer=self.key_deserializer,
                 value_serializer=self.value_serializer,
                 value_deserializer=self.value_deserializer,
                 persist=self.persist,
-                data=self,
             )
             tmp |= other
             return tmp
