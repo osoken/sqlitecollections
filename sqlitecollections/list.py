@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+import warnings
 from itertools import count, repeat
 from typing import Any, Optional, Tuple, Union, cast, overload
 
@@ -207,6 +208,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
 
     def __init__(
         self,
+        __data: Optional[Iterable[T]] = None,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
         table_name: Optional[str] = None,
         serializer: Optional[Callable[[T], bytes]] = None,
@@ -223,9 +225,17 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        if data is not None:
+        if data is not None or __data is not None:
             self.clear()
-            self.extend(data)
+            if data is not None:
+                warnings.warn(
+                    "data keyword argument is deprecated and will be removed in version 1.0.0",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                self.extend(data)
+            if __data is not None:
+                self.extend(__data)
 
     def _do_rebuild(self) -> None:
         cur = self.connection.cursor()
@@ -308,12 +318,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
 
     def _create_volatile_copy(self, data: Optional[Iterable[T]] = None) -> "List[T]":
         return List[T](
+            (self if data is None else data),
             connection=self.connection,
             serializer=self.serializer,
             deserializer=self.deserializer,
             rebuild_strategy=RebuildStrategy.SKIP,
             persist=False,
-            data=(self if data is None else data),
         )
 
     def copy(self) -> "List[T]":
