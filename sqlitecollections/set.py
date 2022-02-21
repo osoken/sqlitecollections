@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+import warnings
 from typing import AbstractSet, Any, Optional, Union, cast
 from uuid import uuid4
 
@@ -134,6 +135,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
 
     def __init__(
         self,
+        __data: Optional[Iterable[T]] = None,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
         table_name: Optional[str] = None,
         serializer: Optional[Callable[[T], bytes]] = None,
@@ -150,9 +152,17 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        if data is not None:
+        if data is not None or __data is not None:
             self.clear()
-            self.update(data)
+            if data is not None:
+                warnings.warn(
+                    "data keyword argument is deprecated and will be removed in version 1.0.0",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                self.update(data)
+            if __data is not None:
+                self.update(__data)
 
     def __contains__(self, value: object) -> bool:
         cur = self.connection.cursor()
@@ -321,12 +331,12 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
 
     def _create_volatile_copy(self, data: Optional[Iterable[T]] = None) -> "Set[T]":
         return Set[T](
+            data if data is not None else self,
             connection=self.connection,
             serializer=self.serializer,
             deserializer=self.deserializer,
             rebuild_strategy=RebuildStrategy.SKIP,
             persist=False,
-            data=data if data is not None else self,
         )
 
     def copy(self) -> "Set[T]":
