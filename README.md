@@ -15,7 +15,7 @@ pip install sqlitecollections
 ```python
 import sqlitecollections as sc
 
-l = sc.List[str](data=["Alice", "Bob", "Carol"])
+l = sc.List[str](["Alice", "Bob", "Carol"])
 print(l[2])
 #> Carol
 print(len(l))
@@ -26,7 +26,7 @@ print(l.index("Bob"))
 print(l.index("Dave"))
 #> 3
 
-d = sc.Dict[str, str](data={"a": "Alice", "b": "Bob"})
+d = sc.Dict[str, str]({"a": "Alice", "b": "Bob"})
 print(d["a"])
 #> Alice
 d["c"] = "Carol"
@@ -35,7 +35,7 @@ print(list(d.keys()))
 print(list(d.values()))
 #> ['Alice', 'Bob', 'Carol']
 
-s = sc.Set[str](data=["Alice", "Bob", "Carol", "Dave"])
+s = sc.Set[str](["Alice", "Bob", "Carol", "Dave"])
 print("Ellen" in s)
 #> False
 print("Alice" in s)
@@ -51,7 +51,7 @@ If you want to reuse the container you created, you can create it by specifying 
 ```python
 import sqlitecollections as sc
 
-l = sc.List[str](connection="path/to/file.db", table_name="list_example", data=["Alice", "Bob", "Carol"])
+l = sc.List[str](["Alice", "Bob", "Carol"], connection="path/to/file.db", table_name="list_example")
 l.append("Dave")
 exit()
 ```

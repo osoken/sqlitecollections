@@ -608,4 +608,4 @@ class BuiltinSetBenchmarkInit(BuiltinSetBenchmarkBase, BenchmarkInitBase):
 
 class SqliteCollectionsSetBenchmarkInit(SqliteCollectionsSetBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_set_t:
-        return sc.Set[target_set_item_t](data=(s for s in target_set))
+        return sc.Set[target_set_item_t]((s for s in target_set))

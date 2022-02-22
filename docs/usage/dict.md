@@ -14,6 +14,7 @@ Constructor.
 
 ### Arguments:
 
+- `data`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`, optional, positional-only argument, defualt=`None`; Initial data.
 - `connection`: `str` or `sqlite3.Connection`, optional, default=`None`; If `None`, temporary file is automatically created. If `connection` is a `str`, it will be used as the sqlite3 database file name. You can pass a `sqlite3.Connection` directly.
 - `table_name`: `str`, optional, default=`None`; Table name of this container. If `None`, an auto-generated unique name will be used. Available characters are letters, numbers, and underscores (`_`).
 - `key_serializer`: `Callable[[KT], bytes]`, optional, default=`None`; Function to serialize key. If `None`, `pickle.dumps` is used.
@@ -22,7 +23,6 @@ Constructor.
 - `value_deserializer`: `Callable[[bytes], VT]`, optional, default=`None`; Function to deserialize value. If `None`, `key_deserializer` is used.
 - `persist`: `bool`, optional, default=`True`; If `True`, table won't be deleted even when the object is deleted. If `False`, the table is deleted when this object is deleted.
 - `rebuild_strategy`: `RebuildStrategy`, optional, default=`RebuildStrategy.CHECK_WITH_FIRST_ELEMENT`; Rebuild strategy.
-- `data`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`, optional, defualt=`None`; Initial data.
 
 ---
 

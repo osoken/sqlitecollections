@@ -484,4 +484,4 @@ class SqliteCollectionsListBenchmarkCreateWithInitialData(
     SqliteCollectionsListBenchmarkBase, BenchmarkCreateWithInitialDataBase
 ):
     def exec(self) -> Any:
-        return sc.List[target_list_element_t](data=iter(target_list))
+        return sc.List[target_list_element_t](iter(target_list))

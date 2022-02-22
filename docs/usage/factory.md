@@ -22,9 +22,9 @@ def encode(x: str) -> bytes:
 def decode(x: bytes) -> str:
     return x.decode("utf-8")
 
-l1 = sc.List[str](connection=conn, serializer=encode, deserializer=decode, data=["Alice", "Bob", "Carol"])
-l2 = sc.List[str](connection=conn, serializer=encode, deserializer=decode, data=["Dave"])
-l3 = sc.List[str](connection=conn, serializer=encode, deserializer=decode, data=["Erin"])
+l1 = sc.List[str](["Alice", "Bob", "Carol"], connection=conn, serializer=encode, deserializer=decode)
+l2 = sc.List[str](["Dave"], connection=conn, serializer=encode, deserializer=decode)
+l3 = sc.List[str](["Erin"], connection=conn, serializer=encode, deserializer=decode)
 ```
 
 With factory:

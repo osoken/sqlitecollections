@@ -76,7 +76,7 @@ We aim to implement containers that are as compatible as possible with the built
 ```python
 import sqlitecollections as sc
 
-x = sc.Dict(data={"a": []}) # create {"a": []}
+x = sc.Dict({"a": []}) # create {"a": []}
 x["a"].append("b")  # try to mutate the empty list
 print(x["a"])  # not ["b"] but []
 

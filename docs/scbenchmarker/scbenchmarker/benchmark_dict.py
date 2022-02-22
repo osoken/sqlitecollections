@@ -464,4 +464,4 @@ class BuiltinDictBenchmarkInit(BuiltinDictBenchmarkBase, BenchmarkInitBase):
 
 class SqliteCollectionsDictBenchmarkInit(SqliteCollectionsDictBenchmarkBase, BenchmarkInitBase):
     def exec(self) -> target_dict_t:
-        return sc.Dict[target_dict_key_t, target_dict_value_t](data=target_dict.items())
+        return sc.Dict[target_dict_key_t, target_dict_value_t](target_dict.items())
