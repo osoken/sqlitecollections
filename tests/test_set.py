@@ -1,6 +1,7 @@
 import pickle
 import sqlite3
 import sys
+import warnings
 from collections.abc import Hashable
 from typing import Any
 from unittest.mock import MagicMock, patch
@@ -79,13 +80,21 @@ class SetTestCase(SqlTestCase):
         def deserializer(x: bytes) -> str:
             return str(x)
 
-        sut = sc.Set[str](
-            connection=memory_db,
-            table_name="items",
-            serializer=serializer,
-            deserializer=deserializer,
-            rebuild_strategy=sc.RebuildStrategy.ALWAYS,
-        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = sc.Set[str](
+                connection=memory_db,
+                table_name="items",
+                serializer=serializer,
+                deserializer=deserializer,
+                rebuild_strategy=sc.RebuildStrategy.ALWAYS,
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
+            )
         self.assert_db_state_equals(
             memory_db,
             [
@@ -100,12 +109,56 @@ class SetTestCase(SqlTestCase):
             ],
         )
 
+    def test_init_with_initial_data_using_kwarg_data_is_warned(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = sc.Set[Hashable](
+                connection=memory_db,
+                table_name="items",
+                data=["a", "b", "a", "a", "aa", b"bb"],
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "data keyword argument is deprecated and will be removed in version 1.0.0",
+            )
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"),),
+                (sc.base.SqliteCollectionBase._default_serializer("b"),),
+                (sc.base.SqliteCollectionBase._default_serializer("aa"),),
+                (sc.base.SqliteCollectionBase._default_serializer(b"bb"),),
+            ],
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = sc.Set[Hashable](
+                connection=memory_db,
+                table_name="items",
+                data=["a"],
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "data keyword argument is deprecated and will be removed in version 1.0.0",
+            )
+        self.assert_db_state_equals(
+            memory_db,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"),),
+            ],
+        )
+
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         sut = sc.Set[Hashable](
+            ["a", "b", "a", "a", "aa", b"bb"],
             connection=memory_db,
             table_name="items",
-            data=["a", "b", "a", "a", "aa", b"bb"],
         )
         self.assert_db_state_equals(
             memory_db,
@@ -117,9 +170,9 @@ class SetTestCase(SqlTestCase):
             ],
         )
         sut = sc.Set[Hashable](
+            ["a"],
             connection=memory_db,
             table_name="items",
-            data=["a"],
         )
         self.assert_db_state_equals(
             memory_db,

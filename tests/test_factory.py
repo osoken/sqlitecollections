@@ -64,7 +64,7 @@ class SequenceFactoryBaseTestCase(TestCase):
         actual = sut.create(data)
         self.assertEqual(actual, expected)
         ConcreteFactory_get_container_class.return_value.assert_called_once_with(
-            data=data, connection=sut.connection, serializer=sut.serializer, deserializer=sut.deserializer
+            data, connection=sut.connection, serializer=sut.serializer, deserializer=sut.deserializer
         )
 
     @patch("sqlitecollections.factory.SequenceFactoryBase.create")
@@ -102,7 +102,7 @@ class SetFactoryTestCase(TestCase):
         actual = sut(["1", "2", "3"])
         self.assertEqual(actual, expected)
         Set.__getitem__.return_value.assert_called_once_with(
-            data=["1", "2", "3"], connection=conn, serializer=serializer, deserializer=deserializer
+            ["1", "2", "3"], connection=conn, serializer=serializer, deserializer=deserializer
         )
 
 
@@ -130,7 +130,7 @@ class ListFactoryTestCase(TestCase):
         actual = sut(["1", "2", "3"])
         self.assertEqual(actual, expected)
         List.__getitem__.return_value.assert_called_once_with(
-            data=["1", "2", "3"], connection=conn, serializer=serializer, deserializer=deserializer
+            ["1", "2", "3"], connection=conn, serializer=serializer, deserializer=deserializer
         )
 
 
@@ -181,7 +181,7 @@ class DictFactoryTestCase(TestCase):
         actual = sut(data)
         self.assertEqual(actual, expected)
         Dict.__getitem__.return_value.assert_called_once_with(
-            data=chain.return_value,
+            chain.return_value,
             connection=conn,
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
@@ -208,7 +208,7 @@ class DictFactoryTestCase(TestCase):
         actual = sut(a=1, b=2)
         self.assertEqual(actual, expected)
         Dict.__getitem__.return_value.assert_called_once_with(
-            data={"a": 1, "b": 2},
+            {"a": 1, "b": 2},
             connection=conn,
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,

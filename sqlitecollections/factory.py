@@ -53,7 +53,7 @@ class SequenceFactoryBase(FactoryBase[T]):
                 connection=self.connection, serializer=self.serializer, deserializer=self.deserializer
             )
         return self._get_container_class()(
-            data=__data, connection=self.connection, serializer=self.serializer, deserializer=self.deserializer
+            __data, connection=self.connection, serializer=self.serializer, deserializer=self.deserializer
         )
 
     def __call__(self, __data: Optional[Iterable[T]] = None) -> SqliteCollectionBase[T]:
@@ -124,7 +124,7 @@ class DictFactory(FactoryBase[KT], Generic[KT, VT]):
                     value_deserializer=self.value_deserializer,
                 )
             return self._get_container_class()(
-                data=kwargs,
+                kwargs,
                 connection=self.connection,
                 key_serializer=self.key_serializer,
                 key_deserializer=self.key_deserializer,
@@ -132,7 +132,7 @@ class DictFactory(FactoryBase[KT], Generic[KT, VT]):
                 value_deserializer=self.value_deserializer,
             )
         return self._get_container_class()(
-            data=chain(__data.items() if isinstance(__data, Mapping) else __data, kwargs.items()),
+            chain(__data.items() if isinstance(__data, Mapping) else __data, kwargs.items()),
             connection=self.connection,
             key_serializer=self.key_serializer,
             key_deserializer=self.key_deserializer,

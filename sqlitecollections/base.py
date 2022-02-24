@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+import warnings
 from abc import ABCMeta, abstractmethod
 from collections.abc import Hashable
 from enum import Enum
@@ -201,7 +202,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
-        rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
+        rebuild_strategy: Optional[RebuildStrategy] = None,
     ):
         super(SqliteCollectionBase, self).__init__()
         self._serializer = self._default_serializer if serializer is None else serializer
@@ -221,7 +222,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             self._driver_class.drop_table(self.table_name, self.container_type_name, cur)
             self.connection.commit()
 
-    def _initialize(self, rebuild_strategy: RebuildStrategy) -> None:
+    def _initialize(self, rebuild_strategy: Optional[RebuildStrategy] = None) -> None:
         cur = self.connection.cursor()
         self._driver_class.initialize_metadata_table(cur)
         self._driver_class.initialize_table(self.table_name, self.container_type_name, self.schema_version, cur)
@@ -229,11 +230,16 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             self._do_rebuild()
         self.connection.commit()
 
-    def _should_rebuild(self, rebuild_strategy: RebuildStrategy) -> bool:
+    def _should_rebuild(self, rebuild_strategy: Optional[RebuildStrategy] = None) -> bool:
+        if rebuild_strategy is None or rebuild_strategy == RebuildStrategy.SKIP:
+            return False
+        warnings.warn(
+            "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         if rebuild_strategy == RebuildStrategy.ALWAYS:
             return True
-        if rebuild_strategy == RebuildStrategy.SKIP:
-            return False
         return self._rebuild_check_with_first_element()
 
     @abstractmethod

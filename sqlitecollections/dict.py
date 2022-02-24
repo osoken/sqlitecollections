@@ -184,6 +184,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
 
     def __init__(
         self,
+        __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
         table_name: Optional[str] = None,
         key_serializer: Optional[Callable[[KT], bytes]] = None,
@@ -193,7 +194,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
         serializer: Optional[Callable[[VT], bytes]] = None,
         deserializer: Optional[Callable[[bytes], VT]] = None,
         persist: bool = True,
-        rebuild_strategy: RebuildStrategy = RebuildStrategy.CHECK_WITH_FIRST_ELEMENT,
+        rebuild_strategy: Optional[RebuildStrategy] = None,
         data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
     ) -> None:
         if serializer is not None:
@@ -232,9 +233,17 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             persist=persist,
             rebuild_strategy=rebuild_strategy,
         )
-        if data is not None:
+        if data is not None or __data is not None:
             self.clear()
-            self.update(data)
+            if data is not None:
+                warnings.warn(
+                    "data keyword argument is deprecated and will be removed in version 1.0.0",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                self.update(data)
+            if __data is not None:
+                self.update(__data)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:
@@ -347,6 +356,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
     ) -> "Dict[KT, VT]":
 
         return Dict[KT, VT](
+            (self if data is None else data),
             connection=self.connection,
             key_serializer=self.key_serializer,
             key_deserializer=self.key_deserializer,
@@ -354,7 +364,6 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             value_deserializer=self.value_deserializer,
             rebuild_strategy=RebuildStrategy.SKIP,
             persist=False,
-            data=(self if data is None else data),
         )
 
     def copy(self) -> "Dict[KT, VT]":
@@ -484,13 +493,13 @@ if sys.version_info >= (3, 9):
     class Dict(_ReversibleDict[KT, VT]):
         def __or__(self, other: Mapping[KT, VT]) -> "Dict[KT, VT]":
             tmp = Dict(
+                self,
                 connection=self.connection,
                 key_serializer=self.key_serializer,
                 key_deserializer=self.key_deserializer,
                 value_serializer=self.value_serializer,
                 value_deserializer=self.value_deserializer,
                 persist=self.persist,
-                data=self,
             )
             tmp |= other
             return tmp
@@ -524,20 +533,20 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
 
     def __and__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:  # type: ignore[override]
         return sc_Set[_KT_co](
+            (d for d in o if d in self._parent),
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
             deserializer=self._parent.key_deserializer,
             persist=False,
-            data=(d for d in o if d in self._parent),
         )
 
     def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         return sc_Set[_T](
+            (d for d in o if d in self._parent),
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
             deserializer=self._parent.key_deserializer,
             persist=False,
-            data=(d for d in o if d in self._parent),
         )
 
     def __contains__(self, o: object) -> bool:
@@ -553,11 +562,11 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
 
     def __or__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return sc_Set[Union[_KT_co, _T]](
+            itertools.chain(self._parent, o),
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
             deserializer=self._parent.key_deserializer,
             persist=False,
-            data=itertools.chain(self._parent, o),
         )
 
     def __ror__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
@@ -565,29 +574,29 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
 
     def __sub__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:  # type: ignore[override]
         return sc_Set[KT](
+            self._parent,
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
             deserializer=self._parent.key_deserializer,
             persist=False,
-            data=self._parent,
         ).difference(o)
 
     def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         return sc_Set[_T](
+            o,
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
             deserializer=self._parent.key_deserializer,
             persist=False,
-            data=o,
         ).difference(self._parent)
 
     def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return sc_Set[Union[KT, _T]](
+            self._parent,
             connection=self._parent.connection,
             serializer=self._parent.key_serializer,
             deserializer=self._parent.key_deserializer,
             persist=False,
-            data=self._parent,
         ).symmetric_difference(o)
 
     def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
@@ -634,18 +643,18 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
 
     def __and__(self, o: Iterable[Any]) -> sc_Set[Tuple[_KT_co, _VT_co]]:  # type: ignore[override]
         tmp = sc_Set[Tuple[_KT_co, _VT_co]](
+            iter(self),
             connection=self._parent.connection,
             serializer=self._item_serializer,
             deserializer=self._item_deserializer,
             persist=False,
-            data=iter(self),
         )
         return sc_Set[Tuple[_KT_co, _VT_co]](
+            (cast(Tuple[_KT_co, _VT_co], d) for d in o if d in tmp),
             connection=self._parent.connection,
             serializer=self._item_serializer,
             deserializer=self._item_deserializer,
             persist=False,
-            data=(cast(Tuple[_KT_co, _VT_co], d) for d in o if d in tmp),
         )
 
     def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
@@ -668,11 +677,11 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
 
     def __or__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         return sc_Set[Union[Tuple[_KT_co, _VT_co], _T]](
+            itertools.chain(self, o),
             connection=self._parent.connection,
             serializer=cast(Callable[[Union[Tuple[_KT_co, _VT_co], _T]], bytes], self._item_serializer),
             deserializer=cast(Callable[[bytes], Union[Tuple[_KT_co, _VT_co], _T]], self._item_deserializer),
             persist=False,
-            data=itertools.chain(self, o),
         )
 
     def __ror__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
@@ -680,36 +689,36 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
 
     def __sub__(self, o: Iterable[Any]) -> sc_Set[Tuple[_KT_co, _VT_co]]:  # type: ignore[override]
         tmp = sc_Set[Tuple[_KT_co, _VT_co]](
+            iter(self),
             connection=self._parent.connection,
             serializer=self._item_serializer,
             deserializer=self._item_deserializer,
             persist=False,
-            data=iter(self),
         )
         tmp.difference_update(o)
         return tmp
 
     def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         tmp = sc_Set[Tuple[_KT_co, _VT_co]](
+            iter(self),
             connection=self._parent.connection,
             serializer=self._item_serializer,
             deserializer=self._item_deserializer,
             persist=False,
-            data=iter(self),
         )
         return sc_Set[_T](
+            (d for d in o if d not in tmp),
             connection=self._parent.connection,
             persist=False,
-            data=(d for d in o if d not in tmp),
         )
 
     def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         tmp = sc_Set[Union[Tuple[_KT_co, _VT_co], _T]](
+            iter(self),
             connection=self._parent.connection,
             serializer=cast(Callable[[Union[Tuple[_KT_co, _VT_co], _T]], bytes], self._item_serializer),
             deserializer=cast(Callable[[bytes], Union[Tuple[_KT_co, _VT_co], _T]], self._item_deserializer),
             persist=False,
-            data=iter(self),
         )
         tmp.symmetric_difference_update(o)
         return tmp

@@ -147,20 +147,36 @@ class DictTestCase(DictAndViewTestCase):
         def deserializer(x: bytes) -> str:
             return str(x)
 
-        sut = sc.Dict[str, str](
-            connection=memory_db,
-            table_name="items",
-            key_serializer=serializer,
-            key_deserializer=deserializer,
-            value_serializer=serializer,
-            value_deserializer=deserializer,
-            rebuild_strategy=sc.RebuildStrategy.ALWAYS,
-        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = sc.Dict[str, str](
+                connection=memory_db,
+                table_name="items",
+                key_serializer=serializer,
+                key_deserializer=deserializer,
+                value_serializer=serializer,
+                value_deserializer=deserializer,
+                rebuild_strategy=sc.RebuildStrategy.ALWAYS,
+            )
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
+            )
         self.assert_dict_state_equals(memory_db, [(b"A", b"B", 0)])
 
-    def test_init_with_initial_data(self) -> None:
+    def test_init_with_initial_data_using_kwarg_data_is_warned(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("a", 1), ("b", 2)))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("a", 1), ("b", 2)))
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "data keyword argument is deprecated and will be removed in version 1.0.0",
+            )
         self.assert_dict_state_equals(
             memory_db,
             [
@@ -176,7 +192,50 @@ class DictTestCase(DictAndViewTestCase):
                 ),
             ],
         )
-        sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("c", 3), ("d", 4)))
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("c", 3), ("d", 4)))
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
+            self.assertEqual(
+                str(w[0].message),
+                "data keyword argument is deprecated and will be removed in version 1.0.0",
+            )
+        self.assert_dict_state_equals(
+            memory_db,
+            [
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(3),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("d"),
+                    sc.base.SqliteCollectionBase._default_serializer(4),
+                    1,
+                ),
+            ],
+        )
+
+    def test_init_with_initial_data(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        sut = sc.Dict[Hashable, Any]((("a", 1), ("b", 2)), connection=memory_db, table_name="items")
+        self.assert_dict_state_equals(
+            memory_db,
+            [
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(1),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    1,
+                ),
+            ],
+        )
+        sut = sc.Dict[Hashable, Any]((("c", 3), ("d", 4)), connection=memory_db, table_name="items")
         self.assert_dict_state_equals(
             memory_db,
             [

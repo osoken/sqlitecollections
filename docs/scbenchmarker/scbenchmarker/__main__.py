@@ -83,6 +83,7 @@ if __name__ == "__main__":
                 sqlitecollections_benchmark_class(timeout=args.timeout, debug=args.debug),
             )
             buf.append(comp().dict())
-            print(".")
+            print(".", end="")
         with open(os.path.join(output_dir, f"{container_type_str}.md"), "w") as fout:
             fout.write(template.render(data=buf))
+        print("")
