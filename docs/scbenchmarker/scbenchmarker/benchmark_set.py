@@ -53,7 +53,7 @@ class BuiltinSetBenchmarkBase:
 class SqliteCollectionsSetBenchmarkBase:
     def __init__(self, timeout: Optional[float] = None, debug: bool = False) -> None:
         super(SqliteCollectionsSetBenchmarkBase, self).__init__(timeout=timeout, debug=debug)
-        self._sut_orig = sc.Set[target_set_item_t](data=target_set)
+        self._sut_orig = sc.Set[target_set_item_t](target_set)
         self._sut: target_set_t
 
     @property
