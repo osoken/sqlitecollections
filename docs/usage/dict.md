@@ -172,7 +172,7 @@ Return a new view of the dictionary's keys.
 
 ### Return value:
 
-`KeysView`: View object of the dictionary's keys
+`KeysView[KT]`: View object of the dictionary's keys. 
 
 ---
 
@@ -285,5 +285,21 @@ Update the dictionary `d` with keys and values from `other`.
 ### Return value:
 
 `Dict[KT, VT]`: The dictionary object.
+
+===
+
+# KeysView
+
+`KeysView` is a view object which is returned by `dict.keys()`. It provides a dynamic view on the dictionary's keys, which means when dictionay changes, the view reflects these changes.
+
+---
+
+## `len(k)`
+
+Return the number of items in the dictionary `d: Dict[KT, VT]` where `k=d.keys()`.
+
+### Return value:
+
+`int`: The number of items in `d`
 
 ---
