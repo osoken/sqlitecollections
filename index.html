@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.1">
     
     
       
@@ -19,7 +19,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.50e68009.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.e8d9bf0c.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.e6a45f82.min.css">
@@ -530,8 +530,9 @@
 </a>
 
 
+
 <h1 id="overview">Overview</h1>
-<p>Documentation for version: <code>0.9.4</code></p>
+<p>Documentation for version: <code>0.9.5</code></p>
 <p><code>sqlitecollections</code> is a sort of containers that are backended by sqlite3 DB and are compatible with corresponding built-in collections. Since containers consume disk space instead of RAM, they can handle large amounts of data even in environments with limited RAM. Migrating from existing code using the built-in container is as simple as importing the library and changing the constructor.</p>
 <p>The elements of the container are automatically serialized and stored in the sqlite3 database, and are automatically read from the sqlite3 database and deserialized when accessed. Current version supports List (mutable sequence), Dict (mutable mapping) and Set (mutable set) and almost all methods are compatible with list, dict and set respectively.</p>
 <h2 id="installation">Installation</h2>
@@ -540,7 +541,7 @@
 <h2 id="example">Example</h2>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sqlitecollections</span> <span class="k">as</span> <span class="nn">sc</span>
 
-<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">])</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]([</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 <span class="c1">#&gt; Carol</span>
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
@@ -551,7 +552,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;Dave&quot;</span><span class="p">))</span>
 <span class="c1">#&gt; 3</span>
 
-<span class="n">d</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">](</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">})</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">})</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">])</span>
 <span class="c1">#&gt; Alice</span>
 <span class="n">d</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Carol&quot;</span>
@@ -560,7 +561,7 @@
 <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
 <span class="c1">#&gt; [&#39;Alice&#39;, &#39;Bob&#39;, &#39;Carol&#39;]</span>
 
-<span class="n">s</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">,</span> <span class="s2">&quot;Dave&quot;</span><span class="p">])</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]([</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">,</span> <span class="s2">&quot;Dave&quot;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ellen&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">)</span>
 <span class="c1">#&gt; False</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Alice&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">)</span>
@@ -572,7 +573,7 @@
 <p>If you want to reuse the container you created, you can create it by specifying the file path and table name of the sqlite3 database.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sqlitecollections</span> <span class="k">as</span> <span class="nn">sc</span>
 
-<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">](</span><span class="n">connection</span><span class="o">=</span><span class="s2">&quot;path/to/file.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;list_example&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">])</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]([</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Carol&quot;</span><span class="p">],</span> <span class="n">connection</span><span class="o">=</span><span class="s2">&quot;path/to/file.db&quot;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s2">&quot;list_example&quot;</span><span class="p">)</span>
 <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Dave&quot;</span><span class="p">)</span>
 <span class="n">exit</span><span class="p">()</span>
 </code></pre></div>
@@ -646,10 +647,10 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.092fa1f6.min.js"}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
     
     
-      <script src="assets/javascripts/bundle.5a9542cf.min.js"></script>
+      <script src="assets/javascripts/bundle.8aa65030.min.js"></script>
       
     
   </body>

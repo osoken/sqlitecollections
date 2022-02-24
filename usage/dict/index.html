@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.11">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.1">
     
     
       
@@ -19,7 +19,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.50e68009.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.e8d9bf0c.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.e6a45f82.min.css">
@@ -1458,6 +1458,7 @@
 </a>
 
 
+
 <h1 id="dict">Dict</h1>
 <p><code>Dict</code> is a container compatible with the built-in <code>dict</code>, which serializes keys and values and stores them in a sqlite3 database.
 It preserves insertion order for all supported python versions.</p>
@@ -1470,6 +1471,7 @@ It preserves insertion order for all supported python versions.</p>
 </ul>
 <h3 id="arguments">Arguments:</h3>
 <ul>
+<li><code>data</code>: <code>Mapping[KT, VT]</code> or <code>Iterable[Tuple[KT, VT]]</code>, optional, positional-only argument, defualt=<code>None</code>; Initial data.</li>
 <li><code>connection</code>: <code>str</code> or <code>sqlite3.Connection</code>, optional, default=<code>None</code>; If <code>None</code>, temporary file is automatically created. If <code>connection</code> is a <code>str</code>, it will be used as the sqlite3 database file name. You can pass a <code>sqlite3.Connection</code> directly.</li>
 <li><code>table_name</code>: <code>str</code>, optional, default=<code>None</code>; Table name of this container. If <code>None</code>, an auto-generated unique name will be used. Available characters are letters, numbers, and underscores (<code>_</code>).</li>
 <li><code>key_serializer</code>: <code>Callable[[KT], bytes]</code>, optional, default=<code>None</code>; Function to serialize key. If <code>None</code>, <code>pickle.dumps</code> is used.</li>
@@ -1478,7 +1480,6 @@ It preserves insertion order for all supported python versions.</p>
 <li><code>value_deserializer</code>: <code>Callable[[bytes], VT]</code>, optional, default=<code>None</code>; Function to deserialize value. If <code>None</code>, <code>key_deserializer</code> is used.</li>
 <li><code>persist</code>: <code>bool</code>, optional, default=<code>True</code>; If <code>True</code>, table won't be deleted even when the object is deleted. If <code>False</code>, the table is deleted when this object is deleted.</li>
 <li><code>rebuild_strategy</code>: <code>RebuildStrategy</code>, optional, default=<code>RebuildStrategy.CHECK_WITH_FIRST_ELEMENT</code>; Rebuild strategy.</li>
-<li><code>data</code>: <code>Mapping[KT, VT]</code> or <code>Iterable[Tuple[KT, VT]]</code>, optional, defualt=<code>None</code>; Initial data.</li>
 </ul>
 <hr />
 <h2 id="lend"><code>len(d)</code></h2>
@@ -1705,10 +1706,10 @@ The return value is volatile by default.</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.092fa1f6.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5a9542cf.min.js"></script>
+      <script src="../../assets/javascripts/bundle.8aa65030.min.js"></script>
       
     
   </body>
