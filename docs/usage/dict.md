@@ -294,12 +294,23 @@ Update the dictionary `d` with keys and values from `other`.
 
 ---
 
-## `len(k)`
+## `len(keysview)`
 
-Return the number of items in the dictionary `d: Dict[KT, VT]` where `k=d.keys()`.
+Return the number of items in the dictionary `d: Dict[KT, VT]` where `keysview=d.keys()`.
 
 ### Return value:
 
 `int`: The number of items in `d`
+
+---
+
+## `iter(keysview)`
+
+Return an iterator over the keys in the dictionary.
+The order of the keys is guaranteed to be inserted order.
+
+### Return value:
+
+`Iterator[_KT_co]`: The iterator over the keys in the dictonary.
 
 ---
