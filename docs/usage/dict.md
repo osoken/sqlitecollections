@@ -172,7 +172,7 @@ Return a new view of the dictionary's keys.
 
 ### Return value:
 
-`KeysView[KT]`: View object of the dictionary's keys. 
+`KeysView[KT]`: View object of the dictionary's keys.
 
 ---
 
@@ -312,5 +312,19 @@ The order of the keys is guaranteed to be inserted order.
 ### Return value:
 
 `Iterator[_KT_co]`: The iterator over the keys in the dictonary.
+
+---
+
+## `key in keysview`
+
+Return whether if `key` is in the dictionary.
+
+### Arguments:
+
+- `key`: `object`; An object to be checked
+
+### Return value:
+
+`bool`: `True` if `key` is in the dictionary and `False` otherwise.
 
 ---
