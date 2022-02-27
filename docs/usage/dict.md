@@ -328,3 +328,15 @@ Return whether if `key` is in the dictionary.
 `bool`: `True` if `key` is in the dictionary and `False` otherwise.
 
 ---
+
+## `reversed(keysview)`
+
+Return a reverse iterator over the keys of the dictionary.
+
+(provided only python version 3.8 and above)
+
+### Return value:
+
+`Iterator[_KT_co]`: The reverse iterator over the keys in the dictonary.
+
+---
