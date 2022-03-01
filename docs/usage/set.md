@@ -210,7 +210,7 @@ Return a new set with elements common to `s` and `other`.
 
 ### Return value:
 
-`Set[T]`: A new set with elements commont ot `s` and `other`.
+`Set[T]`: A new set with elements common to `s` and `other`.
 
 ---
 

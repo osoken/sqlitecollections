@@ -340,3 +340,17 @@ Return a reverse iterator over the keys of the dictionary.
 `Iterator[_KT_co]`: The reverse iterator over the keys in the dictonary.
 
 ---
+
+## `keysview & other`
+
+Return a set with elements common to `keysview` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[Any]`; Iterable to take the intersection.
+
+### Return value:
+
+`Set[_KT_co]`: A set with elements common to `keysview` and `other`.
+
+---
