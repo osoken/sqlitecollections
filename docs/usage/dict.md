@@ -354,3 +354,17 @@ Return a set with elements common to `keysview` and `other`.
 `Set[_KT_co]`: A set with elements common to `keysview` and `other`.
 
 ---
+
+## `other & keysview`
+
+Return a set with elements common to `keysview` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the intersection.
+
+### Return value:
+
+`Set[_T]`: A set with elements common to `keysview` and `other`.
+
+---
