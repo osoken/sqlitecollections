@@ -368,3 +368,17 @@ Return a set with elements common to `keysview` and `other`.
 `Set[_T]`: A set with elements common to `keysview` and `other`.
 
 ---
+
+## `keysview | other`
+
+Return a new set with elements from `keysview` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the union.
+
+### Return value:
+
+`Set[Union[_KT_co, _T]]`: A new set with elements from `keysview` and `other`.
+
+---
