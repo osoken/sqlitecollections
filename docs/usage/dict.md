@@ -382,3 +382,17 @@ Return a new set with elements from `keysview` and `other`.
 `Set[Union[_KT_co, _T]]`: A new set with elements from `keysview` and `other`.
 
 ---
+
+## `other | keysview`
+
+Return a new set with elements from `keysview` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the union.
+
+### Return value:
+
+`Set[Union[_KT_co, _T]]`: A new set with elements from `keysview` and `other`.
+
+---
