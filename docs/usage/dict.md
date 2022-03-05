@@ -396,3 +396,17 @@ Return a new set with elements from `keysview` and `other`.
 `Set[Union[_KT_co, _T]]`: A new set with elements from `keysview` and `other`.
 
 ---
+
+## `keysview - other`
+
+Return a new set with elements in the `keysview` that are not in the `other`.
+
+### Arguments:
+
+- `other`: `Iterable[Any]`; Iterable to take the difference.
+
+### Return value:
+
+`Set[_KT_co]`: A new set with elements in the set that are not in the `other`.
+
+---
