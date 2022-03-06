@@ -410,3 +410,17 @@ Return a new set with elements in the `keysview` that are not in the `other`.
 `Set[_KT_co]`: A new set with elements in the set that are not in the `other`.
 
 ---
+
+## `other - keysview`
+
+Return a new set with elements in the `other` that are not in the `keysview`.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to be taken the difference.
+
+### Return value:
+
+`Set[_T]`: A new set with elements
+
+---
