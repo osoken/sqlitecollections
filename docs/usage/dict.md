@@ -438,3 +438,17 @@ Return a new set with elements in either the `keysview` or `other` but not both.
 `Set[Union[_KT_co, _T]]`: A new set with elements in either the `keysview` or `other` but not both.
 
 ---
+
+## `other ^ keysview`
+
+Return a new set with elements in either the `keysview` or `other` but not both.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the symmetric difference.
+
+### Return value
+
+`Set[Union[_KT_co, _T]]`: A new set with elements in either the `keysview` or `other` but not both.
+
+---
