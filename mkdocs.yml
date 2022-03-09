@@ -36,6 +36,8 @@ nav:
   - Usage:
       - List: usage/list.md
       - Dict: usage/dict.md
+      - dictview:
+          - usage/dictview/keysview.md
       - Set: usage/set.md
       - factory: usage/factory.md
   - development.md
