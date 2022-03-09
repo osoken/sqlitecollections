@@ -172,7 +172,7 @@ Return a new view of the dictionary's keys.
 
 ### Return value:
 
-`KeysView`: View object of the dictionary's keys
+`KeysView[KT]`: View object of the dictionary's keys.
 
 ---
 
@@ -285,5 +285,3 @@ Update the dictionary `d` with keys and values from `other`.
 ### Return value:
 
 `Dict[KT, VT]`: The dictionary object.
-
----

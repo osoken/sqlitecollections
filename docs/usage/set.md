@@ -210,7 +210,7 @@ Return a new set with elements common to `s` and `other`.
 
 ### Return value:
 
-`Set[T]`: A new set with elements commont ot `s` and `other`.
+`Set[T]`: A new set with elements common to `s` and `other`.
 
 ---
 
@@ -252,7 +252,7 @@ Return a new set with elements in either the set or `other` but not both.
 
 ### Return value:
 
-`Set[T]`: A new set with elements in enther the set or `other` but not both.
+`Set[T]`: A new set with elements in either the set or `other` but not both.
 
 ---
 
@@ -266,7 +266,7 @@ Return a new set with elements in either the set or `other` but not both.
 
 ### Return value:
 
-`Set[T]`: A new set with elements in enther the set or `other` but not both.
+`Set[T]`: A new set with elements in either the set or `other` but not both.
 
 ---
 
