@@ -24,3 +24,17 @@ The order of the values is guaranteed to be inserted order.
 `Iterator[_VT_co]`: The iterator over the values in the dictionary.
 
 ---
+
+## `value in valuesview`
+
+Return whether if `value` is in the dictionary.
+
+### Arguments:
+
+- `value`: `object`; An object to be checked
+
+### Return value:
+
+`bool`: `True` if `value` is in the dictionary and `False` otherwise.
+
+---
