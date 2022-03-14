@@ -38,3 +38,15 @@ Return whether if `value` is in the dictionary.
 `bool`: `True` if `value` is in the dictionary and `False` otherwise.
 
 ---
+
+## `reversed(valuesview)`
+
+Return a reverse iterator over the values of the dictionary.
+
+(provided only python version 3.8 and above)
+
+### Return value:
+
+`Iterator[_VT_co]`: The reverse iterator over the values in the dictonary.
+
+---
