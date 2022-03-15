@@ -27,7 +27,7 @@ setup(
     project_urls={'Documentation': "https://osoken.github.io/sqlitecollections/"},
     install_requires=[],
     extras_require={
-        "dev": ["flake8", "pytest", "black", "mypy", "tox", "isort"],
+        "dev": ["flake8", "pytest", "black", "mypy==0.931", "tox", "isort"],
         "docs": ["mkdocs", "mkdocs-material", "mdx_include", "mkdocs-macros-plugin", "memory_profiler"],
     },
 )
