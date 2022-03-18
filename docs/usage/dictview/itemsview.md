@@ -13,3 +13,14 @@ Return the number of items in the dictionary `d: Dict[KT, VT]` where `itemsview=
 `int`: The number of items in `d`
 
 ---
+
+## `iter(itemsview)`
+
+Return an iterator over the (key, value) tuples in the dictionary.
+The order of the items is guaranteed to be inserted order.
+
+### Return value:
+
+`Iterable[Tuple[_KT_co, _VT_co]]`: The iterator over the keys in the dictionary.
+
+---
