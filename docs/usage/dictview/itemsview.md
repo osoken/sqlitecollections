@@ -24,3 +24,17 @@ The order of the items is guaranteed to be inserted order.
 `Iterable[Tuple[_KT_co, _VT_co]]`: The iterator over the keys in the dictionary.
 
 ---
+
+## `item in itemsview`
+
+Return whether if `item` is in the dictionary.
+
+### Arguments:
+
+- `item`: `object`; An object to be checked
+
+### Return value:
+
+`bool`: `True` if `item` is in the dictionary and `False` otherwise.
+
+---
