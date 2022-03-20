@@ -38,3 +38,15 @@ Return whether if `item` is in the dictionary.
 `bool`: `True` if `item` is in the dictionary and `False` otherwise.
 
 ---
+
+## `reversed(itemsview)`
+
+Return a reverse iterator over the (key, value) tuples of the dictionary.
+
+(provided only python version 3.8 and above)
+
+### Return value:
+
+`Iterator[Tuple[_KT_co, _VT_co]]`: The reverse iterator over the (key, value) tuples in the dictonary.
+
+---
