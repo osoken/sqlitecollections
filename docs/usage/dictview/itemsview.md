@@ -64,3 +64,17 @@ Return a set with elements common to `itemsview` and `other`.
 `Set[Tuple[_KT_co, _VT_co]]`: A set with elements common to `itemsview` and `other`.
 
 ---
+
+## `other & itemsview`
+
+Return a set with elements common to `itemsview` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the intersection.
+
+### Return value:
+
+`Set[_T]`: A set with elements common to `itemsview` and `other`.
+
+---
