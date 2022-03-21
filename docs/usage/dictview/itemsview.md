@@ -50,3 +50,17 @@ Return a reverse iterator over the (key, value) tuples of the dictionary.
 `Iterator[Tuple[_KT_co, _VT_co]]`: The reverse iterator over the (key, value) tuples in the dictonary.
 
 ---
+
+## `itemsview & other`
+
+Return a set with elements common to `itemsview` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[Any]`; Iterable to take the intersection.
+
+### Return value:
+
+`Set[Tuple[_KT_co, _VT_co]]`: A set with elements common to `itemsview` and `other`.
+
+---
