@@ -78,3 +78,17 @@ Return a set with elements common to `itemsview` and `other`.
 `Set[_T]`: A set with elements common to `itemsview` and `other`.
 
 ---
+
+## `itemsview | other`
+
+Return a new set with elements from `itemsview` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the union.
+
+### Return value:
+
+`Set[Union[Tuple[_KT_co, _VT_co], _T]]`: A new set with elements from `itemsview` and `other`.
+
+---
