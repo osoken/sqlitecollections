@@ -92,3 +92,17 @@ Return a new set with elements from `itemsview` and `other`.
 `Set[Union[Tuple[_KT_co, _VT_co], _T]]`: A new set with elements from `itemsview` and `other`.
 
 ---
+
+## `other | itemsview`
+
+Return a new set with elements from `itemsview` and `other`.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the union.
+
+### Return value:
+
+`Set[Union[Tuple[_KT_co, _VT_co], _T]]`: A new set with elements from `itemsview` and `other`.
+
+---
