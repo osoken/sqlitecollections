@@ -106,3 +106,17 @@ Return a new set with elements from `itemsview` and `other`.
 `Set[Union[Tuple[_KT_co, _VT_co], _T]]`: A new set with elements from `itemsview` and `other`.
 
 ---
+
+## `itemsview - other`
+
+Return a new set with elements in the `itemsview` that are not in the `other`.
+
+### Arguments:
+
+- `other`: `Iterable[Any]`; Iterable to take the difference.
+
+### Return value:
+
+`Set[Tuple[_KT_co, _VT_co]]`: A new set with elements in the set that are not in the `other`.
+
+---
