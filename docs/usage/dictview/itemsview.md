@@ -120,3 +120,17 @@ Return a new set with elements in the `itemsview` that are not in the `other`.
 `Set[Tuple[_KT_co, _VT_co]]`: A new set with elements in the set that are not in the `other`.
 
 ---
+
+## `other - itemsview`
+
+Return a new set with elements in the `other` that are not in the `itemsview`.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the difference.
+
+### Return value:
+
+`Set[_T]`: A new set with elements in the `other` that are not in the `itemsview`.
+
+---
