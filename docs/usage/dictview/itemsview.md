@@ -134,3 +134,15 @@ Return a new set with elements in the `other` that are not in the `itemsview`.
 `Set[_T]`: A new set with elements in the `other` that are not in the `itemsview`.
 
 ---
+
+## `itemsview ^ other`
+
+Return a new set with elements in either the `itemsview` or `other` but not both.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the symmetric difference.
+
+### Return value
+
+`Set[Union[Tuple[_KT_co, _VT_co], _T]]`: A new set with elements in either the `itemsview` or `other` but not both.
