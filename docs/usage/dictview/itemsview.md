@@ -146,3 +146,19 @@ Return a new set with elements in either the `itemsview` or `other` but not both
 ### Return value
 
 `Set[Union[Tuple[_KT_co, _VT_co], _T]]`: A new set with elements in either the `itemsview` or `other` but not both.
+
+---
+
+## `other ^ itemsview`
+
+Return a new set with elements in either the `itemsview` or `other` but not both.
+
+### Arguments:
+
+- `other`: `Iterable[_T]`; Iterable to take the symmetric difference.
+
+### Return value
+
+`Set[Union[Tuple[_KT_co, _VT_co], _T]]`: A new set with elements in either the `itemsview` or `other` but not both.
+
+---
