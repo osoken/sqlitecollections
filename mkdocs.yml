@@ -39,6 +39,7 @@ nav:
       - dictview:
           - usage/dictview/keysview.md
           - usage/dictview/valuesview.md
+          - usage/dictview/itemsview.md
       - Set: usage/set.md
       - factory: usage/factory.md
   - development.md
