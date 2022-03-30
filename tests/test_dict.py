@@ -2,6 +2,7 @@ import sqlite3
 import sys
 import warnings
 from collections.abc import Hashable
+from types import MappingProxyType
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -1205,6 +1206,22 @@ class KeysViewTestCase(DictAndViewTestCase):
         )
         del actual2
         self.assert_items_table_only(memory_db)
+
+    def test_mapping(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/keysview_mapping.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        if sys.version_info < (3, 10):
+            with self.assertRaisesRegex(AttributeError, "'KeysView' object has no attribute 'mapping'"):
+                _ = sut.mapping  # type: ignore
+        else:
+            actual = sut.mapping
+            self.assertIsInstance(actual, MappingProxyType)
+            self.assertEqual(len(actual), 3)
+            self.assertEqual(actual["a"], 1)
+            self.assertEqual(actual["b"], 2)
+            self.assertEqual(actual["c"], 3)
 
 
 class ValuesViewTestCase(DictAndViewTestCase):
