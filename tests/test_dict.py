@@ -11,9 +11,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
 
-from test_base import SqlTestCase
-
 import sqlitecollections as sc
+
+from test_base import SqlTestCase
 
 
 class DictAndViewTestCase(SqlTestCase):
@@ -1216,7 +1216,7 @@ class KeysViewTestCase(DictAndViewTestCase):
             with self.assertRaisesRegex(AttributeError, "'KeysView' object has no attribute 'mapping'"):
                 _ = sut.mapping  # type: ignore
         else:
-            actual = sut.mapping
+            actual = sut.mapping  # type: ignore
             self.assertIsInstance(actual, MappingProxyType)
             self.assertEqual(len(actual), 3)
             self.assertEqual(actual["a"], 1)

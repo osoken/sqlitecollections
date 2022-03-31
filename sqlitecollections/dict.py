@@ -37,9 +37,12 @@ if sys.version_info >= (3, 9):
     from collections.abc import KeysView as KeysViewType
     from collections.abc import ValuesView as ValuesViewType
 else:
+    from typing import ItemsView as ItemsViewType
     from typing import KeysView as KeysViewType
     from typing import ValuesView as ValuesViewType
-    from typing import ItemsView as ItemsViewType
+
+if sys.version_info > (3, 10):
+    from types import MappingProxyType
 
 from . import RebuildStrategy
 from .base import (
@@ -601,6 +604,12 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
 
     def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return self.__xor__(o)
+
+    if sys.version_info > (3, 10):
+
+        @property
+        def mapping(self) -> MappingProxyType:
+            return MappingProxyType(self._parent)
 
 
 class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
