@@ -11,9 +11,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import ItemsView, KeysView, ValuesView, Iterator, Callable
 
-import sqlitecollections as sc
-
 from test_base import SqlTestCase
+
+import sqlitecollections as sc
 
 
 class DictAndViewTestCase(SqlTestCase):
@@ -1290,6 +1290,22 @@ class ValuesViewTestCase(DictAndViewTestCase):
             self.assertIsInstance(actual, Iterator)
             expected = [2, 4]
             self.assertEqual(list(actual), expected)
+
+    def test_mapping(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/valuesview_mapping.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+        if sys.version_info < (3, 10):
+            with self.assertRaisesRegex(AttributeError, "'ValuesView' object has no attribute 'mapping'"):
+                _ = sut.mapping  # type: ignore
+        else:
+            actual = sut.mapping  # type: ignore
+            self.assertIsInstance(actual, MappingProxyType)
+            self.assertEqual(len(actual), 3)
+            self.assertEqual(actual["a"], 1)
+            self.assertEqual(actual["b"], 2)
+            self.assertEqual(actual["c"], 3)
 
 
 class ItemsViewTestCase(DictAndViewTestCase):

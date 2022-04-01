@@ -634,6 +634,12 @@ class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
             for sv in self._parent._driver_class.get_reversed_serialized_values(self._parent.table_name, cur):
                 yield self._parent.deserialize_value(sv)
 
+    if sys.version_info > (3, 10):
+
+        @property
+        def mapping(self) -> MappingProxyType:
+            return MappingProxyType(self._parent)
+
 
 class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
     def _item_serializer(self, o: Tuple[_KT_co, _VT_co]) -> bytes:
