@@ -37,9 +37,12 @@ if sys.version_info >= (3, 9):
     from collections.abc import KeysView as KeysViewType
     from collections.abc import ValuesView as ValuesViewType
 else:
+    from typing import ItemsView as ItemsViewType
     from typing import KeysView as KeysViewType
     from typing import ValuesView as ValuesViewType
-    from typing import ItemsView as ItemsViewType
+
+if sys.version_info > (3, 10):
+    from types import MappingProxyType
 
 from . import RebuildStrategy
 from .base import (
@@ -525,6 +528,12 @@ class MappingView(Sized):
 
     def __len__(self) -> int:
         return len(self._parent)
+
+    if sys.version_info > (3, 10):
+
+        @property
+        def mapping(self) -> MappingProxyType:
+            return MappingProxyType(self._parent)
 
 
 class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
