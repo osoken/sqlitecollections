@@ -1809,3 +1809,19 @@ class ItemsViewTestCase(DictAndViewTestCase):
         sut = parent.items()
         with self.assertRaisesRegex(TypeError, r"unhashable type: '[a-zA-Z0-9_]+'"):
             _ = iter(tuple(("a", 1))) ^ sut
+
+    def test_mapping(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_mapping.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        if sys.version_info < (3, 10):
+            with self.assertRaisesRegex(AttributeError, "'ItemsView' object has no attribute 'mapping'"):
+                _ = sut.mapping  # type: ignore
+        else:
+            actual = sut.mapping  # type: ignore
+            self.assertIsInstance(actual, MappingProxyType)
+            self.assertEqual(len(actual), 3)
+            self.assertEqual(actual["a"], 1)
+            self.assertEqual(actual["b"], 2)
+            self.assertEqual(actual["c"], 3)

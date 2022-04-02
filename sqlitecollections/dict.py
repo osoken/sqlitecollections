@@ -529,6 +529,12 @@ class MappingView(Sized):
     def __len__(self) -> int:
         return len(self._parent)
 
+    if sys.version_info > (3, 10):
+
+        @property
+        def mapping(self) -> MappingProxyType:
+            return MappingProxyType(self._parent)
+
 
 class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
     def __init__(self, mapping: Dict[_KT_co, Any]):
@@ -605,12 +611,6 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
     def __rxor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return self.__xor__(o)
 
-    if sys.version_info > (3, 10):
-
-        @property
-        def mapping(self) -> MappingProxyType:
-            return MappingProxyType(self._parent)
-
 
 class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
     def __init__(self, mapping: Dict[Any, _VT_co]):
@@ -633,12 +633,6 @@ class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
             cur = self._parent.connection.cursor()
             for sv in self._parent._driver_class.get_reversed_serialized_values(self._parent.table_name, cur):
                 yield self._parent.deserialize_value(sv)
-
-    if sys.version_info > (3, 10):
-
-        @property
-        def mapping(self) -> MappingProxyType:
-            return MappingProxyType(self._parent)
 
 
 class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
