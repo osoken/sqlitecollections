@@ -50,3 +50,15 @@ Return a reverse iterator over the values of the dictionary.
 `Iterator[_VT_co]`: The reverse iterator over the values in the dictonary.
 
 ---
+
+## `valuesview.mapping`
+
+Return a `MappingProxyType` that wraps the original dictionary to which the view refers.
+
+(provided only python version 3.10 and above)
+
+### Return value
+
+`MappingProxyType`: A read-only proxy of the original dictionary.
+
+---

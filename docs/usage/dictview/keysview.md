@@ -162,3 +162,15 @@ Return a new set with elements in either the `keysview` or `other` but not both.
 `Set[Union[_KT_co, _T]]`: A new set with elements in either the `keysview` or `other` but not both.
 
 ---
+
+## `keysview.mapping`
+
+Return a `MappingProxyType` that wraps the original dictionary to which the view refers.
+
+(provided only python version 3.10 and above)
+
+### Return value
+
+`MappingProxyType`: A read-only proxy of the original dictionary.
+
+---
