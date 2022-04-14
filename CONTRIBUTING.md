@@ -19,6 +19,8 @@ Feature request template is intended to be used as a template for requests for m
 
 ### Make Changes
 
-### Testing and Linting
+1. Fork the repository
+2. Setup the development environment locally. See [our development guide](https://osoken.github.io/sqlitecollections/development/) for more details.
+3. Create a working branch and start with your changes.
 
 ### Pull Request
