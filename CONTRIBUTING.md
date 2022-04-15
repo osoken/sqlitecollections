@@ -7,9 +7,7 @@ Thank you for investing your time in contributing to our project!
 If you want to know what features are implemented in this package, please refer to the documentation under `docs/usage`.
 See `docs/development.md` to setup the development environment, testing, and lint.
 
-### Issues
-
-#### Create a new issue
+## Create a new issue
 
 If there is a problem with the package, search to see if the issue already exists.
 If no related issue exists, you can open a new issue using one of the issue templates.
@@ -17,10 +15,16 @@ If no related issue exists, you can open a new issue using one of the issue temp
 This package is intended to be as compatible as possible with the built-in containers, so different behavior or missing attributes or member functions are bugs.
 Feature request template is intended to be used as a template for requests for make the package more useful.
 
-### Make Changes
+## Make Changes
 
 1. Fork the repository
 2. Setup the development environment locally. See [our development guide](https://osoken.github.io/sqlitecollections/development/) for more details.
 3. Create a working branch and start with your changes.
 
-### Pull Request
+## Commit your update
+
+Commit your code changes when you are satisfied with them.
+Although there are no explicit conventions for commit messages in our project,
+it is more appreciated if they are written according to the following format: `<type>(<scope>): <short summary>` (See ["Commit Message Header" in "Contributing to Angular"](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#commit-message-header) for possible `<type>` options)
+
+## Pull Request
