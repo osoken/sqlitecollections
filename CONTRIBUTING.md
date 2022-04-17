@@ -29,9 +29,11 @@ it is more appreciated if they are written according to the following format: `<
 
 ## Pull Request
 
-When you have finished coding and have verified that the tests and lint pass, it's time to make a pull request.
+When you have finished coding and have verified that the tests and lint pass, it's time to make a pull request (PR).
 
-- Fill the pull request template which will helps reviewers understand your changes.
+- Fill the PR template which will helps reviewers understand your changes.
 - Don't forget to [link PR to issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue).
 - Enable the checkbox to allow maintainer edits so the branch can be updated for a merge. We may ask questions or request for additional information.
 - As you update your PR and apply changes, mark each conversation as resolved.
+
+After the review is complete, your PR will be merged to the repository and we will thank you :)
