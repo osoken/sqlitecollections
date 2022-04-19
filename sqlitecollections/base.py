@@ -27,12 +27,6 @@ _T = TypeVar("_T")
 _S = TypeVar("_S")
 
 
-class RebuildStrategy(Enum):
-    CHECK_WITH_FIRST_ELEMENT = 1
-    ALWAYS = 2
-    SKIP = 3
-
-
 def sanitize_table_name(table_name: str, prefix: str) -> str:
     ret = "".join(c for c in table_name if c.isalnum() or c == "_")
     if len(ret) == 0:
@@ -202,7 +196,6 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
-        rebuild_strategy: Optional[RebuildStrategy] = None,
     ):
         super(SqliteCollectionBase, self).__init__()
         self._serializer = self._default_serializer if serializer is None else serializer
@@ -214,7 +207,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             if table_name is None
             else sanitize_table_name(table_name, self.container_type_name)
         )
-        self._initialize(rebuild_strategy=rebuild_strategy)
+        self._initialize()
 
     def __del__(self) -> None:
         if not self.persist:
@@ -222,33 +215,11 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             self._driver_class.drop_table(self.table_name, self.container_type_name, cur)
             self.connection.commit()
 
-    def _initialize(self, rebuild_strategy: Optional[RebuildStrategy] = None) -> None:
+    def _initialize(self) -> None:
         cur = self.connection.cursor()
         self._driver_class.initialize_metadata_table(cur)
         self._driver_class.initialize_table(self.table_name, self.container_type_name, self.schema_version, cur)
-        if self._should_rebuild(rebuild_strategy):
-            self._do_rebuild()
         self.connection.commit()
-
-    def _should_rebuild(self, rebuild_strategy: Optional[RebuildStrategy] = None) -> bool:
-        if rebuild_strategy is None or rebuild_strategy == RebuildStrategy.SKIP:
-            return False
-        warnings.warn(
-            "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        if rebuild_strategy == RebuildStrategy.ALWAYS:
-            return True
-        return self._rebuild_check_with_first_element()
-
-    @abstractmethod
-    def _rebuild_check_with_first_element(self) -> bool:
-        ...
-
-    @abstractmethod
-    def _do_rebuild(self) -> None:
-        ...
 
     @property
     def persist(self) -> bool:

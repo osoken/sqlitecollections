@@ -43,14 +43,12 @@ class SetTestCase(SqlTestCase):
         serializer = MagicMock(spec=Callable[[Hashable], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Hashable])
         persist = False
-        rebuild_strategy = sc.RebuildStrategy.SKIP
         sut = sc.Set[Hashable](
             connection=memory_db,
             table_name=table_name,
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
-            rebuild_strategy=rebuild_strategy,
         )
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
@@ -58,7 +56,6 @@ class SetTestCase(SqlTestCase):
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
-            rebuild_strategy=rebuild_strategy,
         )
 
     def test_initialize(self) -> None:
@@ -68,45 +65,6 @@ class SetTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db,
             [],
-        )
-
-    def test_rebuild(self) -> None:
-        memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "set/base.sql", "set/rebuild.sql")
-
-        def serializer(x: str) -> bytes:
-            return x.upper().encode("utf-8")
-
-        def deserializer(x: bytes) -> str:
-            return str(x)
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.Set[str](
-                connection=memory_db,
-                table_name="items",
-                serializer=serializer,
-                deserializer=deserializer,
-                rebuild_strategy=sc.RebuildStrategy.ALWAYS,
-            )
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
-            )
-        self.assert_db_state_equals(
-            memory_db,
-            [
-                (b"A",),
-                (b"B",),
-                (b"C",),
-                (b"D",),
-                (b"E",),
-                (b"F",),
-                (b"G",),
-                (b"H",),
-            ],
         )
 
     def test_init_with_initial_data_using_kwarg_data_is_warned(self) -> None:

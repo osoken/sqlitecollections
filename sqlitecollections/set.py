@@ -9,7 +9,6 @@ if sys.version_info >= (3, 9):
 else:
     from typing import Iterable, Iterator, MutableSet, Callable
 
-from . import RebuildStrategy
 from .base import (
     _S,
     _T,
@@ -141,7 +140,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
-        rebuild_strategy: Optional[RebuildStrategy] = None,
         data: Optional[Iterable[T]] = None,
     ) -> None:
         super(Set, self).__init__(
@@ -150,7 +148,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
-            rebuild_strategy=rebuild_strategy,
         )
         if data is not None or __data is not None:
             self.clear()
@@ -177,33 +174,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def __len__(self) -> int:
         cur = self.connection.cursor()
         return self._driver_class.get_count(self.table_name, cur)
-
-    def _do_rebuild(self) -> None:
-        cur = self.connection.cursor()
-        backup_table_name = f'bk_{self.container_type_name}_{str(uuid4()).replace("-", "")}'
-        cur.execute(f"CREATE TABLE {backup_table_name} AS SELECT * FROM {self.table_name}")
-        cur.execute(f"DELETE FROM {self.table_name}")
-        iter_old_records = self.connection.cursor()
-        iter_old_records.execute(f"SELECT serialized_value FROM {backup_table_name}")
-        delete_old_records = self.connection.cursor()
-        insert_new_records = self.connection.cursor()
-        for d in iter_old_records:
-            insert_new_records.execute(
-                f"INSERT INTO {self.table_name} (serialized_value) VALUES (?)",
-                (self.serialize(self.deserialize(d[0])),),
-            )
-            delete_old_records.execute(f"DELETE FROM {backup_table_name} WHERE serialized_value = ?", d)
-        cur.execute(f"DROP TABLE {backup_table_name}")
-
-    def _rebuild_check_with_first_element(self) -> bool:
-        cur = self.connection.cursor()
-        cur.execute(f"SELECT serialized_value FROM {self.table_name} LIMIT 1")
-        res = cur.fetchone()
-        if res is None:
-            return False
-        serialized_value = cast(bytes, res[0])
-        value = self.deserialize(serialized_value)
-        return serialized_value != self.serialize(value)
 
     def serialize(self, value: T) -> bytes:
         if not is_hashable(value):
@@ -335,7 +305,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             connection=self.connection,
             serializer=self.serializer,
             deserializer=self.deserializer,
-            rebuild_strategy=RebuildStrategy.SKIP,
             persist=False,
         )
 
