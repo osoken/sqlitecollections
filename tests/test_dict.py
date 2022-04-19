@@ -34,12 +34,10 @@ class DictTestCase(DictAndViewTestCase):
 
     @patch("sqlitecollections.Dict.table_name", return_value="items")
     @patch("sqlitecollections.Dict._initialize", return_value=None)
-    @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
     def test_serializer_argument_is_deprecated(
         self,
         SqliteCollectionBase_del: MagicMock,
-        SqliteCollectionBase_init: MagicMock,
         _initialize: MagicMock,
         _table_name: MagicMock,
     ) -> None:
@@ -57,12 +55,10 @@ class DictTestCase(DictAndViewTestCase):
 
     @patch("sqlitecollections.Dict.table_name", return_value="items")
     @patch("sqlitecollections.Dict._initialize", return_value=None)
-    @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
     def test_deserializer_argument_is_deprecated(
         self,
         SqliteCollectionBase_del: MagicMock,
-        SqliteCollectionBase_init: MagicMock,
         _initialize: MagicMock,
         _table_name: MagicMock,
     ) -> None:

@@ -198,6 +198,13 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
         persist: bool = True,
         data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
     ) -> None:
+        super(_Dict, self).__init__(
+            connection=connection,
+            table_name=table_name,
+            serializer=key_serializer,
+            deserializer=key_deserializer,
+            persist=persist,
+        )
         if serializer is not None:
             warnings.warn(
                 "serializer argument is deprecated. use key_serializer or value_serializer instead",
@@ -209,7 +216,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             if value_serializer is not None
             else serializer
             if serializer is not None
-            else cast(Callable[[VT], bytes], self._default_serializer if key_serializer is None else key_serializer)
+            else cast(Callable[[VT], bytes], self.key_serializer)
         )
         if deserializer is not None:
             warnings.warn(
@@ -222,16 +229,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             if value_deserializer is not None
             else deserializer
             if deserializer is not None
-            else cast(
-                Callable[[bytes], VT], self._default_deserializer if key_deserializer is None else key_deserializer
-            )
-        )
-        super(_Dict, self).__init__(
-            connection=connection,
-            table_name=table_name,
-            serializer=key_serializer,
-            deserializer=key_deserializer,
-            persist=persist,
+            else cast(Callable[[bytes], VT], self.key_deserializer)
         )
         if data is not None or __data is not None:
             self.clear()
