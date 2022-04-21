@@ -43,14 +43,12 @@ class ListTestCase(SqlTestCase):
         serializer = MagicMock(spec=Callable[[Any], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Any])
         persist = False
-        rebuild_strategy = sc.RebuildStrategy.SKIP
         sut = sc.List[Any](
             connection=memory_db,
             table_name=table_name,
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
-            rebuild_strategy=rebuild_strategy,
         )
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
@@ -58,7 +56,6 @@ class ListTestCase(SqlTestCase):
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
-            rebuild_strategy=rebuild_strategy,
         )
 
     def test_initialize(self) -> None:
@@ -101,45 +98,6 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(memory_db, [(sc.base.SqliteCollectionBase._default_serializer(0), 0)])
         sut = sc.List[Any]([1], connection=memory_db, table_name="items")
         self.assert_db_state_equals(memory_db, [(sc.base.SqliteCollectionBase._default_serializer(1), 0)])
-
-    def test_rebuild(self) -> None:
-        memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "list/base.sql", "list/rebuild.sql")
-
-        def serializer(x: str) -> bytes:
-            return x.upper().encode("utf-8")
-
-        def deserializer(x: bytes) -> str:
-            return str(x)
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.List[str](
-                connection=memory_db,
-                table_name="items",
-                serializer=serializer,
-                deserializer=deserializer,
-                rebuild_strategy=sc.RebuildStrategy.ALWAYS,
-            )
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
-            )
-        self.assert_db_state_equals(
-            memory_db,
-            [
-                (b"A", 0),
-                (b"B", 1),
-                (b"C", 2),
-                (b"D", 3),
-                (b"E", 4),
-                (b"F", 5),
-                (b"G", 6),
-                (b"H", 7),
-            ],
-        )
 
     def test_getitem_int(self) -> None:
         memory_db = sqlite3.connect(":memory:")

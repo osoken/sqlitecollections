@@ -9,7 +9,6 @@ if sys.version_info >= (3, 9):
 else:
     from typing import Callable, Iterable, MutableSequence, Iterator
 
-from . import RebuildStrategy
 from .base import SqliteCollectionBase, T, _SqliteCollectionBaseDatabaseDriver
 
 
@@ -214,7 +213,6 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
-        rebuild_strategy: Optional[RebuildStrategy] = None,
         data: Optional[Iterable[T]] = None,
     ) -> None:
         super(List, self).__init__(
@@ -223,7 +221,6 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
-            rebuild_strategy=rebuild_strategy,
         )
         if data is not None or __data is not None:
             self.clear()
@@ -236,33 +233,6 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
                 self.extend(data)
             if __data is not None:
                 self.extend(__data)
-
-    def _do_rebuild(self) -> None:
-        cur = self.connection.cursor()
-        last_index = -1
-        while last_index is not None:
-            cur.execute(
-                f"SELECT serialized_value, item_index FROM {self.table_name} WHERE item_index > ? ORDER BY item_index LIMIT 1",
-                (last_index,),
-            )
-            res = cur.fetchone()
-            if res is None:
-                break
-            cur.execute(
-                f"UPDATE {self.table_name} SET serialized_value=? WHERE item_index=?",
-                (self.serialize(self.deserialize(res[0])), res[1]),
-            )
-            last_index = res[1]
-
-    def _rebuild_check_with_first_element(self) -> bool:
-        cur = self.connection.cursor()
-        cur.execute(f"SELECT serialized_value FROM {self.table_name} ORDER BY item_index LIMIT 1")
-        res = cur.fetchone()
-        if res is None:
-            return False
-        serialized_value = cast(bytes, res[0])
-        value = self.deserialize(serialized_value)
-        return serialized_value != self.serialize(value)
 
     @property
     def schema_version(self) -> str:
@@ -322,7 +292,6 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             connection=self.connection,
             serializer=self.serializer,
             deserializer=self.deserializer,
-            rebuild_strategy=RebuildStrategy.SKIP,
             persist=False,
         )
 

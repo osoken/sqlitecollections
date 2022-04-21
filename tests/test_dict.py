@@ -34,12 +34,10 @@ class DictTestCase(DictAndViewTestCase):
 
     @patch("sqlitecollections.Dict.table_name", return_value="items")
     @patch("sqlitecollections.Dict._initialize", return_value=None)
-    @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
     def test_serializer_argument_is_deprecated(
         self,
         SqliteCollectionBase_del: MagicMock,
-        SqliteCollectionBase_init: MagicMock,
         _initialize: MagicMock,
         _table_name: MagicMock,
     ) -> None:
@@ -57,12 +55,10 @@ class DictTestCase(DictAndViewTestCase):
 
     @patch("sqlitecollections.Dict.table_name", return_value="items")
     @patch("sqlitecollections.Dict._initialize", return_value=None)
-    @patch("sqlitecollections.base.SqliteCollectionBase.__init__", return_value=None)
     @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
     def test_deserializer_argument_is_deprecated(
         self,
         SqliteCollectionBase_del: MagicMock,
-        SqliteCollectionBase_init: MagicMock,
         _initialize: MagicMock,
         _table_name: MagicMock,
     ) -> None:
@@ -97,7 +93,6 @@ class DictTestCase(DictAndViewTestCase):
         key_serializer = MagicMock(spec=Callable[[Hashable], bytes])
         key_deserializer = MagicMock(spec=Callable[[bytes], Hashable])
         persist = False
-        rebuild_strategy = sc.RebuildStrategy.SKIP
         sut = sc.Dict[Hashable, Any](
             connection=memory_db,
             table_name=table_name,
@@ -106,7 +101,6 @@ class DictTestCase(DictAndViewTestCase):
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
             persist=persist,
-            rebuild_strategy=rebuild_strategy,
         )
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
@@ -114,7 +108,6 @@ class DictTestCase(DictAndViewTestCase):
             serializer=key_serializer,
             deserializer=key_deserializer,
             persist=persist,
-            rebuild_strategy=rebuild_strategy,
         )
         self.assertEqual(sut.value_serializer, value_serializer)
         self.assertEqual(sut.value_deserializer, value_deserializer)
@@ -137,35 +130,6 @@ class DictTestCase(DictAndViewTestCase):
             memory_db,
             [],
         )
-
-    def test_rebuild(self) -> None:
-        memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "dict/base.sql", "dict/rebuild.sql")
-
-        def serializer(x: str) -> bytes:
-            return x.upper().encode("utf-8")
-
-        def deserializer(x: bytes) -> str:
-            return str(x)
-
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.Dict[str, str](
-                connection=memory_db,
-                table_name="items",
-                key_serializer=serializer,
-                key_deserializer=deserializer,
-                value_serializer=serializer,
-                value_deserializer=deserializer,
-                rebuild_strategy=sc.RebuildStrategy.ALWAYS,
-            )
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "rebuild_strategy argument and rebuilding DB feature are deprecated and will be removed in version 1.0.0",
-            )
-        self.assert_dict_state_equals(memory_db, [(b"A", b"B", 0)])
 
     def test_init_with_initial_data_using_kwarg_data_is_warned(self) -> None:
         memory_db = sqlite3.connect(":memory:")

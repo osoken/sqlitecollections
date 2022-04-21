@@ -22,7 +22,6 @@ Constructor.
 - `value_serializer`: `Callable[[VT], bytes]`, optional, default=`None`; Function to serialize value. If `None`, `key_serializer` is used.
 - `value_deserializer`: `Callable[[bytes], VT]`, optional, default=`None`; Function to deserialize value. If `None`, `key_deserializer` is used.
 - `persist`: `bool`, optional, default=`True`; If `True`, table won't be deleted even when the object is deleted. If `False`, the table is deleted when this object is deleted.
-- `rebuild_strategy`: `RebuildStrategy`, optional, default=`RebuildStrategy.CHECK_WITH_FIRST_ELEMENT`; Rebuild strategy.
 
 ---
 

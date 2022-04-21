@@ -44,7 +44,6 @@ else:
 if sys.version_info > (3, 10):
     from types import MappingProxyType
 
-from . import RebuildStrategy
 from .base import (
     _T,
     KT,
@@ -197,9 +196,15 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
         serializer: Optional[Callable[[VT], bytes]] = None,
         deserializer: Optional[Callable[[bytes], VT]] = None,
         persist: bool = True,
-        rebuild_strategy: Optional[RebuildStrategy] = None,
         data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
     ) -> None:
+        super(_Dict, self).__init__(
+            connection=connection,
+            table_name=table_name,
+            serializer=key_serializer,
+            deserializer=key_deserializer,
+            persist=persist,
+        )
         if serializer is not None:
             warnings.warn(
                 "serializer argument is deprecated. use key_serializer or value_serializer instead",
@@ -211,7 +216,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             if value_serializer is not None
             else serializer
             if serializer is not None
-            else cast(Callable[[VT], bytes], self._default_serializer if key_serializer is None else key_serializer)
+            else cast(Callable[[VT], bytes], self.key_serializer)
         )
         if deserializer is not None:
             warnings.warn(
@@ -224,17 +229,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             if value_deserializer is not None
             else deserializer
             if deserializer is not None
-            else cast(
-                Callable[[bytes], VT], self._default_deserializer if key_deserializer is None else key_deserializer
-            )
-        )
-        super(_Dict, self).__init__(
-            connection=connection,
-            table_name=table_name,
-            serializer=key_serializer,
-            deserializer=key_deserializer,
-            persist=persist,
-            rebuild_strategy=rebuild_strategy,
+            else cast(Callable[[bytes], VT], self.key_deserializer)
         )
         if data is not None or __data is not None:
             self.clear()
@@ -267,43 +262,6 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
     @property
     def schema_version(self) -> str:
         return "0"
-
-    def _rebuild_check_with_first_element(self) -> bool:
-        cur = self.connection.cursor()
-        cur.execute(f"SELECT serialized_key FROM {self.table_name} ORDER BY item_order LIMIT 1")
-        res = cur.fetchone()
-        if res is None:
-            return False
-        serialized_key = cast(bytes, res[0])
-        key = self.deserialize_key(serialized_key)
-        return serialized_key != self.serialize_key(key)
-
-    def _do_rebuild(self) -> None:
-        cur = self.connection.cursor()
-        last_order = -1
-        while last_order is not None:
-            cur.execute(
-                f"SELECT item_order FROM {self.table_name} WHERE item_order > ? ORDER BY item_order LIMIT 1",
-                (last_order,),
-            )
-            res = cur.fetchone()
-            if res is None:
-                break
-            i = res[0]
-            cur.execute(
-                f"SELECT serialized_key, serialized_value FROM {self.table_name} WHERE item_order=?",
-                (i,),
-            )
-            serialized_key, serialized_value = cur.fetchone()
-            cur.execute(
-                f"UPDATE {self.table_name} SET serialized_key=?, serialized_value=? WHERE item_order=?",
-                (
-                    self.serialize_key(self.deserialize_key(serialized_key)),
-                    self.serialize_value(self.deserialize_value(serialized_value)),
-                    i,
-                ),
-            )
-            last_order = i
 
     def serialize_key(self, key: KT) -> bytes:
         if not is_hashable(key):
@@ -365,7 +323,6 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             key_deserializer=self.key_deserializer,
             value_serializer=self.value_serializer,
             value_deserializer=self.value_deserializer,
-            rebuild_strategy=RebuildStrategy.SKIP,
             persist=False,
         )
 
