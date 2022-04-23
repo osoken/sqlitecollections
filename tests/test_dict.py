@@ -131,7 +131,7 @@ class DictTestCase(DictAndViewTestCase):
             [],
         )
 
-    def test_init_with_initial_data_using_kwarg_data_raises_error(self) -> None:
+    def test_init_with_kwarg_data_raises_error(self) -> None:
         memory_db = sqlite3.connect(":memory:")
         with self.assertRaisesRegex(TypeError, ".+ got an unexpected keyword argument 'data'"):
             _ = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("a", 1), ("b", 2)))  # type: ignore
