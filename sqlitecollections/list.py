@@ -213,7 +213,6 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
-        data: Optional[Iterable[T]] = None,
     ) -> None:
         super(List, self).__init__(
             connection=connection,
@@ -222,17 +221,9 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             deserializer=deserializer,
             persist=persist,
         )
-        if data is not None or __data is not None:
+        if __data is not None:
             self.clear()
-            if data is not None:
-                warnings.warn(
-                    "data keyword argument is deprecated and will be removed in version 1.0.0",
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-                self.extend(data)
-            if __data is not None:
-                self.extend(__data)
+            self.extend(__data)
 
     @property
     def schema_version(self) -> str:

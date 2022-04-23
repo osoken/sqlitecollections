@@ -68,29 +68,10 @@ class ListTestCase(SqlTestCase):
         )
         self.assert_db_state_equals(memory_db, [])
 
-    def test_init_with_initial_data_using_kwarg_data_is_warned(self) -> None:
+    def test_init_with_kwarg_data_raises_error(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.List[Any](connection=memory_db, table_name="items", data=[0])
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "data keyword argument is deprecated and will be removed in version 1.0.0",
-            )
-
-        self.assert_db_state_equals(memory_db, [(sc.base.SqliteCollectionBase._default_serializer(0), 0)])
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.List[Any](connection=memory_db, table_name="items", data=[1])
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "data keyword argument is deprecated and will be removed in version 1.0.0",
-            )
-        self.assert_db_state_equals(memory_db, [(sc.base.SqliteCollectionBase._default_serializer(1), 0)])
+        with self.assertRaisesRegex(TypeError, ".+ got an unexpected keyword argument 'data'"):
+            _ = sc.List[Any](connection=memory_db, table_name="items", data=("a", "b"))  # type: ignore
 
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")
