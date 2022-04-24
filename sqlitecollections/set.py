@@ -140,7 +140,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
-        data: Optional[Iterable[T]] = None,
     ) -> None:
         super(Set, self).__init__(
             connection=connection,
@@ -149,17 +148,9 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
             deserializer=deserializer,
             persist=persist,
         )
-        if data is not None or __data is not None:
+        if __data is not None:
             self.clear()
-            if data is not None:
-                warnings.warn(
-                    "data keyword argument is deprecated and will be removed in version 1.0.0",
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-                self.update(data)
-            if __data is not None:
-                self.update(__data)
+            self.update(__data)
 
     def __contains__(self, value: object) -> bool:
         cur = self.connection.cursor()
