@@ -232,8 +232,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
         )
         if __data is not None:
             self.clear()
-            if __data is not None:
-                self.update(__data)
+            self.update(__data)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:
