@@ -14,7 +14,7 @@ Constructor.
 
 ### Arguments:
 
-- `data`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`, optional, positional-only argument, defualt=`None`; Initial data.
+- `data`: `Mapping[KT, VT]` or `Iterable[Tuple[KT, VT]]`, optional, positional-only argument, defualt=`None`; Initial data. If `None` or no argument is given, persistent data is used as is if available, otherwise persistent data in the corresponding table is cleared and given data is stored instead.
 - `connection`: `str` or `sqlite3.Connection`, optional, default=`None`; If `None`, temporary file is automatically created. If `connection` is a `str`, it will be used as the sqlite3 database file name. You can pass a `sqlite3.Connection` directly.
 - `table_name`: `str`, optional, default=`None`; Table name of this container. If `None`, an auto-generated unique name will be used. Available characters are letters, numbers, and underscores (`_`).
 - `key_serializer`: `Callable[[KT], bytes]`, optional, default=`None`; Function to serialize key. If `None`, `pickle.dumps` is used.
