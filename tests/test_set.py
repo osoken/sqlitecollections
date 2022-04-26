@@ -67,49 +67,10 @@ class SetTestCase(SqlTestCase):
             [],
         )
 
-    def test_init_with_initial_data_using_kwarg_data_is_warned(self) -> None:
+    def test_init_with_kwarg_data_raises_error(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.Set[Hashable](
-                connection=memory_db,
-                table_name="items",
-                data=["a", "b", "a", "a", "aa", b"bb"],
-            )
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "data keyword argument is deprecated and will be removed in version 1.0.0",
-            )
-        self.assert_db_state_equals(
-            memory_db,
-            [
-                (sc.base.SqliteCollectionBase._default_serializer("a"),),
-                (sc.base.SqliteCollectionBase._default_serializer("b"),),
-                (sc.base.SqliteCollectionBase._default_serializer("aa"),),
-                (sc.base.SqliteCollectionBase._default_serializer(b"bb"),),
-            ],
-        )
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.Set[Hashable](
-                connection=memory_db,
-                table_name="items",
-                data=["a"],
-            )
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "data keyword argument is deprecated and will be removed in version 1.0.0",
-            )
-        self.assert_db_state_equals(
-            memory_db,
-            [
-                (sc.base.SqliteCollectionBase._default_serializer("a"),),
-            ],
-        )
+        with self.assertRaisesRegex(TypeError, ".+ got an unexpected keyword argument 'data'"):
+            _ = sc.Set[Hashable](connection=memory_db, table_name="items", data=["a", "b", "a", "a", "aa", b"bb"])  # type: ignore
 
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")

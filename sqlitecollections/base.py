@@ -210,7 +210,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         self._initialize()
 
     def __del__(self) -> None:
-        if not self.persist:
+        if hasattr(self, "persist") and not self.persist:
             cur = self.connection.cursor()
             self._driver_class.drop_table(self.table_name, self.container_type_name, cur)
             self.connection.commit()

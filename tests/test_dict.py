@@ -131,56 +131,10 @@ class DictTestCase(DictAndViewTestCase):
             [],
         )
 
-    def test_init_with_initial_data_using_kwarg_data_is_warned(self) -> None:
+    def test_init_with_kwarg_data_raises_error(self) -> None:
         memory_db = sqlite3.connect(":memory:")
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("a", 1), ("b", 2)))
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "data keyword argument is deprecated and will be removed in version 1.0.0",
-            )
-        self.assert_dict_state_equals(
-            memory_db,
-            [
-                (
-                    sc.base.SqliteCollectionBase._default_serializer("a"),
-                    sc.base.SqliteCollectionBase._default_serializer(1),
-                    0,
-                ),
-                (
-                    sc.base.SqliteCollectionBase._default_serializer("b"),
-                    sc.base.SqliteCollectionBase._default_serializer(2),
-                    1,
-                ),
-            ],
-        )
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("c", 3), ("d", 4)))
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "data keyword argument is deprecated and will be removed in version 1.0.0",
-            )
-        self.assert_dict_state_equals(
-            memory_db,
-            [
-                (
-                    sc.base.SqliteCollectionBase._default_serializer("c"),
-                    sc.base.SqliteCollectionBase._default_serializer(3),
-                    0,
-                ),
-                (
-                    sc.base.SqliteCollectionBase._default_serializer("d"),
-                    sc.base.SqliteCollectionBase._default_serializer(4),
-                    1,
-                ),
-            ],
-        )
+        with self.assertRaisesRegex(TypeError, ".+ got an unexpected keyword argument 'data'"):
+            _ = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", data=(("a", 1), ("b", 2)))  # type: ignore
 
     def test_init_with_initial_data(self) -> None:
         memory_db = sqlite3.connect(":memory:")

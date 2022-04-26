@@ -196,7 +196,6 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
         serializer: Optional[Callable[[VT], bytes]] = None,
         deserializer: Optional[Callable[[bytes], VT]] = None,
         persist: bool = True,
-        data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None,
     ) -> None:
         super(_Dict, self).__init__(
             connection=connection,
@@ -231,17 +230,9 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             if deserializer is not None
             else cast(Callable[[bytes], VT], self.key_deserializer)
         )
-        if data is not None or __data is not None:
+        if __data is not None:
             self.clear()
-            if data is not None:
-                warnings.warn(
-                    "data keyword argument is deprecated and will be removed in version 1.0.0",
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-                self.update(data)
-            if __data is not None:
-                self.update(__data)
+            self.update(__data)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:
