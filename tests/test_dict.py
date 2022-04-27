@@ -32,48 +32,25 @@ class DictTestCase(DictAndViewTestCase):
             expected,
         )
 
-    @patch("sqlitecollections.Dict.table_name", return_value="items")
-    @patch("sqlitecollections.Dict._initialize", return_value=None)
-    @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
-    def test_serializer_argument_is_deprecated(
+    def test_serializer_argument_raises_error(
         self,
-        SqliteCollectionBase_del: MagicMock,
-        _initialize: MagicMock,
-        _table_name: MagicMock,
     ) -> None:
         def serializer(x: str) -> bytes:
             return x.encode("utf-8")
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.Dict[Hashable, Any](serializer=serializer)
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message), "serializer argument is deprecated. use key_serializer or value_serializer instead"
-            )
+        memory_db = sqlite3.connect(":memory:")
+        with self.assertRaisesRegex(TypeError, ".+ got an unexpected keyword argument 'serializer'"):
+            _ = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", serializer=serializer)  # type: ignore
 
-    @patch("sqlitecollections.Dict.table_name", return_value="items")
-    @patch("sqlitecollections.Dict._initialize", return_value=None)
-    @patch("sqlitecollections.base.SqliteCollectionBase.__del__", return_value=None)
-    def test_deserializer_argument_is_deprecated(
+    def test_deserializer_argument_raises_error(
         self,
-        SqliteCollectionBase_del: MagicMock,
-        _initialize: MagicMock,
-        _table_name: MagicMock,
     ) -> None:
         def deserializer(x: bytes) -> str:
             return x.decode("utf-8")
 
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            sut = sc.Dict[Hashable, Any](deserializer=deserializer)
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, DeprecationWarning))
-            self.assertEqual(
-                str(w[0].message),
-                "deserializer argument is deprecated. use key_deserializer or value_deserializer instead",
-            )
+        memory_db = sqlite3.connect(":memory:")
+        with self.assertRaisesRegex(TypeError, ".+ got an unexpected keyword argument 'deserializer'"):
+            _ = sc.Dict[Hashable, Any](connection=memory_db, table_name="items", deserializer=deserializer)  # type: ignore
 
     @patch("sqlitecollections.Dict.table_name", return_value="items")
     @patch("sqlitecollections.Dict._initialize", return_value=None)
