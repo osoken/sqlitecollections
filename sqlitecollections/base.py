@@ -16,9 +16,9 @@ if sys.version_info >= (3, 9):
     from contextlib import AbstractContextManager
 
     ContextManager = AbstractContextManager
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
 else:
-    from typing import Callable, ContextManager
+    from typing import Callable, ContextManager, Sequence
 
 T = TypeVar("T")
 KT = TypeVar("KT")
@@ -176,6 +176,34 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     def alter_table_name(cls, table_name: str, new_table_name: str, cur: sqlite3.Cursor) -> None:
         cur.execute("UPDATE metadata SET table_name=? WHERE table_name=?", (new_table_name, table_name))
         cur.execute(f"ALTER TABLE {table_name} RENAME TO {new_table_name}")
+
+
+class MetadataItem:
+    def __init__(self, table_name: str, schema_version: str, container_type: str):
+        self._table_name = table_name
+        self._schema_version = schema_version
+        self._container_type = container_type
+
+    @property
+    def table_name(self) -> str:
+        return self._table_name
+
+    @property
+    def schema_version(self) -> str:
+        return self._schema_version
+
+    @property
+    def container_type(self) -> str:
+        return self._container_type
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, MetadataItem):
+            return False
+        return (
+            self.table_name == __o.table_name
+            and self.container_type == __o.container_type
+            and self.schema_version == __o.schema_version
+        )
 
 
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):

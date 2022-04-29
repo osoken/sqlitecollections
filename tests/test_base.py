@@ -77,6 +77,23 @@ class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
         self.connection.commit()
 
 
+class MetadataItemTestCase(TestCase):
+    def test_metadata_item_has_table_name_schema_version_and_container_type_ro_attrs(self) -> None:
+        table_name = "the_table_name"
+        container_type = "SomeContainer"
+        schema_version = "0.1"
+        sut = base.MetadataItem(table_name=table_name, container_type=container_type, schema_version=schema_version)
+        self.assertEqual(sut.table_name, table_name)
+        self.assertEqual(sut.container_type, container_type)
+        self.assertEqual(sut.schema_version, schema_version)
+        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+            sut.table_name = "new_table_name"  # type: ignore
+        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+            sut.container_type = "AnotherContainer"  # type: ignore
+        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+            sut.schema_version = "0.1.1"  # type: ignore
+
+
 class SqliteCollectionsBaseTestCase(SqlTestCase):
     def test_default_serializer(self) -> None:
         expected = b'\x80\x03X\x03\x00\x00\x00123q\x00.'
