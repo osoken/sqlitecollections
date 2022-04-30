@@ -94,6 +94,19 @@ class MetadataItemTestCase(TestCase):
             sut.schema_version = "0.1.1"  # type: ignore
 
 
+class MetadataReaderTestCase(TestCase):
+    def test_len(self) -> None:
+        memory_db = sqlite3.Connection(":memory:")
+        sut = base.MetadataReader(connection=memory_db)
+        self.assertEqual(len(sut), 0)
+        ConcreteSqliteCollectionClass(connection=memory_db, table_name="item")
+        self.assertEqual(len(sut), 1)
+        ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
+        self.assertEqual(len(sut), 2)
+        ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
+        self.assertEqual(len(sut), 2)
+
+
 class SqliteCollectionsBaseTestCase(SqlTestCase):
     def test_default_serializer(self) -> None:
         expected = b'\x80\x03X\x03\x00\x00\x00123q\x00.'

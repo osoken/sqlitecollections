@@ -7,7 +7,7 @@ from enum import Enum
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
 from types import TracebackType
-from typing import IO, Generic, Optional, Type, TypeVar, Union, cast
+from typing import IO, Generic, Optional, Type, TypeVar, Union, cast, overload
 from uuid import uuid4
 
 from .logger import logger
@@ -178,6 +178,17 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         cur.execute(f"ALTER TABLE {table_name} RENAME TO {new_table_name}")
 
 
+class MetadataDatabaseDriver:
+    @classmethod
+    def get_count(cls, cur: sqlite3.Cursor) -> int:
+        try:
+            cur.execute(f"SELECT COUNT(1) FROM metadata")
+            res = cur.fetchone()
+            return cast(int, res[0])
+        except sqlite3.OperationalError:
+            return 0
+
+
 class MetadataItem:
     def __init__(self, table_name: str, schema_version: str, container_type: str):
         self._table_name = table_name
@@ -204,6 +215,25 @@ class MetadataItem:
             and self.container_type == __o.container_type
             and self.schema_version == __o.schema_version
         )
+
+
+class MetadataReader(Sequence[MetadataItem]):
+    def __init__(self, connection: Optional[Union[str, sqlite3.Connection]]):
+        self._connection = tidy_connection(connection)
+
+    def __len__(self) -> int:
+        return MetadataDatabaseDriver.get_count(self._connection.cursor())
+
+    @overload
+    def __getitem__(self, i: int) -> MetadataItem:
+        ...
+
+    @overload
+    def __getitem__(self, s: slice) -> Sequence[MetadataItem]:
+        ...
+
+    def __getitem__(self, x: Union[int, slice]) -> Union[MetadataItem, Sequence[MetadataItem]]:
+        raise NotImplementedError
 
 
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
