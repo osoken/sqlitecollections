@@ -16,9 +16,9 @@ if sys.version_info >= (3, 9):
     from contextlib import AbstractContextManager
 
     ContextManager = AbstractContextManager
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Collection, Iterator
 else:
-    from typing import Callable, ContextManager, Sequence
+    from typing import Callable, Collection, ContextManager, Iterator
 
 T = TypeVar("T")
 KT = TypeVar("KT")
@@ -178,17 +178,6 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         cur.execute(f"ALTER TABLE {table_name} RENAME TO {new_table_name}")
 
 
-class MetadataDatabaseDriver:
-    @classmethod
-    def get_count(cls, cur: sqlite3.Cursor) -> int:
-        try:
-            cur.execute(f"SELECT COUNT(1) FROM metadata")
-            res = cur.fetchone()
-            return cast(int, res[0])
-        except sqlite3.OperationalError:
-            return 0
-
-
 class MetadataItem:
     def __init__(self, table_name: str, schema_version: str, container_type: str):
         self._table_name = table_name
@@ -217,23 +206,29 @@ class MetadataItem:
         )
 
 
-class MetadataReader(Sequence[MetadataItem]):
+class MetadataDatabaseDriver:
+    @classmethod
+    def get_count(cls, cur: sqlite3.Cursor) -> int:
+        try:
+            cur.execute(f"SELECT COUNT(1) FROM metadata")
+            res = cur.fetchone()
+            return cast(int, res[0])
+        except sqlite3.OperationalError:
+            return 0
+
+
+class MetadataReader(Collection[MetadataItem]):
     def __init__(self, connection: Optional[Union[str, sqlite3.Connection]]):
         self._connection = tidy_connection(connection)
 
     def __len__(self) -> int:
         return MetadataDatabaseDriver.get_count(self._connection.cursor())
 
-    @overload
-    def __getitem__(self, i: int) -> MetadataItem:
-        ...
+    def __contains__(self, __x: object) -> bool:
+        return super().__contains__(__x)
 
-    @overload
-    def __getitem__(self, s: slice) -> Sequence[MetadataItem]:
-        ...
-
-    def __getitem__(self, x: Union[int, slice]) -> Union[MetadataItem, Sequence[MetadataItem]]:
-        raise NotImplementedError
+    def __iter__(self) -> Iterator[MetadataItem]:
+        return super().__iter__()
 
 
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
