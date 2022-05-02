@@ -216,6 +216,17 @@ class MetadataDatabaseDriver:
         except sqlite3.OperationalError:
             return 0
 
+    @classmethod
+    def is_metadata_in(cls, cur: sqlite3.Cursor, metadata: MetadataItem) -> bool:
+        try:
+            cur.execute(
+                "SELECT COUNT(1) FROM metadata WHERE table_name=? AND schema_version=? AND container_type=?",
+                (metadata.table_name, metadata.schema_version, metadata.container_type),
+            )
+            return cast(int, cur.fetchone()[0]) == 1
+        except sqlite3.OperationalError:
+            return False
+
 
 class MetadataReader(Collection[MetadataItem]):
     def __init__(self, connection: Optional[Union[str, sqlite3.Connection]]):
@@ -225,7 +236,9 @@ class MetadataReader(Collection[MetadataItem]):
         return MetadataDatabaseDriver.get_count(self._connection.cursor())
 
     def __contains__(self, __x: object) -> bool:
-        return super().__contains__(__x)
+        if isinstance(__x, MetadataItem):
+            return MetadataDatabaseDriver.is_metadata_in(self._connection.cursor(), __x)
+        return False
 
     def __iter__(self) -> Iterator[MetadataItem]:
         return super().__iter__()

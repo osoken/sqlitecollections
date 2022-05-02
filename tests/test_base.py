@@ -106,6 +106,25 @@ class MetadataReaderTestCase(TestCase):
         ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
         self.assertEqual(len(sut), 2)
 
+    def test_contains_by_metadata(self) -> None:
+        memory_db = sqlite3.Connection(":memory:")
+        sut = base.MetadataReader(connection=memory_db)
+        dummy_metadata = base.MetadataItem(table_name="dummy", schema_version="0.1", container_type="dummy")
+        self.assertFalse(dummy_metadata in sut)
+        item = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item")
+        item_metadata = base.MetadataItem(
+            table_name="item",
+            schema_version=item.schema_version,
+            container_type=item.container_type_name,
+        )
+        item2_metadata = base.MetadataItem(
+            table_name="item2",
+            schema_version=item.schema_version,
+            container_type=item.container_type_name,
+        )
+        self.assertTrue(item_metadata in sut)
+        self.assertFalse(item2_metadata in sut)
+
 
 class SqliteCollectionsBaseTestCase(SqlTestCase):
     def test_default_serializer(self) -> None:
