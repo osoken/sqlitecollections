@@ -197,13 +197,13 @@ class MetadataItem:
         return self._container_type
 
     def __eq__(self, __o: object) -> bool:
-        if not isinstance(__o, MetadataItem):
-            return False
-        return (
-            self.table_name == __o.table_name
-            and self.container_type == __o.container_type
-            and self.schema_version == __o.schema_version
-        )
+        if isinstance(__o, MetadataItem):
+            return (
+                self.table_name == __o.table_name
+                and self.container_type == __o.container_type
+                and self.schema_version == __o.schema_version
+            )
+        return False
 
 
 class MetadataDatabaseDriver:
