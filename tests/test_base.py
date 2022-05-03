@@ -5,6 +5,7 @@ import sys
 import uuid
 import warnings
 from collections.abc import Hashable
+from types import GeneratorType
 from typing import Any
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
@@ -93,6 +94,10 @@ class MetadataItemTestCase(TestCase):
         with self.assertRaisesRegex(AttributeError, "can't set attribute"):
             sut.schema_version = "0.1.1"  # type: ignore
 
+    def test_metadata_item_is_hashable(self) -> None:
+        sut = base.MetadataItem(table_name="aa", container_type="SomeType", schema_version="-2")
+        self.assertIsInstance(sut, Hashable)
+
 
 class MetadataReaderTestCase(TestCase):
     def test_len(self) -> None:
@@ -124,6 +129,27 @@ class MetadataReaderTestCase(TestCase):
         )
         self.assertTrue(item_metadata in sut)
         self.assertFalse(item2_metadata in sut)
+
+    def test_iter(self) -> None:
+        memory_db = sqlite3.Connection(":memory:")
+        sut = base.MetadataReader(connection=memory_db)
+        actual = iter(sut)
+        self.assertIsInstance(actual, GeneratorType)
+        actual_set = set(actual)
+        self.assertEqual(actual_set, set())
+        item = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item")
+        item_metadata = base.MetadataItem(
+            table_name="item", container_type=item.container_type_name, schema_version=item.schema_version
+        )
+        ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
+        item2 = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
+        item2_metadata = base.MetadataItem(
+            table_name="item2", container_type=item2.container_type_name, schema_version=item2.schema_version
+        )
+        actual = iter(sut)
+        self.assertIsInstance(actual, GeneratorType)
+        actual_set = set(actual)
+        self.assertEqual(actual_set, {item_metadata, item2_metadata})
 
 
 class SqliteCollectionsBaseTestCase(SqlTestCase):
