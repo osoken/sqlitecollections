@@ -34,6 +34,7 @@ nav:
   - Overview: index.md
   - install.md
   - Usage:
+      - common features: usage/common.md
       - List: usage/list.md
       - Dict: usage/dict.md
       - dictview:
