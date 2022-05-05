@@ -43,5 +43,6 @@ nav:
           - usage/dictview/itemsview.md
       - Set: usage/set.md
       - factory: usage/factory.md
+      - metadata: usage/metadata.md
   - development.md
   - benchmark.md
