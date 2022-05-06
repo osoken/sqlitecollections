@@ -1,5 +1,7 @@
 # Metadata
 
+# MetadataItem
+
 ## `MetadataItem(...)`
 
 Constructor for MetadataItem.
@@ -40,6 +42,10 @@ Read-only property for the schema version
 ### Return value:
 
 `str`: The schema version.
+
+---
+
+# MetadataReader
 
 ## `MetadataReader(...)`
 
