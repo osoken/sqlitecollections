@@ -40,3 +40,11 @@ Read-only property for the schema version
 ### Return value:
 
 `str`: The schema version.
+
+## `MetadataReader(...)`
+
+Constructor for `MetadataReader` class which can iterate over all records in the given connection.
+
+### Arguments:
+
+- `connection`: `str` or `sqlite3.Connection`; Connection to sqlite3 to get metadata. If `connection` is a `str`, it will be used as the sqlite3 database file name. You can pass a `sqlite3.Connection` directly.
