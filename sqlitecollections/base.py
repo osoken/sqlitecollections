@@ -240,7 +240,7 @@ class MetadataDatabaseDriver:
 
 
 class MetadataReader(Collection[MetadataItem]):
-    def __init__(self, connection: Optional[Union[str, sqlite3.Connection]]):
+    def __init__(self, connection: Union[str, sqlite3.Connection]):
         self._connection = tidy_connection(connection)
 
     def __len__(self) -> int:
