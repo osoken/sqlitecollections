@@ -54,3 +54,14 @@ Constructor for `MetadataReader` class which can iterate over all records in the
 ### Arguments:
 
 - `connection`: `str` or `sqlite3.Connection`; Connection to sqlite3 to get metadata. If `connection` is a `str`, it will be used as the sqlite3 database file name. You can pass a `sqlite3.Connection` directly.
+
+---
+
+## `len(metadata_reader)`
+
+Return the number of records in the metadata table read by `metadata_reader`.
+It coincides the number of collections in the sqlite3 database connected by `metadata_reader._connection`.
+
+### Return value:
+
+`int`: The number of items in the metadata table.
