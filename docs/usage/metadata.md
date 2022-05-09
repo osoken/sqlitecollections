@@ -65,3 +65,17 @@ It coincides the number of collections in the sqlite3 database connected by `met
 ### Return value:
 
 `int`: The number of items in the metadata table.
+
+---
+
+## `obj in metadata_reader`
+
+Return
+
+### Arguments:
+
+- `obj`: `object`; object to be checked the membership.
+
+### Return value:
+
+`bool`: Boolean value whether if `metadata_item` is in the metadata table.
