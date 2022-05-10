@@ -79,3 +79,14 @@ Return whether if `obj` is in `metadata_reader`
 ### Return value:
 
 `bool`: Boolean value whether if `metadata_item` is in the metadata table.
+
+---
+
+## `iter(metadata_reader)`
+
+Return an iterator over the `MetadataItem`'s in `metadata_reader`
+It coincides the records of metadata table in the sqlite3 database connected by `metadata_reader._connection`.
+
+### Return value:
+
+`Iterator[MetadataItem]`: an iterator over the `MetadataItem`'s in `metadata_reader`
