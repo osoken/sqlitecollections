@@ -70,7 +70,7 @@ It coincides the number of collections in the sqlite3 database connected by `met
 
 ## `obj in metadata_reader`
 
-Return
+Return whether if `obj` is in `metadata_reader`
 
 ### Arguments:
 
