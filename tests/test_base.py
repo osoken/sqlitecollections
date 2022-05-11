@@ -5,6 +5,7 @@ import sys
 import uuid
 import warnings
 from collections.abc import Hashable
+from types import GeneratorType
 from typing import Any
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
@@ -75,6 +76,80 @@ class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
         cur = self.connection.cursor()
         self._driver_class.add(self.table_name, value, cur)
         self.connection.commit()
+
+
+class MetadataItemTestCase(TestCase):
+    def test_metadata_item_has_table_name_schema_version_and_container_type_ro_attrs(self) -> None:
+        table_name = "the_table_name"
+        container_type = "SomeContainer"
+        schema_version = "0.1"
+        sut = base.MetadataItem(table_name=table_name, container_type=container_type, schema_version=schema_version)
+        self.assertEqual(sut.table_name, table_name)
+        self.assertEqual(sut.container_type, container_type)
+        self.assertEqual(sut.schema_version, schema_version)
+        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+            sut.table_name = "new_table_name"  # type: ignore
+        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+            sut.container_type = "AnotherContainer"  # type: ignore
+        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+            sut.schema_version = "0.1.1"  # type: ignore
+
+    def test_metadata_item_is_hashable(self) -> None:
+        sut = base.MetadataItem(table_name="aa", container_type="SomeType", schema_version="-2")
+        self.assertIsInstance(sut, Hashable)
+
+
+class MetadataReaderTestCase(TestCase):
+    def test_len(self) -> None:
+        memory_db = sqlite3.Connection(":memory:")
+        sut = base.MetadataReader(connection=memory_db)
+        self.assertEqual(len(sut), 0)
+        ConcreteSqliteCollectionClass(connection=memory_db, table_name="item")
+        self.assertEqual(len(sut), 1)
+        ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
+        self.assertEqual(len(sut), 2)
+        ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
+        self.assertEqual(len(sut), 2)
+
+    def test_contains_by_metadata(self) -> None:
+        memory_db = sqlite3.Connection(":memory:")
+        sut = base.MetadataReader(connection=memory_db)
+        dummy_metadata = base.MetadataItem(table_name="dummy", schema_version="0.1", container_type="dummy")
+        self.assertFalse(dummy_metadata in sut)
+        item = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item")
+        item_metadata = base.MetadataItem(
+            table_name="item",
+            schema_version=item.schema_version,
+            container_type=item.container_type_name,
+        )
+        item2_metadata = base.MetadataItem(
+            table_name="item2",
+            schema_version=item.schema_version,
+            container_type=item.container_type_name,
+        )
+        self.assertTrue(item_metadata in sut)
+        self.assertFalse(item2_metadata in sut)
+
+    def test_iter(self) -> None:
+        memory_db = sqlite3.Connection(":memory:")
+        sut = base.MetadataReader(connection=memory_db)
+        actual = iter(sut)
+        self.assertIsInstance(actual, GeneratorType)
+        actual_set = set(actual)
+        self.assertEqual(actual_set, set())
+        item = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item")
+        item_metadata = base.MetadataItem(
+            table_name="item", container_type=item.container_type_name, schema_version=item.schema_version
+        )
+        ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
+        item2 = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
+        item2_metadata = base.MetadataItem(
+            table_name="item2", container_type=item2.container_type_name, schema_version=item2.schema_version
+        )
+        actual = iter(sut)
+        self.assertIsInstance(actual, GeneratorType)
+        actual_set = set(actual)
+        self.assertEqual(actual_set, {item_metadata, item2_metadata})
 
 
 class SqliteCollectionsBaseTestCase(SqlTestCase):

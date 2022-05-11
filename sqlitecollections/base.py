@@ -7,7 +7,7 @@ from enum import Enum
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
 from types import TracebackType
-from typing import IO, Generic, Optional, Type, TypeVar, Union, cast
+from typing import IO, Generic, Optional, Tuple, Type, TypeVar, Union, cast, overload
 from uuid import uuid4
 
 from .logger import logger
@@ -16,9 +16,9 @@ if sys.version_info >= (3, 9):
     from contextlib import AbstractContextManager
 
     ContextManager = AbstractContextManager
-    from collections.abc import Callable
+    from collections.abc import Callable, Collection, Iterable, Iterator
 else:
-    from typing import Callable, ContextManager
+    from typing import Callable, Collection, ContextManager, Iterable, Iterator
 
 T = TypeVar("T")
 KT = TypeVar("KT")
@@ -176,6 +176,84 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     def alter_table_name(cls, table_name: str, new_table_name: str, cur: sqlite3.Cursor) -> None:
         cur.execute("UPDATE metadata SET table_name=? WHERE table_name=?", (new_table_name, table_name))
         cur.execute(f"ALTER TABLE {table_name} RENAME TO {new_table_name}")
+
+
+class MetadataItem(Hashable):
+    def __init__(self, table_name: str, schema_version: str, container_type: str):
+        self._table_name = table_name
+        self._schema_version = schema_version
+        self._container_type = container_type
+
+    @property
+    def table_name(self) -> str:
+        return self._table_name
+
+    @property
+    def schema_version(self) -> str:
+        return self._schema_version
+
+    @property
+    def container_type(self) -> str:
+        return self._container_type
+
+    def __eq__(self, __o: object) -> bool:
+        if isinstance(__o, MetadataItem):
+            return (
+                self.table_name == __o.table_name
+                and self.container_type == __o.container_type
+                and self.schema_version == __o.schema_version
+            )
+        return False
+
+    def __hash__(self) -> int:
+        return hash((self.table_name, self.schema_version, self.container_type))
+
+
+class MetadataDatabaseDriver:
+    @classmethod
+    def get_count(cls, cur: sqlite3.Cursor) -> int:
+        try:
+            cur.execute(f"SELECT COUNT(1) FROM metadata")
+            res = cur.fetchone()
+            return cast(int, res[0])
+        except sqlite3.OperationalError:
+            return 0
+
+    @classmethod
+    def is_metadata_in(cls, cur: sqlite3.Cursor, metadata: MetadataItem) -> bool:
+        try:
+            cur.execute(
+                "SELECT COUNT(1) FROM metadata WHERE table_name=? AND schema_version=? AND container_type=?",
+                (metadata.table_name, metadata.schema_version, metadata.container_type),
+            )
+            return cast(int, cur.fetchone()[0]) == 1
+        except sqlite3.OperationalError:
+            return False
+
+    @classmethod
+    def get_metadata(cls, cur: sqlite3.Cursor) -> Iterable[Tuple[str, str, str]]:
+        try:
+            cur.execute("SELECT table_name, schema_version, container_type FROM metadata")
+            yield from cur
+        except sqlite3.OperationalError:
+            yield from tuple()
+
+
+class MetadataReader(Collection[MetadataItem]):
+    def __init__(self, connection: Union[str, sqlite3.Connection]):
+        self._connection = tidy_connection(connection)
+
+    def __len__(self) -> int:
+        return MetadataDatabaseDriver.get_count(self._connection.cursor())
+
+    def __contains__(self, __x: object) -> bool:
+        if isinstance(__x, MetadataItem):
+            return MetadataDatabaseDriver.is_metadata_in(self._connection.cursor(), __x)
+        return False
+
+    def __iter__(self) -> Iterator[MetadataItem]:
+        for d in MetadataDatabaseDriver.get_metadata(self._connection.cursor()):
+            yield MetadataItem(table_name=d[0], schema_version=d[1], container_type=d[2])
 
 
 class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
