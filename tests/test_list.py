@@ -64,7 +64,7 @@ class ListTestCase(SqlTestCase):
         self.assert_sql_result_equals(
             memory_db,
             "SELECT table_name, schema_version, container_type FROM metadata",
-            [("items", sut.schema_version, sut.container_type_name)],
+            [("items", sut._driver_class.schema_version, sut.container_type_name)],
         )
         self.assert_db_state_equals(memory_db, [])
 

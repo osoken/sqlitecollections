@@ -90,6 +90,16 @@ class TemporaryTableContext(ContextManager[str]):
 
 
 class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
+    if sys.version_info >= (3, 9):
+
+        @classmethod
+        @property
+        def schema_version(cls) -> str:
+            return ""
+
+    else:
+        schema_version = ""
+
     @classmethod
     def initialize_metadata_table(cls, cur: sqlite3.Cursor) -> None:
         if not cls.is_metadata_table_initialized(cur):
@@ -119,17 +129,13 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         )
 
     @classmethod
-    def initialize_table(
-        cls, table_name: str, container_type_name: str, schema_version: str, cur: sqlite3.Cursor
-    ) -> None:
-        if not cls.is_table_initialized(table_name, container_type_name, schema_version, cur):
-            cls.do_create_table(table_name, container_type_name, schema_version, cur)
-            cls.do_tidy_table_metadata(table_name, container_type_name, schema_version, cur)
+    def initialize_table(cls, table_name: str, container_type: str, cur: sqlite3.Cursor) -> None:
+        if not cls.is_table_initialized(table_name, container_type, cur):
+            cls.do_create_table(table_name, container_type, cur)
+            cls.do_tidy_table_metadata(table_name, container_type, cur)
 
     @classmethod
-    def is_table_initialized(
-        self, table_name: str, container_type_name: str, schema_version: str, cur: sqlite3.Cursor
-    ) -> bool:
+    def is_table_initialized(cls, table_name: str, container_type_name: str, cur: sqlite3.Cursor) -> bool:
         try:
             cur.execute(
                 "SELECT schema_version FROM metadata WHERE table_name=? AND container_type=?",
@@ -139,7 +145,7 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
             if buf is None:
                 return False
             version = buf[0]
-            if version != schema_version:
+            if version != cls.schema_version:
                 return False
             cur.execute(f"SELECT 1 FROM {table_name} LIMIT 1")
             _ = list(cur)
@@ -149,19 +155,15 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         return False
 
     @classmethod
-    def do_tidy_table_metadata(
-        cls, table_name: str, container_type_name: str, schema_version: str, cur: sqlite3.Cursor
-    ) -> None:
+    def do_tidy_table_metadata(cls, table_name: str, container_type_name: str, cur: sqlite3.Cursor) -> None:
         cur.execute(
             "INSERT INTO metadata (table_name, schema_version, container_type) VALUES (?, ?, ?)",
-            (table_name, schema_version, container_type_name),
+            (table_name, cls.schema_version, container_type_name),
         )
 
     @classmethod
     @abstractmethod
-    def do_create_table(
-        cls, table_name: str, container_type_name: str, schema_version: str, cur: sqlite3.Cursor
-    ) -> None:
+    def do_create_table(cls, table_name: str, container_type_name: str, cur: sqlite3.Cursor) -> None:
         ...
 
     @classmethod
@@ -296,7 +298,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     def _initialize(self) -> None:
         cur = self.connection.cursor()
         self._driver_class.initialize_metadata_table(cur)
-        self._driver_class.initialize_table(self.table_name, self.container_type_name, self.schema_version, cur)
+        self._driver_class.initialize_table(self.table_name, self.container_type_name, cur)
         self.connection.commit()
 
     @property
@@ -342,8 +344,3 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
     @property
     def container_type_name(self) -> str:
         return self.__class__.__name__
-
-    @property
-    @abstractmethod
-    def schema_version(self) -> str:
-        ...

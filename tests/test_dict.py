@@ -98,7 +98,7 @@ class DictTestCase(DictAndViewTestCase):
             [
                 (
                     "items",
-                    sut.schema_version,
+                    sut._driver_class.schema_version,
                     sut.container_type_name,
                 ),
             ],
