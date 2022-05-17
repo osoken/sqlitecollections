@@ -54,10 +54,18 @@ class SqlTestCase(TestCase):
 
 
 class ConcreteSqliteCollectionDatabaseDriver(base._SqliteCollectionBaseDatabaseDriver):
+    if sys.version_info >= (3, 9):
+
+        @classmethod
+        @property
+        def schema_version(cls) -> str:
+            return "test_0"
+
+    else:
+        schema_version = "test_0"
+
     @classmethod
-    def do_create_table(
-        cls, table_name: str, container_type_nam: str, schema_version: str, cur: sqlite3.Cursor
-    ) -> None:
+    def do_create_table(cls, table_name: str, container_type_nam: str, cur: sqlite3.Cursor) -> None:
         cur.execute(f"CREATE TABLE {table_name} (idx INTEGER AUTO INCREMENT, value BLOB)")
 
     @classmethod
@@ -67,10 +75,6 @@ class ConcreteSqliteCollectionDatabaseDriver(base._SqliteCollectionBaseDatabaseD
 
 class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
     _driver_class = ConcreteSqliteCollectionDatabaseDriver
-
-    @property
-    def schema_version(self) -> str:
-        return "test_0"
 
     def add(self, value: bytes) -> None:
         cur = self.connection.cursor()
@@ -119,12 +123,12 @@ class MetadataReaderTestCase(TestCase):
         item = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item")
         item_metadata = base.MetadataItem(
             table_name="item",
-            schema_version=item.schema_version,
+            schema_version="test_0",
             container_type=item.container_type_name,
         )
         item2_metadata = base.MetadataItem(
             table_name="item2",
-            schema_version=item.schema_version,
+            schema_version="test_0",
             container_type=item.container_type_name,
         )
         self.assertTrue(item_metadata in sut)
@@ -139,12 +143,14 @@ class MetadataReaderTestCase(TestCase):
         self.assertEqual(actual_set, set())
         item = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item")
         item_metadata = base.MetadataItem(
-            table_name="item", container_type=item.container_type_name, schema_version=item.schema_version
+            table_name="item", container_type=item.container_type_name, schema_version="test_0"
         )
         ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
         item2 = ConcreteSqliteCollectionClass(connection=memory_db, table_name="item2")
         item2_metadata = base.MetadataItem(
-            table_name="item2", container_type=item2.container_type_name, schema_version=item2.schema_version
+            table_name="item2",
+            container_type=item2.container_type_name,
+            schema_version="test_0",
         )
         actual = iter(sut)
         self.assertIsInstance(actual, GeneratorType)

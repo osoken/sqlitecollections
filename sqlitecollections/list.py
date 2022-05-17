@@ -70,10 +70,18 @@ def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]) -> Iterable[Tuple[An
 
 
 class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
+    if sys.version_info >= (3, 9):
+
+        @classmethod
+        @property
+        def schema_version(cls) -> str:
+            return "0"
+
+    else:
+        schema_version = "0"
+
     @classmethod
-    def do_create_table(
-        cls, table_name: str, container_type_nam: str, schema_version: str, cur: sqlite3.Cursor
-    ) -> None:
+    def do_create_table(cls, table_name: str, container_type_nam: str, cur: sqlite3.Cursor) -> None:
         cur.execute(f"CREATE TABLE {table_name} (serialized_value BLOB, item_index INTEGER PRIMARY KEY)")
 
     @classmethod
@@ -224,10 +232,6 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         if __data is not None:
             self.clear()
             self.extend(__data)
-
-    @property
-    def schema_version(self) -> str:
-        return "0"
 
     def __delitem__(self, i: Union[int, slice]) -> None:
         cur = self.connection.cursor()

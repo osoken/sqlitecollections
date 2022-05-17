@@ -21,10 +21,18 @@ from .base import (
 
 
 class _SetDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
+    if sys.version_info >= (3, 9):
+
+        @classmethod
+        @property
+        def schema_version(cls) -> str:
+            return "0"
+
+    else:
+        schema_version = "0"
+
     @classmethod
-    def do_create_table(
-        cls, table_name: str, container_type_nam: str, schema_version: str, cur: sqlite3.Cursor
-    ) -> None:
+    def do_create_table(cls, table_name: str, container_type_nam: str, cur: sqlite3.Cursor) -> None:
         cur.execute(f"CREATE TABLE {table_name} (serialized_value BLOB PRIMARY KEY)")
 
     @classmethod
@@ -203,10 +211,6 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         self._driver_class.delete_by_serialized_value(self.table_name, cur, serialized_value)
         self.connection.commit()
         return self.deserialize(serialized_value)
-
-    @property
-    def schema_version(self) -> str:
-        return "0"
 
     def issubset(self, other: Iterable[T]) -> bool:
         return len(self) == len(self.intersection(other))
