@@ -90,10 +90,12 @@ jobs:
           python-version: 3.8
 
       - name: Download benchmarking result
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
+        with:
+          path: ~/tmp/
 
       - name: Move benchmarking result
-        run: mv /home/runner/work/sqlitecollections/sqlitecollections/3.* /home/runner/work/sqlitecollections/sqlitecollections/docs/benchmark_results/
+        run: mv ~/tmp/3.*/* /home/runner/work/sqlitecollections/sqlitecollections/docs/benchmark_results/
 
       - name: Install tox
         run: pip install tox
