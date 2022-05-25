@@ -35,6 +35,7 @@ if __name__ == "__main__":
     parser.add_argument("--prefix", default="benchmarks")
     parser.add_argument("--timeout", default=None, type=float)
     parser.add_argument("--debug", action="store_true")
+    parser.add_argument("targets", nargs="*")
     args = parser.parse_args()
     wd = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(os.path.dirname(os.path.dirname(wd)), "benchmark_results", args.prefix)
