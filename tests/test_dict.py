@@ -1118,6 +1118,13 @@ class KeysViewTestCase(DictAndViewTestCase):
             self.assertEqual(actual["b"], 2)
             self.assertEqual(actual["c"], 3)
 
+    def test_repr(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_mapping.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.keys()
+        self.assertRegex(repr(sut), r"KeysView\(<sqlitecollections\.dict\.Dict object at 0x[0-9a-f]+>\)")
+
 
 class ValuesViewTestCase(DictAndViewTestCase):
     def test_len(self) -> None:
@@ -1201,6 +1208,13 @@ class ValuesViewTestCase(DictAndViewTestCase):
             self.assertEqual(actual["a"], 1)
             self.assertEqual(actual["b"], 2)
             self.assertEqual(actual["c"], 3)
+
+    def test_repr(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_mapping.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.values()
+        self.assertRegex(repr(sut), r"ValuesView\(<sqlitecollections\.dict\.Dict object at 0x[0-9a-f]+>\)")
 
 
 class ItemsViewTestCase(DictAndViewTestCase):
@@ -1720,3 +1734,10 @@ class ItemsViewTestCase(DictAndViewTestCase):
             self.assertEqual(actual["a"], 1)
             self.assertEqual(actual["b"], 2)
             self.assertEqual(actual["c"], 3)
+
+    def test_repr(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "dict/base.sql", "dict/itemsview_mapping.sql")
+        parent = sc.Dict[Hashable, Any](connection=memory_db, table_name="items")
+        sut = parent.items()
+        self.assertRegex(repr(sut), r"ItemsView\(<sqlitecollections\.dict\.Dict object at 0x[0-9a-f]+>\)")
