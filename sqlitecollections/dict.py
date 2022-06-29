@@ -454,16 +454,16 @@ else:
 
 class MappingView(Sized):
     def __init__(self, mapping: Dict[Any, Any]):
-        self._parent = mapping
+        self._mapping = mapping
 
     def __len__(self) -> int:
-        return len(self._parent)
+        return len(self._mapping)
 
     if sys.version_info > (3, 10):
 
         @property
         def mapping(self) -> MappingProxyType:
-            return MappingProxyType(self._parent)
+            return MappingProxyType(self._mapping)
 
 
 class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
@@ -472,39 +472,39 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
 
     def __and__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:  # type: ignore[override]
         return sc_Set[_KT_co](
-            (d for d in o if d in self._parent),
-            connection=self._parent.connection,
-            serializer=self._parent.key_serializer,
-            deserializer=self._parent.key_deserializer,
+            (d for d in o if d in self._mapping),
+            connection=self._mapping.connection,
+            serializer=self._mapping.key_serializer,
+            deserializer=self._mapping.key_deserializer,
             persist=False,
         )
 
     def __rand__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         return sc_Set[_T](
-            (d for d in o if d in self._parent),
-            connection=self._parent.connection,
-            serializer=self._parent.key_serializer,
-            deserializer=self._parent.key_deserializer,
+            (d for d in o if d in self._mapping),
+            connection=self._mapping.connection,
+            serializer=self._mapping.key_serializer,
+            deserializer=self._mapping.key_deserializer,
             persist=False,
         )
 
     def __contains__(self, o: object) -> bool:
-        return o in self._parent
+        return o in self._mapping
 
     def __iter__(self) -> Iterator[_KT_co]:
-        return iter(self._parent)
+        return iter(self._mapping)
 
     if sys.version_info >= (3, 8):
 
         def __reversed__(self) -> Iterator[_KT_co]:
-            return reversed(self._parent)
+            return reversed(self._mapping)
 
     def __or__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return sc_Set[Union[_KT_co, _T]](
-            itertools.chain(self._parent, o),
-            connection=self._parent.connection,
-            serializer=self._parent.key_serializer,
-            deserializer=self._parent.key_deserializer,
+            itertools.chain(self._mapping, o),
+            connection=self._mapping.connection,
+            serializer=self._mapping.key_serializer,
+            deserializer=self._mapping.key_deserializer,
             persist=False,
         )
 
@@ -513,28 +513,28 @@ class KeysView(MappingView, KeysViewType[_KT_co], Generic[_KT_co]):
 
     def __sub__(self, o: Iterable[Any]) -> sc_Set[_KT_co]:  # type: ignore[override]
         return sc_Set[KT](
-            self._parent,
-            connection=self._parent.connection,
-            serializer=self._parent.key_serializer,
-            deserializer=self._parent.key_deserializer,
+            self._mapping,
+            connection=self._mapping.connection,
+            serializer=self._mapping.key_serializer,
+            deserializer=self._mapping.key_deserializer,
             persist=False,
         ).difference(o)
 
     def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         return sc_Set[_T](
             o,
-            connection=self._parent.connection,
-            serializer=self._parent.key_serializer,
-            deserializer=self._parent.key_deserializer,
+            connection=self._mapping.connection,
+            serializer=self._mapping.key_serializer,
+            deserializer=self._mapping.key_deserializer,
             persist=False,
-        ).difference(self._parent)
+        ).difference(self._mapping)
 
     def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[_KT_co, _T]]:  # type: ignore[override]
         return sc_Set[Union[KT, _T]](
-            self._parent,
-            connection=self._parent.connection,
-            serializer=self._parent.key_serializer,
-            deserializer=self._parent.key_deserializer,
+            self._mapping,
+            connection=self._mapping.connection,
+            serializer=self._mapping.key_serializer,
+            deserializer=self._mapping.key_deserializer,
             persist=False,
         ).symmetric_difference(o)
 
@@ -553,16 +553,16 @@ class ValuesView(MappingView, ValuesViewType[_VT_co], Generic[_VT_co]):
         return False
 
     def __iter__(self) -> Iterator[_VT_co]:
-        cur = self._parent.connection.cursor()
-        for sv in self._parent._driver_class.get_serialized_values(self._parent.table_name, cur):
-            yield self._parent.deserialize_value(sv)
+        cur = self._mapping.connection.cursor()
+        for sv in self._mapping._driver_class.get_serialized_values(self._mapping.table_name, cur):
+            yield self._mapping.deserialize_value(sv)
 
     if sys.version_info >= (3, 8):
 
         def __reversed__(self) -> Iterator[_VT_co]:
-            cur = self._parent.connection.cursor()
-            for sv in self._parent._driver_class.get_reversed_serialized_values(self._parent.table_name, cur):
-                yield self._parent.deserialize_value(sv)
+            cur = self._mapping.connection.cursor()
+            for sv in self._mapping._driver_class.get_reversed_serialized_values(self._mapping.table_name, cur):
+                yield self._mapping.deserialize_value(sv)
 
 
 class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
@@ -570,12 +570,12 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         if not is_hashable(o[1]):
             raise TypeError(f"unhashable type: '{type(o[1]).__name__}'")
         return SqliteCollectionBase[Tuple[bytes, bytes]]._default_serializer(
-            (self._parent.serialize_key(o[0]), self._parent.serialize_value(o[1]))
+            (self._mapping.serialize_key(o[0]), self._mapping.serialize_value(o[1]))
         )
 
     def _item_deserializer(self, o: bytes) -> Tuple[_KT_co, _VT_co]:
         sk, sv = SqliteCollectionBase[Tuple[bytes, bytes]]._default_deserializer(o)
-        return (self._parent.deserialize_key(sk), self._parent.deserialize_value(sv))
+        return (self._mapping.deserialize_key(sk), self._mapping.deserialize_value(sv))
 
     def __init__(self, mapping: Dict[_KT_co, _VT_co]) -> None:
         super(ItemsView, self).__init__(mapping)
@@ -583,14 +583,14 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
     def __and__(self, o: Iterable[Any]) -> sc_Set[Tuple[_KT_co, _VT_co]]:  # type: ignore[override]
         tmp = sc_Set[Tuple[_KT_co, _VT_co]](
             iter(self),
-            connection=self._parent.connection,
+            connection=self._mapping.connection,
             serializer=self._item_serializer,
             deserializer=self._item_deserializer,
             persist=False,
         )
         return sc_Set[Tuple[_KT_co, _VT_co]](
             (cast(Tuple[_KT_co, _VT_co], d) for d in o if d in tmp),
-            connection=self._parent.connection,
+            connection=self._mapping.connection,
             serializer=self._item_serializer,
             deserializer=self._item_deserializer,
             persist=False,
@@ -600,14 +600,14 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
         return cast(sc_Set[_T], self & o)
 
     def __contains__(self, o: object) -> bool:
-        if not isinstance(o, tuple) or len(o) != 2 or o[0] not in self._parent:
+        if not isinstance(o, tuple) or len(o) != 2 or o[0] not in self._mapping:
             return False
-        return bool(self._parent[o[0]] == o[1])
+        return bool(self._mapping[o[0]] == o[1])
 
     def __iter__(self) -> Iterator[Tuple[_KT_co, _VT_co]]:
-        cur = self._parent.connection.cursor()
-        for sk, sv in self._parent._driver_class.get_serialized_items(self._parent.table_name, cur):
-            yield self._parent.deserialize_key(sk), self._parent.deserialize_value(sv)
+        cur = self._mapping.connection.cursor()
+        for sk, sv in self._mapping._driver_class.get_serialized_items(self._mapping.table_name, cur):
+            yield self._mapping.deserialize_key(sk), self._mapping.deserialize_value(sv)
 
     if sys.version_info >= (3, 8):
 
@@ -617,7 +617,7 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
     def __or__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         return sc_Set[Union[Tuple[_KT_co, _VT_co], _T]](
             itertools.chain(self, o),
-            connection=self._parent.connection,
+            connection=self._mapping.connection,
             serializer=cast(Callable[[Union[Tuple[_KT_co, _VT_co], _T]], bytes], self._item_serializer),
             deserializer=cast(Callable[[bytes], Union[Tuple[_KT_co, _VT_co], _T]], self._item_deserializer),
             persist=False,
@@ -629,7 +629,7 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
     def __sub__(self, o: Iterable[Any]) -> sc_Set[Tuple[_KT_co, _VT_co]]:  # type: ignore[override]
         tmp = sc_Set[Tuple[_KT_co, _VT_co]](
             iter(self),
-            connection=self._parent.connection,
+            connection=self._mapping.connection,
             serializer=self._item_serializer,
             deserializer=self._item_deserializer,
             persist=False,
@@ -640,21 +640,21 @@ class ItemsView(MappingView, ItemsViewType[_KT_co, _VT_co]):
     def __rsub__(self, o: Iterable[_T]) -> sc_Set[_T]:  # type: ignore[override]
         tmp = sc_Set[Tuple[_KT_co, _VT_co]](
             iter(self),
-            connection=self._parent.connection,
+            connection=self._mapping.connection,
             serializer=self._item_serializer,
             deserializer=self._item_deserializer,
             persist=False,
         )
         return sc_Set[_T](
             (d for d in o if d not in tmp),
-            connection=self._parent.connection,
+            connection=self._mapping.connection,
             persist=False,
         )
 
     def __xor__(self, o: Iterable[_T]) -> sc_Set[Union[Tuple[_KT_co, _VT_co], _T]]:  # type: ignore[override]
         tmp = sc_Set[Union[Tuple[_KT_co, _VT_co], _T]](
             iter(self),
-            connection=self._parent.connection,
+            connection=self._mapping.connection,
             serializer=cast(Callable[[Union[Tuple[_KT_co, _VT_co], _T]], bytes], self._item_serializer),
             deserializer=cast(Callable[[bytes], Union[Tuple[_KT_co, _VT_co], _T]], self._item_deserializer),
             persist=False,
