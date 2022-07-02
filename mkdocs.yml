@@ -28,7 +28,8 @@ markdown_extensions:
   - pymdownx.superfences
   - mdx_include:
       base_path: docs
-  - pymdownx.tabbed
+  - pymdownx.tabbed:
+      alternate_style: true
 
 nav:
   - Overview: index.md
