@@ -3,7 +3,7 @@ import os
 import re
 import sys
 from argparse import ArgumentParser
-from typing import TypeVar
+from typing import Tuple, TypeVar
 
 if sys.version_info >= (3, 9):
     from collections.abc import Callable, Iterable
@@ -28,6 +28,10 @@ def is_special_benchmark_class(x: type, base1: type, base2: type):
         return issubclass(x, base1) and issubclass(x, base2)
     except TypeError as _:
         return False
+
+
+def parse_target(s: str) -> Tuple[str]:
+    return tuple(s.split("::"))
 
 
 if __name__ == "__main__":
