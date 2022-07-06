@@ -1,9 +1,12 @@
 import importlib
+import json
 import os
 import re
 import sys
 from argparse import ArgumentParser
 from typing import Tuple, TypeVar
+
+import sqlitecollections as sc
 
 if sys.version_info >= (3, 9):
     from collections.abc import Callable, Iterable
@@ -35,21 +38,33 @@ def parse_target(s: str) -> Tuple[str]:
 
 
 if __name__ == "__main__":
+    wd = os.path.dirname(os.path.abspath(__file__))
     parser = ArgumentParser()
     subcommand_parser = parser.add_subparsers(dest="subcommand")
     benchmarking_parser = subcommand_parser.add_parser("benchmarking")
     benchmarking_parser.add_argument("--prefix", default="benchmarks")
     benchmarking_parser.add_argument("--timeout", default=None, type=float)
     benchmarking_parser.add_argument("--debug", action="store_true")
+    benchmarking_parser.add_argument("--output-path")
     benchmarking_parser.add_argument("targets", nargs="*")
     args = parser.parse_args()
     if args.subcommand == "benchmarking":
-        wd = os.path.dirname(os.path.abspath(__file__))
-        output_dir = os.path.join(os.path.dirname(os.path.dirname(wd)), "benchmark_results", args.prefix)
+        output_path = args.output_path or os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(wd))), "temp", f"benchmark_{args.prefix}.db"
+        )
+        output_dir = os.path.dirname(output_path)
+
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-        env = Environment(loader=FileSystemLoader(wd), autoescape=select_autoescape())
-        template = env.get_template("template.j2")
+
+        buf = sc.Dict[str, dict](
+            connection=output_path,
+            table_name="benchmark_results",
+            key_serializer=lambda x: x.encode("utf-8"),
+            key_deserializer=lambda x: x.decode("utf-8"),
+            value_serializer=lambda x: json.dumps(x).encode("utf-8"),
+            value_deserializer=lambda x: json.loads(x.decode("utf-8")),
+        )
 
         for fn in filter(lambda x: x.startswith("benchmark_") and x.endswith(".py"), os.listdir(wd)):
             container_type_str = re.sub(r"benchmark_([a-z]+)\.py", "\\1", fn)
@@ -60,7 +75,6 @@ if __name__ == "__main__":
             sqlitecollections_base = getattr(
                 m, get_element_by_condition(lambda s: re.match(r"SqliteCollections[A-Za-z]+BenchmarkBase", s), dir(m))
             )
-            buf = []
             for benchmark_cls in (
                 getattr(m, cn) for cn in filter(lambda x: re.match(r"^Benchmark.+Base$", x) is not None, dir(m))
             ):
@@ -90,8 +104,6 @@ if __name__ == "__main__":
                     builtin_benchmark_class(timeout=args.timeout, debug=args.debug),
                     sqlitecollections_benchmark_class(timeout=args.timeout, debug=args.debug),
                 )
-                buf.append(comp().dict())
+                buf[f"{fn}::{comp._subject}"] = comp().dict()
                 print(".", end="")
-            with open(os.path.join(output_dir, f"{container_type_str}.md"), "w") as fout:
-                fout.write(template.render(data=buf))
             print("")
