@@ -50,7 +50,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.subcommand == "benchmarking":
         output_path = args.output_path or os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(wd))), "temp", f"benchmark_{args.prefix}.db"
+            os.path.dirname(os.path.dirname(wd)), "temp", f"benchmark_{args.prefix}.db"
         )
         output_dir = os.path.dirname(output_path)
 
