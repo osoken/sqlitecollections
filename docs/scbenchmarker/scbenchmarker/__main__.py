@@ -40,13 +40,15 @@ def parse_target(s: str) -> Tuple[str]:
 if __name__ == "__main__":
     wd = os.path.dirname(os.path.abspath(__file__))
     parser = ArgumentParser()
+    parser.add_argument("--prefix", default="benchmarks")
     subcommand_parser = parser.add_subparsers(dest="subcommand")
     benchmarking_parser = subcommand_parser.add_parser("benchmarking")
-    benchmarking_parser.add_argument("--prefix", default="benchmarks")
     benchmarking_parser.add_argument("--timeout", default=None, type=float)
     benchmarking_parser.add_argument("--debug", action="store_true")
     benchmarking_parser.add_argument("--output-path")
     benchmarking_parser.add_argument("targets", nargs="*")
+    render_parser = subcommand_parser.add_parser("render")
+    render_parser.add_argument("--input-path")
     args = parser.parse_args()
     if args.subcommand == "benchmarking":
         output_path = args.output_path or os.path.join(
@@ -107,3 +109,7 @@ if __name__ == "__main__":
                 buf[f"{fn}::{comp._subject}"] = comp().dict()
                 print(".", end="")
             print("")
+    elif args.subcommand == "render":
+        ...
+    else:
+        parser.print_help()
