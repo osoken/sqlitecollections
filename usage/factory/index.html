@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.8">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.9">
     
     
       
@@ -458,6 +458,26 @@
     Example
   </a>
   
+    <nav class="md-nav" aria-label="Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    Basic usage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifying-a-table-name" class="md-nav__link">
+    Specifying a table name
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -550,6 +570,26 @@
     Example
   </a>
   
+    <nav class="md-nav" aria-label="Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-usage" class="md-nav__link">
+    Basic usage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specifying-a-table-name" class="md-nav__link">
+    Specifying a table name
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -575,6 +615,7 @@
 <code>ListFactory</code> for <code>List</code>, <code>SetFactory</code> for <code>Set</code> and <code>DictFactory</code> for <code>Dict</code>.
 They replace constructors of each container that require extra arguments such as <code>connection</code>, <code>serializer</code>, <code>deserializer</code> etc., and allow users to construct a container without specifying those extra arguments.</p>
 <h2 id="example">Example</h2>
+<h3 id="basic-usage">Basic usage</h3>
 <p>The results of the following two examples are almost the same (except for the auto-generated table names).</p>
 <p>Without factory:</p>
 <div class="highlight"><pre><span></span><code>import sqlite3
@@ -610,6 +651,25 @@ l1 = list_([&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;])
 l2 = list_([&quot;Dave&quot;])
 l3 = list_([&quot;Erin&quot;])
 </code></pre></div>
+<h3 id="specifying-a-table-name">Specifying a table name</h3>
+<p>If you want to specify table names of containers from a factory, you can do that as follows:</p>
+<div class="highlight"><pre><span></span><code>import sqlite3
+from sqlitecollections import factory
+
+conn = sqlite3.connect(&quot;path/to/file.db&quot;)
+
+def encode(x: str) -&gt; bytes:
+    return x.encode(&quot;utf-8&quot;)
+
+def decode(x: bytes) -&gt; str:
+    return x.decode(&quot;utf-8&quot;)
+
+list_ = factory.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
+
+l1 = list_[&quot;first_table_name&quot;]([&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;])
+
+assert l1.table_name == &quot;first_table_name&quot;
+</code></pre></div>
 <h1 id="listfactory">ListFactory</h1>
 <h2 id="listfactoryt"><code>ListFactory[T](...)</code></h2>
 <p>Constructor of <code>ListFactory</code> which constructs <code>List</code>.</p>
@@ -620,6 +680,7 @@ l3 = list_([&quot;Erin&quot;])
 <h3 id="arguments">Arguments:</h3>
 <ul>
 <li><code>connection</code>: <code>str</code> or <code>sqlite3.Connection</code>, optional, default=<code>None</code>; If <code>None</code>, temporary file is automatically created. If <code>connection</code> is a <code>str</code>, it will be used as the sqlite3 database file name. You can pass a <code>sqlite3.Connection</code> directly.</li>
+<li><code>table_name</code>: <code>str</code>, optional, default=<code>None</code>; Table name of containers from this factory. This argument is assumed not to be specified directly by users. If <code>None</code>, an auto-generated unique name will be used.</li>
 <li><code>serializer</code>: <code>Callable[[T], bytes]</code>, optional, default=<code>None</code>; Function to serialize value. If <code>None</code>, <code>pickle.dumps</code> is used.</li>
 <li><code>deserializer</code>: <code>Callable[[bytes], T]</code>, optional, default=<code>None</code>; Function to deserialize value. If <code>None</code>, <code>pickle.loads</code> is used.</li>
 </ul>
@@ -641,6 +702,15 @@ l3 = list_([&quot;Erin&quot;])
 </ul>
 <h3 id="return-value_1">Return value:</h3>
 <p><code>List[T]</code>: connection, serializer and deserializer are the same as those of the factory.</p>
+<hr />
+<h2 id="ft"><code>f[t]</code></h2>
+<p>Return a copy of this factory <code>f</code> that creates container with table name <code>t</code>.</p>
+<h3 id="arguments_3">Arguments:</h3>
+<ul>
+<li><code>t</code>: <code>str</code>; the table name</li>
+</ul>
+<h3 id="return-value_2">Return value:</h3>
+<p><code>ListFactory[T]</code>: connection, serializer and deserializer are the same as those of this factory and the table name of the <code>List[T]</code> from this return value will be set to <code>t</code>.</p>
 <p>===</p>
 <h1 id="dictfactory">DictFactory</h1>
 <h2 id="dictfactorykt-vt"><code>DictFactory[KT, VT](...)</code></h2>
@@ -650,9 +720,10 @@ l3 = list_([&quot;Erin&quot;])
 <li><code>KT</code>: key type of the <code>Dict</code></li>
 <li><code>VT</code>: value type of the <code>Dict</code></li>
 </ul>
-<h3 id="arguments_3">Arguments:</h3>
+<h3 id="arguments_4">Arguments:</h3>
 <ul>
 <li><code>connection</code>: <code>str</code> or <code>sqlite3.Connection</code>, optional, default=<code>None</code>; If <code>None</code>, temporary file is automatically created. If <code>connection</code> is a <code>str</code>, it will be used as the sqlite3 database file name. You can pass a <code>sqlite3.Connection</code> directly.</li>
+<li><code>table_name</code>: <code>str</code>, optional, default=<code>None</code>; Table name of containers from this factory. This argument is assumed not to be specified directly by users. If <code>None</code>, an auto-generated unique name will be used.</li>
 <li><code>key_serializer</code>: <code>Callable[[KT], bytes]</code>, optional, default=<code>None</code>; Function to serialize key. If <code>None</code>, <code>pickle.dumps</code> is used.</li>
 <li><code>key_deserializer</code>: <code>Callable[[bytes], KT]</code>, optional, default=<code>None</code>; Function to deserialize key. If <code>None</code>, <code>pickle.loads</code> is used.</li>
 <li><code>value_serializer</code>: <code>Callable[[VT], bytes]</code>, optional, default=<code>None</code>; Function to serialize value. If <code>None</code>, <code>key_serializer</code> is used.</li>
@@ -661,23 +732,32 @@ l3 = list_([&quot;Erin&quot;])
 <hr />
 <h2 id="dict_data-kwargs"><code>dict_(data, **kwargs)</code></h2>
 <p>Construct <code>Dict[KT, VT]</code> with connection, key*serializer, etc., preset from <code>DictFactory[KT, VT]</code> <code>dict*</code>.</p>
-<h3 id="arguments_4">Arguments:</h3>
-<ul>
-<li><code>data</code>: <code>Mapping[KT, VT]</code> or <code>Iterable[Tuple[KT, VT]]</code>, optional, defualt=<code>None</code>; Initial data.</li>
-<li><code>**kwargs</code>: <code>VT</code>, optional; Appended to initial data.</li>
-</ul>
-<h3 id="return-value_2">Return value:</h3>
-<p><code>Dict[KT, VT]</code>: connection, key*serializers, etc., are the same as those of the factory <code>dict*</code>.</p>
-<hr />
-<h2 id="createdata-kwargs"><code>create(data, **kwargs)</code></h2>
-<p>Construct <code>Dict[KT, VT]</code> with connection, key_serializer, etc., preset from the factory.</p>
 <h3 id="arguments_5">Arguments:</h3>
 <ul>
 <li><code>data</code>: <code>Mapping[KT, VT]</code> or <code>Iterable[Tuple[KT, VT]]</code>, optional, defualt=<code>None</code>; Initial data.</li>
 <li><code>**kwargs</code>: <code>VT</code>, optional; Appended to initial data.</li>
 </ul>
 <h3 id="return-value_3">Return value:</h3>
+<p><code>Dict[KT, VT]</code>: connection, key*serializers, etc., are the same as those of the factory <code>dict*</code>.</p>
+<hr />
+<h2 id="createdata-kwargs"><code>create(data, **kwargs)</code></h2>
+<p>Construct <code>Dict[KT, VT]</code> with connection, key_serializer, etc., preset from the factory.</p>
+<h3 id="arguments_6">Arguments:</h3>
+<ul>
+<li><code>data</code>: <code>Mapping[KT, VT]</code> or <code>Iterable[Tuple[KT, VT]]</code>, optional, defualt=<code>None</code>; Initial data.</li>
+<li><code>**kwargs</code>: <code>VT</code>, optional; Appended to initial data.</li>
+</ul>
+<h3 id="return-value_4">Return value:</h3>
 <p><code>Dict[KT, VT]</code>: connection, key_serializers, etc., are the same as those of the factory.</p>
+<hr />
+<h2 id="ft_1"><code>f[t]</code></h2>
+<p>Return a copy of this factory <code>f</code> that creates container with table name <code>t</code>.</p>
+<h3 id="arguments_7">Arguments:</h3>
+<ul>
+<li><code>t</code>: <code>str</code>; the table name</li>
+</ul>
+<h3 id="return-value_5">Return value:</h3>
+<p><code>DictFactory[KT, VT]</code>: connection, key_serializer, key_deserializer, value_serializer and value_deserializer are the same as those of this factory and the table name of the <code>Dict[KT, VT]</code> from this return value will be set to <code>t</code>.</p>
 <p>===</p>
 <h1 id="setfactory">SetFactory</h1>
 <h2 id="setfactoryt"><code>SetFactory[T](...)</code></h2>
@@ -686,30 +766,39 @@ l3 = list_([&quot;Erin&quot;])
 <ul>
 <li><code>T</code>: value type of the <code>Set</code></li>
 </ul>
-<h3 id="arguments_6">Arguments:</h3>
+<h3 id="arguments_8">Arguments:</h3>
 <ul>
 <li><code>connection</code>: <code>str</code> or <code>sqlite3.Connection</code>, optional, default=<code>None</code>; If <code>None</code>, temporary file is automatically created. If <code>connection</code> is a <code>str</code>, it will be used as the sqlite3 database file name. You can pass a <code>sqlite3.Connection</code> directly.</li>
+<li><code>table_name</code>: <code>str</code>, optional, default=<code>None</code>; Table name of containers from this factory. This argument is assumed not to be specified directly by users. If <code>None</code>, an auto-generated unique name will be used.</li>
 <li><code>serializer</code>: <code>Callable[[T], bytes]</code>, optional, default=<code>None</code>; Function to serialize value. If <code>None</code>, <code>pickle.dumps</code> is used.</li>
 <li><code>deserializer</code>: <code>Callable[[bytes], T]</code>, optional, default=<code>None</code>; Function to deserialize value. If <code>None</code>, <code>pickle.loads</code> is used.</li>
 </ul>
 <hr />
 <h2 id="set_data"><code>set_(data)</code></h2>
 <p>Construct <code>Set[T]</code> with connection, serializer and deserializer preset from <code>SetFactory[T]</code> <code>set_</code>.</p>
-<h3 id="arguments_7">Arguments:</h3>
+<h3 id="arguments_9">Arguments:</h3>
 <ul>
 <li><code>data</code>: <code>Iterable[T]</code>, optional, defualt=<code>None</code>; Initial data.</li>
 </ul>
-<h3 id="return-value_4">Return value:</h3>
+<h3 id="return-value_6">Return value:</h3>
 <p><code>Set[T]</code>: connection, serializer and deserializer are the same as those of the factory <code>set_</code>.</p>
 <hr />
 <h2 id="createdata_1"><code>create(data)</code></h2>
 <p>Construct <code>Set[T]</code> with connection, serializer and deserializer preset from the factory.</p>
-<h3 id="arguments_8">Arguments:</h3>
+<h3 id="arguments_10">Arguments:</h3>
 <ul>
 <li><code>data</code>: <code>Iterable[T]</code>, optional, defualt=<code>None</code>; Initial data.</li>
 </ul>
-<h3 id="return-value_5">Return value:</h3>
+<h3 id="return-value_7">Return value:</h3>
 <p><code>Set[T]</code>: connection, serializer and deserializer are the same as those of the factory.</p>
+<h2 id="ft_2"><code>f[t]</code></h2>
+<p>Return a copy of this factory <code>f</code> that creates container with table name <code>t</code>.</p>
+<h3 id="arguments_11">Arguments:</h3>
+<ul>
+<li><code>t</code>: <code>str</code>; the table name</li>
+</ul>
+<h3 id="return-value_8">Return value:</h3>
+<p><code>SetFactory[T]</code>: connection, serializer and deserializer are the same as those of this factory and the table name of the <code>Set[T]</code> from this return value will be set to <code>t</code>.</p>
 <p>===</p>
 
               
@@ -781,7 +870,7 @@ l3 = list_([&quot;Erin&quot;])
     <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.b97dbffb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.0238f547.min.js"></script>
+      <script src="../../assets/javascripts/bundle.6c7ad80a.min.js"></script>
       
     
   </body>

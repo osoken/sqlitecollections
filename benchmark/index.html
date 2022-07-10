@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.8">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.9">
     
     
       
@@ -515,8 +515,12 @@
 
   <h1>Benchmark</h1>
 
-<div class="tabbed-set" data-tabs="1:5"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">py36</label><div class="tabbed-content">
-<div class="tabbed-set" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">dict</label><div class="tabbed-content">
+<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">py36</label><label for="__tabbed_1_2">py37</label><label for="__tabbed_1_3">py38</label><label for="__tabbed_1_4">py39</label><label for="__tabbed_1_5">py310</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">dict</label><label for="__tabbed_2_2">list</label><label for="__tabbed_2_3">set</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -530,141 +534,141 @@
 <tbody>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.00363</td>
-<td align="right">0.0074</td>
-<td align="right">2.03972</td>
+<td align="right">0.00342</td>
+<td align="right">0.00631</td>
+<td align="right">1.84355</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.00365</td>
-<td align="right">0.00365</td>
-<td align="right">0.9982</td>
+<td align="right">0.00353</td>
+<td align="right">0.0035</td>
+<td align="right">0.9903</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.0037</td>
-<td align="right">0.06666</td>
-<td align="right">18.02148</td>
+<td align="right">0.00359</td>
+<td align="right">0.05032</td>
+<td align="right">14.01616</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code></td>
-<td align="right">0.0038</td>
-<td align="right">0.00847</td>
-<td align="right">2.23129</td>
+<td align="right">0.00348</td>
+<td align="right">0.0063</td>
+<td align="right">1.80955</td>
 </tr>
 <tr>
 <td align="left"><code>get</code></td>
-<td align="right">0.00367</td>
-<td align="right">0.00369</td>
-<td align="right">1.00693</td>
+<td align="right">0.00348</td>
+<td align="right">0.00356</td>
+<td align="right">1.02208</td>
 </tr>
 <tr>
 <td align="left"><code>get (unsuccessful search)</code></td>
-<td align="right">0.0038</td>
-<td align="right">0.00372</td>
-<td align="right">0.97945</td>
+<td align="right">0.00353</td>
+<td align="right">0.00348</td>
+<td align="right">0.98594</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code></td>
-<td align="right">0.00366</td>
-<td align="right">0.00371</td>
-<td align="right">1.01214</td>
+<td align="right">0.00361</td>
+<td align="right">0.00367</td>
+<td align="right">1.01489</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.00377</td>
-<td align="right">0.04691</td>
-<td align="right">12.43576</td>
+<td align="right">0.00354</td>
+<td align="right">0.03973</td>
+<td align="right">11.2198</td>
 </tr>
 <tr>
 <td align="left"><code>items</code></td>
-<td align="right">0.00422</td>
-<td align="right">0.01106</td>
-<td align="right">2.62174</td>
+<td align="right">0.00382</td>
+<td align="right">0.0098</td>
+<td align="right">2.56746</td>
 </tr>
 <tr>
 <td align="left"><code>__iter__</code></td>
-<td align="right">0.00392</td>
-<td align="right">0.00773</td>
-<td align="right">1.9721</td>
+<td align="right">0.00359</td>
+<td align="right">0.0068</td>
+<td align="right">1.89573</td>
 </tr>
 <tr>
 <td align="left"><code>keys</code></td>
-<td align="right">0.0039</td>
-<td align="right">0.00773</td>
-<td align="right">1.98158</td>
+<td align="right">0.00386</td>
+<td align="right">0.00726</td>
+<td align="right">1.88217</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00371</td>
-<td align="right">0.00378</td>
-<td align="right">1.01817</td>
+<td align="right">0.00385</td>
+<td align="right">0.00376</td>
+<td align="right">0.97666</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00385</td>
-<td align="right">0.00378</td>
-<td align="right">0.98039</td>
+<td align="right">0.0037</td>
+<td align="right">0.00353</td>
+<td align="right">0.95439</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.0039</td>
-<td align="right">0.00748</td>
-<td align="right">1.92131</td>
+<td align="right">0.00366</td>
+<td align="right">0.00638</td>
+<td align="right">1.74369</td>
 </tr>
 <tr>
 <td align="left"><code>pop (unsuccessful search)</code></td>
-<td align="right">0.00391</td>
-<td align="right">0.00601</td>
-<td align="right">1.53688</td>
+<td align="right">0.00354</td>
+<td align="right">0.00515</td>
+<td align="right">1.45666</td>
 </tr>
 <tr>
 <td align="left"><code>popitem</code></td>
-<td align="right">0.00399</td>
-<td align="right">0.00748</td>
-<td align="right">1.87475</td>
+<td align="right">0.00365</td>
+<td align="right">0.0064</td>
+<td align="right">1.75341</td>
 </tr>
 <tr>
 <td align="left"><code>setdefault (unsuccessful search)</code></td>
-<td align="right">0.0039</td>
-<td align="right">0.00659</td>
-<td align="right">1.69047</td>
+<td align="right">0.00368</td>
+<td align="right">0.00543</td>
+<td align="right">1.4768</td>
 </tr>
 <tr>
 <td align="left"><code>setdefault</code></td>
-<td align="right">0.00415</td>
-<td align="right">0.0062</td>
-<td align="right">1.49247</td>
+<td align="right">0.00361</td>
+<td align="right">0.01158</td>
+<td align="right">3.20907</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (add new item)</td>
-<td align="right">0.0039</td>
-<td align="right">0.00733</td>
-<td align="right">1.87924</td>
+<td align="right">0.00361</td>
+<td align="right">0.00635</td>
+<td align="right">1.75979</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (replace)</td>
-<td align="right">0.0039</td>
-<td align="right">0.00828</td>
-<td align="right">2.12437</td>
+<td align="right">0.00381</td>
+<td align="right">0.00732</td>
+<td align="right">1.92075</td>
 </tr>
 <tr>
 <td align="left"><code>update</code></td>
-<td align="right">0.00391</td>
-<td align="right">0.00813</td>
-<td align="right">2.07801</td>
+<td align="right">0.00395</td>
+<td align="right">0.00678</td>
+<td align="right">1.71738</td>
 </tr>
 <tr>
 <td align="left"><code>update</code> (many)</td>
-<td align="right">0.00463</td>
-<td align="right">0.04191</td>
-<td align="right">9.05382</td>
+<td align="right">0.00455</td>
+<td align="right">0.03988</td>
+<td align="right">8.76178</td>
 </tr>
 <tr>
 <td align="left"><code>values</code></td>
 <td align="right">0.00379</td>
-<td align="right">0.0074</td>
-<td align="right">1.95399</td>
+<td align="right">0.00737</td>
+<td align="right">1.94704</td>
 </tr>
 </tbody>
 </table>
@@ -693,9 +697,9 @@
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.04688</td>
-<td align="right">0.01172</td>
-<td align="right">0.25</td>
+<td align="right">0.00781</td>
+<td align="right">0.01562</td>
+<td align="right">2.0</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code></td>
@@ -723,15 +727,15 @@
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.02344</td>
+<td align="right">0.01562</td>
+<td align="right">0.66667</td>
 </tr>
 <tr>
 <td align="left"><code>items</code></td>
-<td align="right">0.22656</td>
-<td align="right">0.28125</td>
-<td align="right">1.24138</td>
+<td align="right">0.15625</td>
+<td align="right">0.27344</td>
+<td align="right">1.75</td>
 </tr>
 <tr>
 <td align="left"><code>__iter__</code></td>
@@ -807,7 +811,7 @@
 </tr>
 <tr>
 <td align="left"><code>update</code> (many)</td>
-<td align="right">0.19922</td>
+<td align="right">0.21094</td>
 <td align="right">0.0</td>
 <td align="right">0.0</td>
 </tr>
@@ -820,7 +824,7 @@
 </tbody>
 </table>
 </div>
-<input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">list</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -834,171 +838,171 @@
 <tbody>
 <tr>
 <td align="left"><code>__add__</code></td>
-<td align="right">0.0038</td>
-<td align="right">0.03949</td>
-<td align="right">10.39313</td>
+<td align="right">0.00358</td>
+<td align="right">0.02938</td>
+<td align="right">8.21552</td>
 </tr>
 <tr>
 <td align="left"><code>append</code></td>
-<td align="right">0.00382</td>
-<td align="right">0.00836</td>
-<td align="right">2.18764</td>
+<td align="right">0.00363</td>
+<td align="right">0.0059</td>
+<td align="right">1.62558</td>
 </tr>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.0038</td>
-<td align="right">0.00893</td>
-<td align="right">2.35128</td>
+<td align="right">0.00353</td>
+<td align="right">0.0059</td>
+<td align="right">1.66889</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.00408</td>
-<td align="right">0.00386</td>
-<td align="right">0.94645</td>
+<td align="right">0.00356</td>
+<td align="right">0.00356</td>
+<td align="right">1.00006</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.00381</td>
-<td align="right">0.04056</td>
-<td align="right">10.6588</td>
+<td align="right">0.0036</td>
+<td align="right">0.02752</td>
+<td align="right">7.64977</td>
 </tr>
 <tr>
 <td align="left"><code>count</code></td>
-<td align="right">0.00385</td>
-<td align="right">0.00393</td>
-<td align="right">1.02088</td>
+<td align="right">0.00354</td>
+<td align="right">0.00356</td>
+<td align="right">1.00313</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.00385</td>
-<td align="right">0.02726</td>
-<td align="right">7.07063</td>
+<td align="right">0.00351</td>
+<td align="right">0.01863</td>
+<td align="right">5.30409</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code></td>
-<td align="right">0.00402</td>
-<td align="right">0.02154</td>
-<td align="right">5.36535</td>
+<td align="right">0.00363</td>
+<td align="right">0.00898</td>
+<td align="right">2.47417</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code> (slice)</td>
-<td align="right">0.00404</td>
-<td align="right">0.01649</td>
-<td align="right">4.0866</td>
+<td align="right">0.00359</td>
+<td align="right">0.01196</td>
+<td align="right">3.32815</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code> (slice with skip)</td>
-<td align="right">0.00381</td>
-<td align="right">0.01634</td>
-<td align="right">4.29127</td>
+<td align="right">0.00357</td>
+<td align="right">0.0119</td>
+<td align="right">3.33736</td>
 </tr>
 <tr>
 <td align="left"><code>extend</code></td>
-<td align="right">0.00384</td>
-<td align="right">0.00804</td>
-<td align="right">2.09517</td>
+<td align="right">0.00361</td>
+<td align="right">0.00576</td>
+<td align="right">1.59568</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code></td>
-<td align="right">0.0038</td>
-<td align="right">0.00382</td>
-<td align="right">1.00388</td>
+<td align="right">0.0035</td>
+<td align="right">0.00352</td>
+<td align="right">1.00609</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code> (slice)</td>
-<td align="right">0.00378</td>
-<td align="right">0.02022</td>
-<td align="right">5.35303</td>
+<td align="right">0.00355</td>
+<td align="right">0.01593</td>
+<td align="right">4.48665</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code> (slice with skip)</td>
-<td align="right">0.00377</td>
-<td align="right">0.01918</td>
-<td align="right">5.0921</td>
+<td align="right">0.00355</td>
+<td align="right">0.00996</td>
+<td align="right">2.80868</td>
 </tr>
 <tr>
 <td align="left"><code>__iadd__</code></td>
-<td align="right">0.00378</td>
-<td align="right">0.01094</td>
-<td align="right">2.89162</td>
+<td align="right">0.00381</td>
+<td align="right">0.00598</td>
+<td align="right">1.56915</td>
 </tr>
 <tr>
 <td align="left"><code>__imult__</code></td>
-<td align="right">0.00392</td>
-<td align="right">0.02264</td>
-<td align="right">5.77953</td>
+<td align="right">0.00391</td>
+<td align="right">0.01746</td>
+<td align="right">4.47125</td>
 </tr>
 <tr>
 <td align="left"><code>index</code></td>
-<td align="right">0.00378</td>
-<td align="right">0.00405</td>
-<td align="right">1.07091</td>
+<td align="right">0.00353</td>
+<td align="right">0.00373</td>
+<td align="right">1.05496</td>
 </tr>
 <tr>
 <td align="left"><code>index</code> (unsuccessful search)</td>
-<td align="right">0.00378</td>
-<td align="right">0.00391</td>
-<td align="right">1.03628</td>
+<td align="right">0.00357</td>
+<td align="right">0.00372</td>
+<td align="right">1.0411</td>
 </tr>
 <tr>
 <td align="left"><code>insert</code></td>
-<td align="right">0.0039</td>
-<td align="right">0.01415</td>
-<td align="right">3.62988</td>
+<td align="right">0.00359</td>
+<td align="right">0.0106</td>
+<td align="right">2.95514</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00377</td>
-<td align="right">0.00386</td>
-<td align="right">1.02373</td>
+<td align="right">0.00351</td>
+<td align="right">0.00354</td>
+<td align="right">1.00857</td>
 </tr>
 <tr>
 <td align="left"><code>__mult__</code></td>
-<td align="right">0.00376</td>
-<td align="right">0.05951</td>
-<td align="right">15.81665</td>
+<td align="right">0.00352</td>
+<td align="right">0.04564</td>
+<td align="right">12.97741</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00373</td>
-<td align="right">0.00387</td>
-<td align="right">1.03741</td>
+<td align="right">0.00353</td>
+<td align="right">0.00355</td>
+<td align="right">1.00586</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.00383</td>
-<td align="right">0.01192</td>
-<td align="right">3.1133</td>
+<td align="right">0.00358</td>
+<td align="right">0.00907</td>
+<td align="right">2.53579</td>
 </tr>
 <tr>
 <td align="left"><code>remove</code></td>
-<td align="right">0.00383</td>
-<td align="right">0.01499</td>
-<td align="right">3.91892</td>
+<td align="right">0.00362</td>
+<td align="right">0.01103</td>
+<td align="right">3.04499</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code></td>
-<td align="right">0.00383</td>
-<td align="right">0.00857</td>
-<td align="right">2.23852</td>
+<td align="right">0.0037</td>
+<td align="right">0.00633</td>
+<td align="right">1.70916</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (slice)</td>
-<td align="right">0.00384</td>
-<td align="right">0.80743</td>
-<td align="right">210.46511</td>
+<td align="right">0.0037</td>
+<td align="right">0.57197</td>
+<td align="right">154.39994</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (slice with skip)</td>
-<td align="right">0.00385</td>
-<td align="right">0.00915</td>
-<td align="right">2.37851</td>
+<td align="right">0.00368</td>
+<td align="right">0.00633</td>
+<td align="right">1.72356</td>
 </tr>
 <tr>
 <td align="left"><code>sort</code></td>
-<td align="right">0.00434</td>
-<td align="right">0.08783</td>
-<td align="right">20.24305</td>
+<td align="right">0.0036</td>
+<td align="right">0.08175</td>
+<td align="right">22.69109</td>
 </tr>
 </tbody>
 </table>
@@ -1178,13 +1182,13 @@
 <tr>
 <td align="left"><code>sort</code></td>
 <td align="right">0.0</td>
-<td align="right">0.82031</td>
+<td align="right">0.82812</td>
 <td align="right">inf</td>
 </tr>
 </tbody>
 </table>
 </div>
-<input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><label for="__tabbed_2_3">set</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -1198,1837 +1202,655 @@
 <tbody>
 <tr>
 <td align="left"><code>add (existing item)</code></td>
-<td align="right">0.00382</td>
-<td align="right">0.00588</td>
-<td align="right">1.53862</td>
-</tr>
-<tr>
-<td align="left"><code>add (new item)</code></td>
-<td align="right">0.00383</td>
-<td align="right">0.00712</td>
-<td align="right">1.85838</td>
-</tr>
-<tr>
-<td align="left"><code>__and__</code></td>
-<td align="right">0.00386</td>
-<td align="right">0.02425</td>
-<td align="right">6.29021</td>
-</tr>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.00383</td>
-<td align="right">0.00704</td>
-<td align="right">1.83496</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.00368</td>
-<td align="right">0.00379</td>
-<td align="right">1.02966</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.00382</td>
-<td align="right">0.0191</td>
-<td align="right">5.00449</td>
-</tr>
-<tr>
-<td align="left"><code>difference</code></td>
-<td align="right">0.00379</td>
-<td align="right">0.01949</td>
-<td align="right">5.13585</td>
-</tr>
-<tr>
-<td align="left"><code>discard</code></td>
-<td align="right">0.00452</td>
-<td align="right">0.00769</td>
-<td align="right">1.70151</td>
-</tr>
-<tr>
-<td align="left"><code>discard (no changes)</code></td>
-<td align="right">0.00374</td>
-<td align="right">0.00638</td>
-<td align="right">1.70562</td>
-</tr>
-<tr>
-<td align="left"><code>__ge__</code></td>
-<td align="right">0.00377</td>
-<td align="right">0.00375</td>
-<td align="right">0.99359</td>
-</tr>
-<tr>
-<td align="left"><code>__ge__</code> (not greater than or equals to)</td>
-<td align="right">0.00385</td>
 <td align="right">0.00396</td>
-<td align="right">1.02927</td>
+<td align="right">0.00543</td>
+<td align="right">1.37261</td>
 </tr>
 <tr>
-<td align="left"><code>__gt__</code></td>
-<td align="right">0.00384</td>
-<td align="right">0.00763</td>
-<td align="right">1.98734</td>
-</tr>
-<tr>
-<td align="left"><code>__gt__</code> (not greater than)</td>
+<td align="left"><code>add (new item)</code></td>
 <td align="right">0.00387</td>
-<td align="right">0.0198</td>
-<td align="right">5.12059</td>
+<td align="right">0.00623</td>
+<td align="right">1.61097</td>
 </tr>
 <tr>
-<td align="left"><code>__iand__</code></td>
-<td align="right">0.00392</td>
-<td align="right">0.00935</td>
-<td align="right">2.38403</td>
+<td align="left"><code>__and__</code></td>
+<td align="right">0.00355</td>
+<td align="right">0.01975</td>
+<td align="right">5.55915</td>
 </tr>
 <tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.004</td>
-<td align="right">0.01828</td>
-<td align="right">4.56421</td>
+<td align="left"><code>clear</code></td>
+<td align="right">0.00369</td>
+<td align="right">0.00602</td>
+<td align="right">1.63046</td>
 </tr>
 <tr>
-<td align="left"><code>intersection</code></td>
-<td align="right">0.0039</td>
-<td align="right">0.02454</td>
-<td align="right">6.28798</td>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.00367</td>
+<td align="right">0.00359</td>
+<td align="right">0.97639</td>
 </tr>
 <tr>
-<td align="left"><code>intersection_update</code></td>
-<td align="right">0.00389</td>
-<td align="right">0.01342</td>
-<td align="right">3.45114</td>
+<td align="left"><code>copy</code></td>
+<td align="right">0.00355</td>
+<td align="right">0.01573</td>
+<td align="right">4.43074</td>
 </tr>
 <tr>
-<td align="left"><code>__ior__</code></td>
-<td align="right">0.00402</td>
-<td align="right">0.00809</td>
-<td align="right">2.0146</td>
-</tr>
-<tr>
-<td align="left"><code>isdisjoint</code></td>
-<td align="right">0.00386</td>
-<td align="right">0.00381</td>
-<td align="right">0.98626</td>
-</tr>
-<tr>
-<td align="left"><code>isdisjoint</code> (not disjoint)</td>
-<td align="right">0.00393</td>
-<td align="right">0.00381</td>
-<td align="right">0.9712</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code></td>
-<td align="right">0.00384</td>
-<td align="right">0.04193</td>
-<td align="right">10.91179</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code> (not subset)</td>
-<td align="right">0.00376</td>
-<td align="right">0.02027</td>
-<td align="right">5.39294</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code></td>
-<td align="right">0.00378</td>
-<td align="right">0.0117</td>
-<td align="right">3.09392</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code> (not superset)</td>
-<td align="right">0.004</td>
-<td align="right">0.00423</td>
-<td align="right">1.05737</td>
-</tr>
-<tr>
-<td align="left"><code>__ixor__</code></td>
-<td align="right">0.00391</td>
-<td align="right">0.02868</td>
-<td align="right">7.33628</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code></td>
-<td align="right">0.00377</td>
-<td align="right">0.00461</td>
-<td align="right">1.22163</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code> (not less than or equals to)</td>
-<td align="right">0.00395</td>
-<td align="right">0.00403</td>
-<td align="right">1.01883</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.00382</td>
-<td align="right">0.0039</td>
-<td align="right">1.02104</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code></td>
-<td align="right">0.00392</td>
-<td align="right">0.00483</td>
-<td align="right">1.23464</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code> (not less than)</td>
-<td align="right">0.00388</td>
-<td align="right">0.00386</td>
-<td align="right">0.99281</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00374</td>
-<td align="right">0.00378</td>
-<td align="right">1.01004</td>
-</tr>
-<tr>
-<td align="left"><code>__or__</code></td>
-<td align="right">0.00382</td>
-<td align="right">0.02332</td>
-<td align="right">6.10726</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.00382</td>
-<td align="right">0.00762</td>
-<td align="right">1.99394</td>
-</tr>
-<tr>
-<td align="left"><code>remove</code></td>
-<td align="right">0.00378</td>
-<td align="right">0.00804</td>
-<td align="right">2.12343</td>
-</tr>
-<tr>
-<td align="left"><code>__sub__</code></td>
+<td align="left"><code>difference</code></td>
 <td align="right">0.00372</td>
-<td align="right">0.01996</td>
-<td align="right">5.361</td>
-</tr>
-<tr>
-<td align="left"><code>symmetric_difference</code></td>
-<td align="right">0.00373</td>
-<td align="right">0.04705</td>
-<td align="right">12.61027</td>
-</tr>
-<tr>
-<td align="left"><code>symmetric_difference_update</code></td>
-<td align="right">0.00373</td>
-<td align="right">0.02787</td>
-<td align="right">7.47875</td>
-</tr>
-<tr>
-<td align="left"><code>union</code></td>
-<td align="right">0.00378</td>
-<td align="right">0.02127</td>
-<td align="right">5.62213</td>
-</tr>
-<tr>
-<td align="left"><code>update</code></td>
-<td align="right">0.00373</td>
-<td align="right">0.00794</td>
-<td align="right">2.12789</td>
-</tr>
-<tr>
-<td align="left"><code>__xor__</code></td>
-<td align="right">0.00377</td>
-<td align="right">0.04659</td>
-<td align="right">12.36522</td>
-</tr>
-</tbody>
-</table>
-<p>approximate memory usage</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>add (existing item)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>add (new item)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__and__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.00391</td>
-<td align="right">inf</td>
-</tr>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>difference</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.01655</td>
+<td align="right">4.45078</td>
 </tr>
 <tr>
 <td align="left"><code>discard</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00363</td>
+<td align="right">0.00649</td>
+<td align="right">1.78857</td>
 </tr>
 <tr>
 <td align="left"><code>discard (no changes)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00357</td>
+<td align="right">0.00509</td>
+<td align="right">1.4263</td>
 </tr>
 <tr>
 <td align="left"><code>__ge__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.0036</td>
+<td align="right">0.00356</td>
+<td align="right">0.99089</td>
 </tr>
 <tr>
 <td align="left"><code>__ge__</code> (not greater than or equals to)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00372</td>
+<td align="right">0.00375</td>
+<td align="right">1.00974</td>
 </tr>
 <tr>
 <td align="left"><code>__gt__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00368</td>
+<td align="right">0.00589</td>
+<td align="right">1.59848</td>
 </tr>
 <tr>
 <td align="left"><code>__gt__</code> (not greater than)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00358</td>
+<td align="right">0.01724</td>
+<td align="right">4.81388</td>
 </tr>
 <tr>
 <td align="left"><code>__iand__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00357</td>
+<td align="right">0.00833</td>
+<td align="right">2.33169</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00362</td>
+<td align="right">0.01668</td>
+<td align="right">4.6076</td>
 </tr>
 <tr>
 <td align="left"><code>intersection</code></td>
-<td align="right">0.0</td>
-<td align="right">0.00781</td>
-<td align="right">inf</td>
+<td align="right">0.00357</td>
+<td align="right">0.01986</td>
+<td align="right">5.56151</td>
 </tr>
 <tr>
 <td align="left"><code>intersection_update</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00354</td>
+<td align="right">0.00778</td>
+<td align="right">2.19555</td>
 </tr>
 <tr>
 <td align="left"><code>__ior__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00351</td>
+<td align="right">0.00664</td>
+<td align="right">1.89073</td>
 </tr>
 <tr>
 <td align="left"><code>isdisjoint</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00353</td>
+<td align="right">0.00356</td>
+<td align="right">1.01054</td>
 </tr>
 <tr>
 <td align="left"><code>isdisjoint</code> (not disjoint)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
+<td align="right">0.00348</td>
+<td align="right">0.00348</td>
+<td align="right">1.00027</td>
 </tr>
 <tr>
 <td align="left"><code>issubset</code></td>
-<td align="right">0.0</td>
-<td align="right">0.00391</td>
-<td align="right">inf</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code> (not subset)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code> (not superset)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__ixor__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code> (not less than or equals to)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code> (not less than)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__or__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.00391</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-</tr>
-<tr>
-<td align="left"><code>remove</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__sub__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>symmetric_difference</code></td>
-<td align="right">0.0</td>
-<td align="right">0.00781</td>
-<td align="right">inf</td>
-</tr>
-<tr>
-<td align="left"><code>symmetric_difference_update</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>union</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>update</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__xor__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.00391</td>
-<td align="right">inf</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">py37</label><div class="tabbed-content">
-<div class="tabbed-set" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><label for="__tabbed_3_1">dict</label><div class="tabbed-content">
-<p>timing</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.00429</td>
-<td align="right">0.01004</td>
-<td align="right">2.33851</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.00468</td>
-<td align="right">0.00475</td>
-<td align="right">1.01522</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.00473</td>
-<td align="right">0.09151</td>
-<td align="right">19.33211</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code></td>
-<td align="right">0.00458</td>
-<td align="right">0.00898</td>
-<td align="right">1.9619</td>
-</tr>
-<tr>
-<td align="left"><code>get</code></td>
-<td align="right">0.00558</td>
-<td align="right">0.00465</td>
-<td align="right">0.83358</td>
-</tr>
-<tr>
-<td align="left"><code>get (unsuccessful search)</code></td>
-<td align="right">0.00477</td>
-<td align="right">0.00412</td>
-<td align="right">0.86341</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code></td>
-<td align="right">0.00422</td>
-<td align="right">0.00475</td>
-<td align="right">1.12503</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.0047</td>
-<td align="right">0.06785</td>
-<td align="right">14.43499</td>
-</tr>
-<tr>
-<td align="left"><code>items</code></td>
-<td align="right">0.00564</td>
-<td align="right">0.01609</td>
-<td align="right">2.85422</td>
-</tr>
-<tr>
-<td align="left"><code>__iter__</code></td>
-<td align="right">0.00508</td>
-<td align="right">0.00981</td>
-<td align="right">1.92931</td>
-</tr>
-<tr>
-<td align="left"><code>keys</code></td>
-<td align="right">0.00476</td>
-<td align="right">0.01023</td>
-<td align="right">2.14996</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.00458</td>
-<td align="right">0.00462</td>
-<td align="right">1.00816</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00455</td>
-<td align="right">0.00456</td>
-<td align="right">1.00387</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.00455</td>
-<td align="right">0.00929</td>
-<td align="right">2.0409</td>
-</tr>
-<tr>
-<td align="left"><code>pop (unsuccessful search)</code></td>
-<td align="right">0.00447</td>
-<td align="right">0.00647</td>
-<td align="right">1.44748</td>
-</tr>
-<tr>
-<td align="left"><code>popitem</code></td>
-<td align="right">0.00409</td>
-<td align="right">0.00822</td>
-<td align="right">2.01016</td>
-</tr>
-<tr>
-<td align="left"><code>setdefault (unsuccessful search)</code></td>
-<td align="right">0.00415</td>
-<td align="right">0.00705</td>
-<td align="right">1.69881</td>
-</tr>
-<tr>
-<td align="left"><code>setdefault</code></td>
-<td align="right">0.00402</td>
-<td align="right">0.00653</td>
-<td align="right">1.62619</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (add new item)</td>
-<td align="right">0.00419</td>
-<td align="right">0.00841</td>
-<td align="right">2.0075</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (replace)</td>
-<td align="right">0.00428</td>
-<td align="right">0.00945</td>
-<td align="right">2.20667</td>
-</tr>
-<tr>
-<td align="left"><code>update</code></td>
-<td align="right">0.00397</td>
-<td align="right">0.00961</td>
-<td align="right">2.42173</td>
-</tr>
-<tr>
-<td align="left"><code>update</code> (many)</td>
-<td align="right">0.00578</td>
-<td align="right">0.05889</td>
-<td align="right">10.19187</td>
-</tr>
-<tr>
-<td align="left"><code>values</code></td>
-<td align="right">0.00444</td>
-<td align="right">0.00872</td>
-<td align="right">1.96401</td>
-</tr>
-</tbody>
-</table>
-<p>approximate memory usage</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.0625</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>get</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>get (unsuccessful search)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>items</code></td>
-<td align="right">0.11328</td>
-<td align="right">0.14453</td>
-<td align="right">1.27586</td>
-</tr>
-<tr>
-<td align="left"><code>__iter__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>keys</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>pop (unsuccessful search)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>popitem</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>setdefault (unsuccessful search)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>setdefault</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (add new item)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (replace)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>update</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>update</code> (many)</td>
-<td align="right">0.00391</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-</tr>
-<tr>
-<td align="left"><code>values</code></td>
-<td align="right">0.125</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-</tr>
-</tbody>
-</table>
-</div>
-<input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><label for="__tabbed_3_2">list</label><div class="tabbed-content">
-<p>timing</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>__add__</code></td>
-<td align="right">0.00475</td>
-<td align="right">0.0511</td>
-<td align="right">10.76323</td>
-</tr>
-<tr>
-<td align="left"><code>append</code></td>
-<td align="right">0.00526</td>
-<td align="right">0.0094</td>
-<td align="right">1.78778</td>
-</tr>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.00457</td>
-<td align="right">0.01101</td>
-<td align="right">2.40834</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.005</td>
-<td align="right">0.00458</td>
-<td align="right">0.91651</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.00478</td>
-<td align="right">0.04662</td>
-<td align="right">9.75897</td>
-</tr>
-<tr>
-<td align="left"><code>count</code></td>
-<td align="right">0.0048</td>
-<td align="right">0.00488</td>
-<td align="right">1.01616</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.00412</td>
-<td align="right">0.03085</td>
-<td align="right">7.48325</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code></td>
-<td align="right">0.00446</td>
-<td align="right">0.01352</td>
-<td align="right">3.03093</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code> (slice)</td>
-<td align="right">0.00469</td>
-<td align="right">0.01798</td>
-<td align="right">3.83526</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code> (slice with skip)</td>
-<td align="right">0.00456</td>
-<td align="right">0.0187</td>
-<td align="right">4.09968</td>
-</tr>
-<tr>
-<td align="left"><code>extend</code></td>
-<td align="right">0.00446</td>
-<td align="right">0.00957</td>
-<td align="right">2.148</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code></td>
-<td align="right">0.00433</td>
-<td align="right">0.0049</td>
-<td align="right">1.13146</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code> (slice)</td>
-<td align="right">0.00441</td>
-<td align="right">0.02743</td>
-<td align="right">6.22477</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code> (slice with skip)</td>
-<td align="right">0.00447</td>
-<td align="right">0.01606</td>
-<td align="right">3.59001</td>
-</tr>
-<tr>
-<td align="left"><code>__iadd__</code></td>
-<td align="right">0.00432</td>
-<td align="right">0.00872</td>
-<td align="right">2.01987</td>
-</tr>
-<tr>
-<td align="left"><code>__imult__</code></td>
-<td align="right">0.0043</td>
-<td align="right">0.02699</td>
-<td align="right">6.27285</td>
-</tr>
-<tr>
-<td align="left"><code>index</code></td>
-<td align="right">0.00429</td>
-<td align="right">0.00567</td>
-<td align="right">1.32082</td>
-</tr>
-<tr>
-<td align="left"><code>index</code> (unsuccessful search)</td>
-<td align="right">0.0047</td>
-<td align="right">0.00608</td>
-<td align="right">1.29405</td>
-</tr>
-<tr>
-<td align="left"><code>insert</code></td>
-<td align="right">0.00429</td>
-<td align="right">0.01452</td>
-<td align="right">3.38004</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.00437</td>
-<td align="right">0.00435</td>
-<td align="right">0.9943</td>
-</tr>
-<tr>
-<td align="left"><code>__mult__</code></td>
-<td align="right">0.00458</td>
-<td align="right">0.08011</td>
-<td align="right">17.48066</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00417</td>
-<td align="right">0.00448</td>
-<td align="right">1.07324</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.00423</td>
-<td align="right">0.01381</td>
-<td align="right">3.26775</td>
-</tr>
-<tr>
-<td align="left"><code>remove</code></td>
-<td align="right">0.00453</td>
-<td align="right">0.01821</td>
-<td align="right">4.02203</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code></td>
-<td align="right">0.00443</td>
-<td align="right">0.00834</td>
-<td align="right">1.88314</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (slice)</td>
-<td align="right">0.00441</td>
-<td align="right">0.77235</td>
-<td align="right">175.03121</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (slice with skip)</td>
-<td align="right">0.00415</td>
-<td align="right">0.00907</td>
-<td align="right">2.18758</td>
-</tr>
-<tr>
-<td align="left"><code>sort</code></td>
-<td align="right">0.00419</td>
-<td align="right">0.10818</td>
-<td align="right">25.80808</td>
-</tr>
-</tbody>
-</table>
-<p>approximate memory usage</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>__add__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>append</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>count</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code> (slice)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code> (slice with skip)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>extend</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code> (slice)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code> (slice with skip)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__iadd__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__imult__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>index</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>index</code> (unsuccessful search)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>insert</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__mult__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>remove</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (slice)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (slice with skip)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>sort</code></td>
-<td align="right">0.0</td>
-<td align="right">0.78516</td>
-<td align="right">inf</td>
-</tr>
-</tbody>
-</table>
-</div>
-<input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><label for="__tabbed_3_3">set</label><div class="tabbed-content">
-<p>timing</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>add (existing item)</code></td>
-<td align="right">0.00382</td>
-<td align="right">0.00646</td>
-<td align="right">1.69155</td>
-</tr>
-<tr>
-<td align="left"><code>add (new item)</code></td>
-<td align="right">0.00448</td>
-<td align="right">0.00823</td>
-<td align="right">1.8385</td>
-</tr>
-<tr>
-<td align="left"><code>__and__</code></td>
-<td align="right">0.00421</td>
-<td align="right">0.02887</td>
-<td align="right">6.85895</td>
-</tr>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.00424</td>
-<td align="right">0.0083</td>
-<td align="right">1.95877</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.0047</td>
-<td align="right">0.00448</td>
-<td align="right">0.95374</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.00436</td>
-<td align="right">0.02402</td>
-<td align="right">5.51593</td>
-</tr>
-<tr>
-<td align="left"><code>difference</code></td>
-<td align="right">0.00479</td>
-<td align="right">0.02438</td>
-<td align="right">5.09103</td>
-</tr>
-<tr>
-<td align="left"><code>discard</code></td>
-<td align="right">0.00461</td>
-<td align="right">0.00954</td>
-<td align="right">2.07046</td>
-</tr>
-<tr>
-<td align="left"><code>discard (no changes)</code></td>
-<td align="right">0.00441</td>
-<td align="right">0.00669</td>
-<td align="right">1.51802</td>
-</tr>
-<tr>
-<td align="left"><code>__ge__</code></td>
-<td align="right">0.00443</td>
-<td align="right">0.00467</td>
-<td align="right">1.0531</td>
-</tr>
-<tr>
-<td align="left"><code>__ge__</code> (not greater than or equals to)</td>
-<td align="right">0.00491</td>
-<td align="right">0.0044</td>
-<td align="right">0.89667</td>
-</tr>
-<tr>
-<td align="left"><code>__gt__</code></td>
-<td align="right">0.00415</td>
-<td align="right">0.00911</td>
-<td align="right">2.19483</td>
-</tr>
-<tr>
-<td align="left"><code>__gt__</code> (not greater than)</td>
-<td align="right">0.00434</td>
-<td align="right">0.02447</td>
-<td align="right">5.63917</td>
-</tr>
-<tr>
-<td align="left"><code>__iand__</code></td>
-<td align="right">0.00503</td>
-<td align="right">0.01273</td>
-<td align="right">2.53252</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.00456</td>
-<td align="right">0.02735</td>
-<td align="right">5.9929</td>
-</tr>
-<tr>
-<td align="left"><code>intersection</code></td>
-<td align="right">0.00465</td>
-<td align="right">0.03383</td>
-<td align="right">7.27105</td>
-</tr>
-<tr>
-<td align="left"><code>intersection_update</code></td>
-<td align="right">0.00436</td>
-<td align="right">0.01246</td>
-<td align="right">2.85959</td>
-</tr>
-<tr>
-<td align="left"><code>__ior__</code></td>
-<td align="right">0.00465</td>
-<td align="right">0.01119</td>
-<td align="right">2.40688</td>
-</tr>
-<tr>
-<td align="left"><code>isdisjoint</code></td>
-<td align="right">0.00464</td>
-<td align="right">0.00466</td>
-<td align="right">1.00499</td>
-</tr>
-<tr>
-<td align="left"><code>isdisjoint</code> (not disjoint)</td>
-<td align="right">0.00455</td>
-<td align="right">0.00497</td>
-<td align="right">1.09146</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code></td>
-<td align="right">0.00495</td>
-<td align="right">0.06065</td>
-<td align="right">12.26387</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code> (not subset)</td>
-<td align="right">0.00478</td>
-<td align="right">0.03544</td>
-<td align="right">7.40844</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.01587</td>
-<td align="right">3.28833</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code> (not superset)</td>
-<td align="right">0.00491</td>
-<td align="right">0.00501</td>
-<td align="right">1.02017</td>
-</tr>
-<tr>
-<td align="left"><code>__ixor__</code></td>
-<td align="right">0.00462</td>
-<td align="right">0.0369</td>
-<td align="right">7.9786</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code></td>
-<td align="right">0.00513</td>
-<td align="right">0.00584</td>
-<td align="right">1.13898</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code> (not less than or equals to)</td>
-<td align="right">0.00491</td>
-<td align="right">0.00496</td>
-<td align="right">1.01055</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.00446</td>
-<td align="right">0.00481</td>
-<td align="right">1.0787</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code></td>
-<td align="right">0.00453</td>
-<td align="right">0.0056</td>
-<td align="right">1.23647</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code> (not less than)</td>
-<td align="right">0.00463</td>
-<td align="right">0.00445</td>
-<td align="right">0.9614</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00451</td>
-<td align="right">0.00474</td>
-<td align="right">1.05074</td>
-</tr>
-<tr>
-<td align="left"><code>__or__</code></td>
-<td align="right">0.00485</td>
-<td align="right">0.02828</td>
-<td align="right">5.82874</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.00473</td>
-<td align="right">0.00878</td>
-<td align="right">1.85705</td>
-</tr>
-<tr>
-<td align="left"><code>remove</code></td>
-<td align="right">0.00451</td>
-<td align="right">0.00958</td>
-<td align="right">2.12257</td>
-</tr>
-<tr>
-<td align="left"><code>__sub__</code></td>
-<td align="right">0.00477</td>
-<td align="right">0.03228</td>
-<td align="right">6.77103</td>
-</tr>
-<tr>
-<td align="left"><code>symmetric_difference</code></td>
-<td align="right">0.00563</td>
-<td align="right">0.06752</td>
-<td align="right">11.99566</td>
-</tr>
-<tr>
-<td align="left"><code>symmetric_difference_update</code></td>
-<td align="right">0.00546</td>
-<td align="right">0.03943</td>
-<td align="right">7.22214</td>
-</tr>
-<tr>
-<td align="left"><code>union</code></td>
-<td align="right">0.0048</td>
-<td align="right">0.0299</td>
-<td align="right">6.23205</td>
-</tr>
-<tr>
-<td align="left"><code>update</code></td>
-<td align="right">0.00552</td>
-<td align="right">0.0115</td>
-<td align="right">2.08282</td>
-</tr>
-<tr>
-<td align="left"><code>__xor__</code></td>
-<td align="right">0.00454</td>
-<td align="right">0.06459</td>
-<td align="right">14.21504</td>
-</tr>
-</tbody>
-</table>
-<p>approximate memory usage</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>add (existing item)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>add (new item)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__and__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>difference</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>discard</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>discard (no changes)</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__ge__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__ge__</code> (not greater than or equals to)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__gt__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__gt__</code> (not greater than)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__iand__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>intersection</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>intersection_update</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__ior__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>isdisjoint</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>isdisjoint</code> (not disjoint)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code> (not subset)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code> (not superset)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__ixor__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code> (not less than or equals to)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code> (not less than)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__or__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>remove</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__sub__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>symmetric_difference</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>symmetric_difference_update</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>union</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>update</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__xor__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-<input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><label for="__tabbed_1_3">py38</label><div class="tabbed-content">
-<div class="tabbed-set" data-tabs="4:3"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><label for="__tabbed_4_1">dict</label><div class="tabbed-content">
-<p>timing</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.00331</td>
-<td align="right">0.00653</td>
-<td align="right">1.97271</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.00334</td>
-<td align="right">0.00332</td>
-<td align="right">0.9954</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.00332</td>
-<td align="right">0.04734</td>
-<td align="right">14.24503</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code></td>
-<td align="right">0.00334</td>
-<td align="right">0.00629</td>
-<td align="right">1.88457</td>
-</tr>
-<tr>
-<td align="left"><code>get</code></td>
-<td align="right">0.00329</td>
-<td align="right">0.00329</td>
-<td align="right">1.00045</td>
-</tr>
-<tr>
-<td align="left"><code>get (unsuccessful search)</code></td>
-<td align="right">0.00325</td>
-<td align="right">0.00332</td>
-<td align="right">1.02045</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code></td>
-<td align="right">0.00331</td>
-<td align="right">0.0033</td>
-<td align="right">0.99761</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.03754</td>
-<td align="right">11.01653</td>
-</tr>
-<tr>
-<td align="left"><code>items</code></td>
-<td align="right">0.00366</td>
-<td align="right">0.00942</td>
-<td align="right">2.57364</td>
-</tr>
-<tr>
-<td align="left"><code>__iter__</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00654</td>
-<td align="right">1.91716</td>
-</tr>
-<tr>
-<td align="left"><code>keys</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.00661</td>
-<td align="right">1.94427</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.00337</td>
-<td align="right">0.00379</td>
-<td align="right">1.12553</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00328</td>
-<td align="right">0.00335</td>
-<td align="right">1.02092</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.00337</td>
-<td align="right">0.00624</td>
-<td align="right">1.85252</td>
-</tr>
-<tr>
-<td align="left"><code>pop (unsuccessful search)</code></td>
-<td align="right">0.00339</td>
-<td align="right">0.00516</td>
-<td align="right">1.52322</td>
-</tr>
-<tr>
-<td align="left"><code>popitem</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.00645</td>
-<td align="right">1.89878</td>
-</tr>
-<tr>
-<td align="left"><code>reversed</code></td>
-<td align="right">0.00328</td>
-<td align="right">0.00639</td>
-<td align="right">1.94527</td>
-</tr>
-<tr>
-<td align="left"><code>setdefault (unsuccessful search)</code></td>
-<td align="right">0.00338</td>
-<td align="right">0.00525</td>
-<td align="right">1.55138</td>
-</tr>
-<tr>
-<td align="left"><code>setdefault</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.006</td>
-<td align="right">1.76043</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (add new item)</td>
-<td align="right">0.00344</td>
-<td align="right">0.0063</td>
-<td align="right">1.83358</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (replace)</td>
-<td align="right">0.00344</td>
-<td align="right">0.00703</td>
-<td align="right">2.04187</td>
-</tr>
-<tr>
-<td align="left"><code>update</code></td>
-<td align="right">0.00343</td>
-<td align="right">0.00633</td>
-<td align="right">1.84357</td>
-</tr>
-<tr>
-<td align="left"><code>update</code> (many)</td>
-<td align="right">0.00427</td>
-<td align="right">0.03485</td>
-<td align="right">8.16904</td>
-</tr>
-<tr>
-<td align="left"><code>values</code></td>
 <td align="right">0.00349</td>
-<td align="right">0.0064</td>
-<td align="right">1.83236</td>
+<td align="right">0.03817</td>
+<td align="right">10.92931</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code> (not subset)</td>
+<td align="right">0.00352</td>
+<td align="right">0.01898</td>
+<td align="right">5.38684</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code></td>
+<td align="right">0.00358</td>
+<td align="right">0.01059</td>
+<td align="right">2.95909</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code> (not superset)</td>
+<td align="right">0.00391</td>
+<td align="right">0.00383</td>
+<td align="right">0.97986</td>
+</tr>
+<tr>
+<td align="left"><code>__ixor__</code></td>
+<td align="right">0.00362</td>
+<td align="right">0.02617</td>
+<td align="right">7.22413</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code></td>
+<td align="right">0.00358</td>
+<td align="right">0.00413</td>
+<td align="right">1.15189</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code> (not less than or equals to)</td>
+<td align="right">0.00354</td>
+<td align="right">0.00355</td>
+<td align="right">1.00311</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.00372</td>
+<td align="right">0.00359</td>
+<td align="right">0.96459</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code></td>
+<td align="right">0.0036</td>
+<td align="right">0.00429</td>
+<td align="right">1.19145</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code> (not less than)</td>
+<td align="right">0.00361</td>
+<td align="right">0.00356</td>
+<td align="right">0.98361</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.0036</td>
+<td align="right">0.00355</td>
+<td align="right">0.98599</td>
+</tr>
+<tr>
+<td align="left"><code>__or__</code></td>
+<td align="right">0.0038</td>
+<td align="right">0.01708</td>
+<td align="right">4.4957</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.00355</td>
+<td align="right">0.00608</td>
+<td align="right">1.71163</td>
+</tr>
+<tr>
+<td align="left"><code>remove</code></td>
+<td align="right">0.00357</td>
+<td align="right">0.00599</td>
+<td align="right">1.6806</td>
+</tr>
+<tr>
+<td align="left"><code>__sub__</code></td>
+<td align="right">0.00348</td>
+<td align="right">0.01541</td>
+<td align="right">4.43078</td>
+</tr>
+<tr>
+<td align="left"><code>symmetric_difference</code></td>
+<td align="right">0.00345</td>
+<td align="right">0.03942</td>
+<td align="right">11.42105</td>
+</tr>
+<tr>
+<td align="left"><code>symmetric_difference_update</code></td>
+<td align="right">0.0035</td>
+<td align="right">0.02376</td>
+<td align="right">6.79131</td>
+</tr>
+<tr>
+<td align="left"><code>union</code></td>
+<td align="right">0.00358</td>
+<td align="right">0.01786</td>
+<td align="right">4.99013</td>
+</tr>
+<tr>
+<td align="left"><code>update</code></td>
+<td align="right">0.00355</td>
+<td align="right">0.00655</td>
+<td align="right">1.84136</td>
+</tr>
+<tr>
+<td align="left"><code>__xor__</code></td>
+<td align="right">0.00356</td>
+<td align="right">0.0394</td>
+<td align="right">11.06134</td>
+</tr>
+</tbody>
+</table>
+<p>approximate memory usage</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>add (existing item)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>add (new item)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__and__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.00781</td>
+<td align="right">inf</td>
+</tr>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>difference</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>discard</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>discard (no changes)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__ge__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__ge__</code> (not greater than or equals to)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__gt__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__gt__</code> (not greater than)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__iand__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>intersection</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>intersection_update</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__ior__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>isdisjoint</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>isdisjoint</code> (not disjoint)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code></td>
+<td align="right">0.0</td>
+<td align="right">0.00391</td>
+<td align="right">inf</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code> (not subset)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code> (not superset)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__ixor__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code> (not less than or equals to)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code> (not less than)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__or__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.00391</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+</tr>
+<tr>
+<td align="left"><code>remove</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__sub__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>symmetric_difference</code></td>
+<td align="right">0.0</td>
+<td align="right">0.00781</td>
+<td align="right">inf</td>
+</tr>
+<tr>
+<td align="left"><code>symmetric_difference_update</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>union</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>update</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__xor__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.00391</td>
+<td align="right">inf</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="tabbed-block">
+<div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">dict</label><label for="__tabbed_3_2">list</label><label for="__tabbed_3_3">set</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>timing</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.00382</td>
+<td align="right">0.00654</td>
+<td align="right">1.71205</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.00392</td>
+<td align="right">0.00387</td>
+<td align="right">0.98535</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.0039</td>
+<td align="right">0.05876</td>
+<td align="right">15.05371</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code></td>
+<td align="right">0.00396</td>
+<td align="right">0.00692</td>
+<td align="right">1.74874</td>
+</tr>
+<tr>
+<td align="left"><code>get</code></td>
+<td align="right">0.00391</td>
+<td align="right">0.00392</td>
+<td align="right">1.00207</td>
+</tr>
+<tr>
+<td align="left"><code>get (unsuccessful search)</code></td>
+<td align="right">0.00412</td>
+<td align="right">0.00392</td>
+<td align="right">0.95158</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code></td>
+<td align="right">0.00393</td>
+<td align="right">0.00388</td>
+<td align="right">0.98771</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.00394</td>
+<td align="right">0.04445</td>
+<td align="right">11.28492</td>
+</tr>
+<tr>
+<td align="left"><code>items</code></td>
+<td align="right">0.0043</td>
+<td align="right">0.01212</td>
+<td align="right">2.81797</td>
+</tr>
+<tr>
+<td align="left"><code>__iter__</code></td>
+<td align="right">0.00393</td>
+<td align="right">0.00812</td>
+<td align="right">2.06488</td>
+</tr>
+<tr>
+<td align="left"><code>keys</code></td>
+<td align="right">0.00393</td>
+<td align="right">0.0082</td>
+<td align="right">2.08728</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.00401</td>
+<td align="right">0.00398</td>
+<td align="right">0.99138</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.00397</td>
+<td align="right">0.00388</td>
+<td align="right">0.97739</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.00396</td>
+<td align="right">0.00724</td>
+<td align="right">1.83087</td>
+</tr>
+<tr>
+<td align="left"><code>pop (unsuccessful search)</code></td>
+<td align="right">0.00397</td>
+<td align="right">0.00579</td>
+<td align="right">1.45903</td>
+</tr>
+<tr>
+<td align="left"><code>popitem</code></td>
+<td align="right">0.004</td>
+<td align="right">0.0069</td>
+<td align="right">1.72394</td>
+</tr>
+<tr>
+<td align="left"><code>setdefault (unsuccessful search)</code></td>
+<td align="right">0.00402</td>
+<td align="right">0.00559</td>
+<td align="right">1.39056</td>
+</tr>
+<tr>
+<td align="left"><code>setdefault</code></td>
+<td align="right">0.00397</td>
+<td align="right">0.00588</td>
+<td align="right">1.47961</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (add new item)</td>
+<td align="right">0.00409</td>
+<td align="right">0.00734</td>
+<td align="right">1.79635</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (replace)</td>
+<td align="right">0.00391</td>
+<td align="right">0.00716</td>
+<td align="right">1.83013</td>
+</tr>
+<tr>
+<td align="left"><code>update</code></td>
+<td align="right">0.00399</td>
+<td align="right">0.00707</td>
+<td align="right">1.77228</td>
+</tr>
+<tr>
+<td align="left"><code>update</code> (many)</td>
+<td align="right">0.0048</td>
+<td align="right">0.04088</td>
+<td align="right">8.52112</td>
+</tr>
+<tr>
+<td align="left"><code>values</code></td>
+<td align="right">0.00392</td>
+<td align="right">0.00804</td>
+<td align="right">2.05349</td>
 </tr>
 </tbody>
 </table>
@@ -3058,8 +1880,8 @@
 <tr>
 <td align="left"><code>copy</code></td>
 <td align="right">0.06641</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
+<td align="right">0.00391</td>
+<td align="right">0.05882</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code></td>
@@ -3093,14 +1915,14 @@
 </tr>
 <tr>
 <td align="left"><code>items</code></td>
-<td align="right">0.03125</td>
-<td align="right">0.13672</td>
-<td align="right">4.375</td>
+<td align="right">0.02734</td>
+<td align="right">0.33203</td>
+<td align="right">12.14286</td>
 </tr>
 <tr>
 <td align="left"><code>__iter__</code></td>
 <td align="right">0.0</td>
-<td align="right">0.08594</td>
+<td align="right">0.07031</td>
 <td align="right">inf</td>
 </tr>
 <tr>
@@ -3135,12 +1957,6 @@
 </tr>
 <tr>
 <td align="left"><code>popitem</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>reversed</code></td>
 <td align="right">0.0</td>
 <td align="right">0.0</td>
 <td align="right">1.0</td>
@@ -3190,7 +2006,7 @@
 </tbody>
 </table>
 </div>
-<input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><label for="__tabbed_4_2">list</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -3204,607 +2020,607 @@
 <tbody>
 <tr>
 <td align="left"><code>__add__</code></td>
-<td align="right">0.00349</td>
-<td align="right">0.02924</td>
-<td align="right">8.38856</td>
+<td align="right">0.00421</td>
+<td align="right">0.03528</td>
+<td align="right">8.37993</td>
 </tr>
 <tr>
 <td align="left"><code>append</code></td>
-<td align="right">0.00345</td>
-<td align="right">0.00567</td>
-<td align="right">1.64239</td>
+<td align="right">0.00408</td>
+<td align="right">0.00641</td>
+<td align="right">1.57067</td>
 </tr>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.00337</td>
-<td align="right">0.00589</td>
-<td align="right">1.74873</td>
+<td align="right">0.00402</td>
+<td align="right">0.00704</td>
+<td align="right">1.75113</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.00344</td>
-<td align="right">0.00363</td>
-<td align="right">1.05626</td>
+<td align="right">0.00405</td>
+<td align="right">0.00403</td>
+<td align="right">0.99306</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.02834</td>
-<td align="right">8.3093</td>
+<td align="right">0.00408</td>
+<td align="right">0.03296</td>
+<td align="right">8.07321</td>
 </tr>
 <tr>
 <td align="left"><code>count</code></td>
-<td align="right">0.00338</td>
-<td align="right">0.00345</td>
-<td align="right">1.02137</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.00344</td>
-<td align="right">0.0185</td>
-<td align="right">5.37754</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code></td>
-<td align="right">0.00347</td>
-<td align="right">0.00968</td>
-<td align="right">2.79074</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code> (slice)</td>
-<td align="right">0.00339</td>
-<td align="right">0.01344</td>
-<td align="right">3.96353</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code> (slice with skip)</td>
-<td align="right">0.00339</td>
-<td align="right">0.01342</td>
-<td align="right">3.95734</td>
-</tr>
-<tr>
-<td align="left"><code>extend</code></td>
-<td align="right">0.00344</td>
-<td align="right">0.00559</td>
-<td align="right">1.62524</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00343</td>
-<td align="right">1.00752</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code> (slice)</td>
-<td align="right">0.00339</td>
-<td align="right">0.01614</td>
-<td align="right">4.75603</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code> (slice with skip)</td>
-<td align="right">0.0034</td>
-<td align="right">0.01021</td>
-<td align="right">3.00673</td>
-</tr>
-<tr>
-<td align="left"><code>__iadd__</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00578</td>
-<td align="right">1.69366</td>
-</tr>
-<tr>
-<td align="left"><code>__imult__</code></td>
-<td align="right">0.00342</td>
-<td align="right">0.01852</td>
-<td align="right">5.42201</td>
-</tr>
-<tr>
-<td align="left"><code>index</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00354</td>
-<td align="right">1.03958</td>
-</tr>
-<tr>
-<td align="left"><code>index</code> (unsuccessful search)</td>
-<td align="right">0.00336</td>
-<td align="right">0.00363</td>
-<td align="right">1.08124</td>
-</tr>
-<tr>
-<td align="left"><code>insert</code></td>
-<td align="right">0.00345</td>
-<td align="right">0.0112</td>
-<td align="right">3.24713</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.00335</td>
-<td align="right">0.98736</td>
-</tr>
-<tr>
-<td align="left"><code>__mult__</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.04695</td>
-<td align="right">13.79959</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00337</td>
-<td align="right">0.00341</td>
-<td align="right">1.01338</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00959</td>
-<td align="right">2.81238</td>
-</tr>
-<tr>
-<td align="left"><code>remove</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.01165</td>
-<td align="right">3.41821</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code></td>
-<td align="right">0.00346</td>
-<td align="right">0.00585</td>
-<td align="right">1.69105</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (slice)</td>
-<td align="right">0.00345</td>
-<td align="right">0.64812</td>
-<td align="right">188.06562</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (slice with skip)</td>
-<td align="right">0.00344</td>
-<td align="right">0.0066</td>
-<td align="right">1.91876</td>
-</tr>
-<tr>
-<td align="left"><code>sort</code></td>
-<td align="right">0.00344</td>
-<td align="right">0.08369</td>
-<td align="right">24.3246</td>
-</tr>
-</tbody>
-</table>
-<p>approximate memory usage</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>__add__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>append</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>count</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code> (slice)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__delitem__</code> (slice with skip)</td>
-<td align="right">0.00391</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-</tr>
-<tr>
-<td align="left"><code>extend</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code> (slice)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__getitem__</code> (slice with skip)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__iadd__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__imult__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>index</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>index</code> (unsuccessful search)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>insert</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__len__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__mult__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.01172</td>
-<td align="right">inf</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>pop</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>remove</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code></td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (slice)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>__setitem__</code> (slice with skip)</td>
-<td align="right">0.0</td>
-<td align="right">0.0</td>
-<td align="right">1.0</td>
-</tr>
-<tr>
-<td align="left"><code>sort</code></td>
-<td align="right">0.0</td>
-<td align="right">0.73828</td>
-<td align="right">inf</td>
-</tr>
-</tbody>
-</table>
-</div>
-<input id="__tabbed_4_3" name="__tabbed_4" type="radio" /><label for="__tabbed_4_3">set</label><div class="tabbed-content">
-<p>timing</p>
-<table>
-<thead>
-<tr>
-<th align="left">subject</th>
-<th align="right"><code>builtin</code></th>
-<th align="right"><code>sqlitecollections</code></th>
-<th align="right">ratio</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>add (existing item)</code></td>
-<td align="right">0.00338</td>
-<td align="right">0.00501</td>
-<td align="right">1.48191</td>
-</tr>
-<tr>
-<td align="left"><code>add (new item)</code></td>
-<td align="right">0.00342</td>
-<td align="right">0.00615</td>
-<td align="right">1.79768</td>
-</tr>
-<tr>
-<td align="left"><code>__and__</code></td>
-<td align="right">0.00334</td>
-<td align="right">0.0198</td>
-<td align="right">5.92045</td>
-</tr>
-<tr>
-<td align="left"><code>clear</code></td>
-<td align="right">0.00338</td>
-<td align="right">0.00605</td>
-<td align="right">1.78807</td>
-</tr>
-<tr>
-<td align="left"><code>__contains__</code></td>
-<td align="right">0.00339</td>
-<td align="right">0.00335</td>
-<td align="right">0.98768</td>
-</tr>
-<tr>
-<td align="left"><code>copy</code></td>
-<td align="right">0.00334</td>
-<td align="right">0.01473</td>
-<td align="right">4.40836</td>
-</tr>
-<tr>
-<td align="left"><code>difference</code></td>
-<td align="right">0.00335</td>
-<td align="right">0.01532</td>
-<td align="right">4.57213</td>
-</tr>
-<tr>
-<td align="left"><code>discard</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00653</td>
-<td align="right">1.91669</td>
-</tr>
-<tr>
-<td align="left"><code>discard (no changes)</code></td>
-<td align="right">0.00334</td>
-<td align="right">0.00501</td>
-<td align="right">1.50178</td>
-</tr>
-<tr>
-<td align="left"><code>__ge__</code></td>
-<td align="right">0.00336</td>
-<td align="right">0.00335</td>
-<td align="right">0.99783</td>
-</tr>
-<tr>
-<td align="left"><code>__ge__</code> (not greater than or equals to)</td>
-<td align="right">0.00336</td>
-<td align="right">0.00338</td>
-<td align="right">1.00399</td>
-</tr>
-<tr>
-<td align="left"><code>__gt__</code></td>
-<td align="right">0.00337</td>
-<td align="right">0.0059</td>
-<td align="right">1.75053</td>
-</tr>
-<tr>
-<td align="left"><code>__gt__</code> (not greater than)</td>
-<td align="right">0.00339</td>
-<td align="right">0.01723</td>
-<td align="right">5.08855</td>
-</tr>
-<tr>
-<td align="left"><code>__iand__</code></td>
-<td align="right">0.00334</td>
-<td align="right">0.00762</td>
-<td align="right">2.27775</td>
-</tr>
-<tr>
-<td align="left"><code>__init__</code></td>
-<td align="right">0.00338</td>
-<td align="right">0.01537</td>
-<td align="right">4.54662</td>
-</tr>
-<tr>
-<td align="left"><code>intersection</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.02012</td>
-<td align="right">5.91826</td>
-</tr>
-<tr>
-<td align="left"><code>intersection_update</code></td>
-<td align="right">0.00338</td>
-<td align="right">0.00802</td>
-<td align="right">2.37221</td>
-</tr>
-<tr>
-<td align="left"><code>__ior__</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.00634</td>
-<td align="right">1.86441</td>
-</tr>
-<tr>
-<td align="left"><code>isdisjoint</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00338</td>
-<td align="right">0.99026</td>
-</tr>
-<tr>
-<td align="left"><code>isdisjoint</code> (not disjoint)</td>
-<td align="right">0.00336</td>
-<td align="right">0.00344</td>
-<td align="right">1.0249</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code></td>
-<td align="right">0.00336</td>
-<td align="right">0.03906</td>
-<td align="right">11.62506</td>
-</tr>
-<tr>
-<td align="left"><code>issubset</code> (not subset)</td>
-<td align="right">0.00346</td>
-<td align="right">0.01857</td>
-<td align="right">5.3741</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code></td>
-<td align="right">0.00342</td>
-<td align="right">0.01001</td>
-<td align="right">2.92389</td>
-</tr>
-<tr>
-<td align="left"><code>issuperset</code> (not superset)</td>
-<td align="right">0.00339</td>
-<td align="right">0.00337</td>
-<td align="right">0.99232</td>
-</tr>
-<tr>
-<td align="left"><code>__ixor__</code></td>
-<td align="right">0.00339</td>
-<td align="right">0.02416</td>
-<td align="right">7.12351</td>
-</tr>
-<tr>
-<td align="left"><code>__le__</code></td>
-<td align="right">0.00349</td>
+<td align="right">0.00405</td>
 <td align="right">0.00404</td>
-<td align="right">1.15962</td>
+<td align="right">0.99712</td>
 </tr>
 <tr>
-<td align="left"><code>__le__</code> (not less than or equals to)</td>
-<td align="right">0.00338</td>
-<td align="right">0.00338</td>
-<td align="right">0.99895</td>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.00408</td>
+<td align="right">0.02185</td>
+<td align="right">5.35876</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code></td>
+<td align="right">0.00409</td>
+<td align="right">0.01034</td>
+<td align="right">2.52948</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code> (slice)</td>
+<td align="right">0.0041</td>
+<td align="right">0.0146</td>
+<td align="right">3.55708</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code> (slice with skip)</td>
+<td align="right">0.00408</td>
+<td align="right">0.01421</td>
+<td align="right">3.47958</td>
+</tr>
+<tr>
+<td align="left"><code>extend</code></td>
+<td align="right">0.00408</td>
+<td align="right">0.00637</td>
+<td align="right">1.55895</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code></td>
+<td align="right">0.00408</td>
+<td align="right">0.00401</td>
+<td align="right">0.98157</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code> (slice)</td>
+<td align="right">0.00405</td>
+<td align="right">0.01794</td>
+<td align="right">4.43148</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code> (slice with skip)</td>
+<td align="right">0.00401</td>
+<td align="right">0.01076</td>
+<td align="right">2.68324</td>
+</tr>
+<tr>
+<td align="left"><code>__iadd__</code></td>
+<td align="right">0.00405</td>
+<td align="right">0.00662</td>
+<td align="right">1.63243</td>
+</tr>
+<tr>
+<td align="left"><code>__imult__</code></td>
+<td align="right">0.00402</td>
+<td align="right">0.02191</td>
+<td align="right">5.44377</td>
+</tr>
+<tr>
+<td align="left"><code>index</code></td>
+<td align="right">0.00404</td>
+<td align="right">0.00422</td>
+<td align="right">1.04464</td>
+</tr>
+<tr>
+<td align="left"><code>index</code> (unsuccessful search)</td>
+<td align="right">0.00418</td>
+<td align="right">0.0044</td>
+<td align="right">1.05215</td>
+</tr>
+<tr>
+<td align="left"><code>insert</code></td>
+<td align="right">0.00413</td>
+<td align="right">0.01194</td>
+<td align="right">2.89088</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00337</td>
-<td align="right">0.98995</td>
+<td align="right">0.00411</td>
+<td align="right">0.00405</td>
+<td align="right">0.98678</td>
 </tr>
 <tr>
-<td align="left"><code>__lt__</code></td>
-<td align="right">0.00341</td>
-<td align="right">0.00413</td>
-<td align="right">1.21232</td>
-</tr>
-<tr>
-<td align="left"><code>__lt__</code> (not less than)</td>
-<td align="right">0.00331</td>
-<td align="right">0.00335</td>
-<td align="right">1.01239</td>
+<td align="left"><code>__mult__</code></td>
+<td align="right">0.00416</td>
+<td align="right">0.05523</td>
+<td align="right">13.2818</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00333</td>
-<td align="right">0.00338</td>
-<td align="right">1.01506</td>
-</tr>
-<tr>
-<td align="left"><code>__or__</code></td>
-<td align="right">0.00339</td>
-<td align="right">0.01652</td>
-<td align="right">4.8697</td>
+<td align="right">0.00406</td>
+<td align="right">0.00408</td>
+<td align="right">1.00492</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.00337</td>
-<td align="right">0.00585</td>
-<td align="right">1.73362</td>
+<td align="right">0.0041</td>
+<td align="right">0.01063</td>
+<td align="right">2.59012</td>
 </tr>
 <tr>
 <td align="left"><code>remove</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.00606</td>
-<td align="right">1.78358</td>
+<td align="right">0.00408</td>
+<td align="right">0.01243</td>
+<td align="right">3.04651</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code></td>
+<td align="right">0.00409</td>
+<td align="right">0.00642</td>
+<td align="right">1.56759</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (slice)</td>
+<td align="right">0.0042</td>
+<td align="right">0.63939</td>
+<td align="right">152.40373</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (slice with skip)</td>
+<td align="right">0.00408</td>
+<td align="right">0.00743</td>
+<td align="right">1.8216</td>
+</tr>
+<tr>
+<td align="left"><code>sort</code></td>
+<td align="right">0.00413</td>
+<td align="right">0.09477</td>
+<td align="right">22.95656</td>
+</tr>
+</tbody>
+</table>
+<p>approximate memory usage</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>__add__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>append</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>count</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code> (slice)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code> (slice with skip)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>extend</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code> (slice)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code> (slice with skip)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__iadd__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__imult__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>index</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>index</code> (unsuccessful search)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>insert</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__mult__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>remove</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (slice)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (slice with skip)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>sort</code></td>
+<td align="right">0.0</td>
+<td align="right">0.64062</td>
+<td align="right">inf</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tabbed-block">
+<p>timing</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>add (existing item)</code></td>
+<td align="right">0.00401</td>
+<td align="right">0.00544</td>
+<td align="right">1.35607</td>
+</tr>
+<tr>
+<td align="left"><code>add (new item)</code></td>
+<td align="right">0.00395</td>
+<td align="right">0.00659</td>
+<td align="right">1.66953</td>
+</tr>
+<tr>
+<td align="left"><code>__and__</code></td>
+<td align="right">0.00391</td>
+<td align="right">0.02218</td>
+<td align="right">5.66799</td>
+</tr>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.00389</td>
+<td align="right">0.00661</td>
+<td align="right">1.69764</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.00389</td>
+<td align="right">0.0039</td>
+<td align="right">1.00195</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.00387</td>
+<td align="right">0.01738</td>
+<td align="right">4.49439</td>
+</tr>
+<tr>
+<td align="left"><code>difference</code></td>
+<td align="right">0.00385</td>
+<td align="right">0.01782</td>
+<td align="right">4.62386</td>
+</tr>
+<tr>
+<td align="left"><code>discard</code></td>
+<td align="right">0.00399</td>
+<td align="right">0.00675</td>
+<td align="right">1.69227</td>
+</tr>
+<tr>
+<td align="left"><code>discard (no changes)</code></td>
+<td align="right">0.00388</td>
+<td align="right">0.00537</td>
+<td align="right">1.38379</td>
+</tr>
+<tr>
+<td align="left"><code>__ge__</code></td>
+<td align="right">0.00396</td>
+<td align="right">0.0039</td>
+<td align="right">0.98486</td>
+</tr>
+<tr>
+<td align="left"><code>__ge__</code> (not greater than or equals to)</td>
+<td align="right">0.00395</td>
+<td align="right">0.00392</td>
+<td align="right">0.99378</td>
+</tr>
+<tr>
+<td align="left"><code>__gt__</code></td>
+<td align="right">0.00391</td>
+<td align="right">0.00703</td>
+<td align="right">1.80079</td>
+</tr>
+<tr>
+<td align="left"><code>__gt__</code> (not greater than)</td>
+<td align="right">0.00391</td>
+<td align="right">0.01942</td>
+<td align="right">4.96665</td>
+</tr>
+<tr>
+<td align="left"><code>__iand__</code></td>
+<td align="right">0.00389</td>
+<td align="right">0.00929</td>
+<td align="right">2.38633</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.00395</td>
+<td align="right">0.01869</td>
+<td align="right">4.72648</td>
+</tr>
+<tr>
+<td align="left"><code>intersection</code></td>
+<td align="right">0.00395</td>
+<td align="right">0.02316</td>
+<td align="right">5.86607</td>
+</tr>
+<tr>
+<td align="left"><code>intersection_update</code></td>
+<td align="right">0.00393</td>
+<td align="right">0.00955</td>
+<td align="right">2.43125</td>
+</tr>
+<tr>
+<td align="left"><code>__ior__</code></td>
+<td align="right">0.0039</td>
+<td align="right">0.00734</td>
+<td align="right">1.88321</td>
+</tr>
+<tr>
+<td align="left"><code>isdisjoint</code></td>
+<td align="right">0.00391</td>
+<td align="right">0.00394</td>
+<td align="right">1.00713</td>
+</tr>
+<tr>
+<td align="left"><code>isdisjoint</code> (not disjoint)</td>
+<td align="right">0.00404</td>
+<td align="right">0.00393</td>
+<td align="right">0.97195</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code></td>
+<td align="right">0.00393</td>
+<td align="right">0.04197</td>
+<td align="right">10.69251</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code> (not subset)</td>
+<td align="right">0.00391</td>
+<td align="right">0.02035</td>
+<td align="right">5.20121</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code></td>
+<td align="right">0.00393</td>
+<td align="right">0.01152</td>
+<td align="right">2.9301</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code> (not superset)</td>
+<td align="right">0.00403</td>
+<td align="right">0.00406</td>
+<td align="right">1.00737</td>
+</tr>
+<tr>
+<td align="left"><code>__ixor__</code></td>
+<td align="right">0.00403</td>
+<td align="right">0.02642</td>
+<td align="right">6.54832</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code></td>
+<td align="right">0.0039</td>
+<td align="right">0.00472</td>
+<td align="right">1.21062</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code> (not less than or equals to)</td>
+<td align="right">0.004</td>
+<td align="right">0.00419</td>
+<td align="right">1.04752</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.00405</td>
+<td align="right">0.00408</td>
+<td align="right">1.00694</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code></td>
+<td align="right">0.00452</td>
+<td align="right">0.00498</td>
+<td align="right">1.10298</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code> (not less than)</td>
+<td align="right">0.00409</td>
+<td align="right">0.0041</td>
+<td align="right">1.00002</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.00411</td>
+<td align="right">0.00406</td>
+<td align="right">0.98837</td>
+</tr>
+<tr>
+<td align="left"><code>__or__</code></td>
+<td align="right">0.00405</td>
+<td align="right">0.01916</td>
+<td align="right">4.72613</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.00405</td>
+<td align="right">0.00649</td>
+<td align="right">1.60472</td>
+</tr>
+<tr>
+<td align="left"><code>remove</code></td>
+<td align="right">0.00411</td>
+<td align="right">0.00669</td>
+<td align="right">1.62791</td>
 </tr>
 <tr>
 <td align="left"><code>__sub__</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.01494</td>
-<td align="right">4.40013</td>
+<td align="right">0.00408</td>
+<td align="right">0.01687</td>
+<td align="right">4.1297</td>
 </tr>
 <tr>
 <td align="left"><code>symmetric_difference</code></td>
-<td align="right">0.00339</td>
-<td align="right">0.0397</td>
-<td align="right">11.70919</td>
+<td align="right">0.00405</td>
+<td align="right">0.04489</td>
+<td align="right">11.07999</td>
 </tr>
 <tr>
 <td align="left"><code>symmetric_difference_update</code></td>
-<td align="right">0.0034</td>
-<td align="right">0.02396</td>
-<td align="right">7.03801</td>
+<td align="right">0.00407</td>
+<td align="right">0.0266</td>
+<td align="right">6.53247</td>
 </tr>
 <tr>
 <td align="left"><code>union</code></td>
-<td align="right">0.00336</td>
-<td align="right">0.01665</td>
-<td align="right">4.95069</td>
+<td align="right">0.00402</td>
+<td align="right">0.01917</td>
+<td align="right">4.77448</td>
 </tr>
 <tr>
 <td align="left"><code>update</code></td>
-<td align="right">0.00343</td>
-<td align="right">0.00616</td>
-<td align="right">1.7932</td>
+<td align="right">0.00398</td>
+<td align="right">0.00716</td>
+<td align="right">1.79649</td>
 </tr>
 <tr>
 <td align="left"><code>__xor__</code></td>
-<td align="right">0.00353</td>
-<td align="right">0.03941</td>
-<td align="right">11.18048</td>
+<td align="right">0.00403</td>
+<td align="right">0.04416</td>
+<td align="right">10.95759</td>
 </tr>
 </tbody>
 </table>
@@ -4064,8 +2880,11 @@
 </div>
 </div>
 </div>
-<input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><label for="__tabbed_1_4">py39</label><div class="tabbed-content">
-<div class="tabbed-set" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><label for="__tabbed_5_1">dict</label><div class="tabbed-content">
+</div>
+<div class="tabbed-block">
+<div class="tabbed-set tabbed-alternate" data-tabs="4:3"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><input id="__tabbed_4_3" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">dict</label><label for="__tabbed_4_2">list</label><label for="__tabbed_4_3">set</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -4079,171 +2898,1365 @@
 <tbody>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.00476</td>
-<td align="right">0.00824</td>
-<td align="right">1.73278</td>
+<td align="right">0.00242</td>
+<td align="right">0.05984</td>
+<td align="right">24.74409</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.00482</td>
-<td align="right">0.00476</td>
-<td align="right">0.98637</td>
+<td align="right">0.00238</td>
+<td align="right">0.00245</td>
+<td align="right">1.0286</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.00501</td>
-<td align="right">0.05868</td>
-<td align="right">11.70617</td>
+<td align="right">0.00249</td>
+<td align="right">0.11867</td>
+<td align="right">47.70566</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code></td>
-<td align="right">0.00485</td>
-<td align="right">0.00835</td>
-<td align="right">1.72081</td>
+<td align="right">0.00245</td>
+<td align="right">0.03725</td>
+<td align="right">15.17257</td>
 </tr>
 <tr>
 <td align="left"><code>get</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.0048</td>
-<td align="right">0.98131</td>
+<td align="right">0.00243</td>
+<td align="right">0.00249</td>
+<td align="right">1.0248</td>
 </tr>
 <tr>
 <td align="left"><code>get (unsuccessful search)</code></td>
-<td align="right">0.00488</td>
-<td align="right">0.00482</td>
-<td align="right">0.98789</td>
+<td align="right">0.0024</td>
+<td align="right">0.00249</td>
+<td align="right">1.03761</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code></td>
-<td align="right">0.00488</td>
-<td align="right">0.0049</td>
-<td align="right">1.0025</td>
+<td align="right">0.0024</td>
+<td align="right">0.00251</td>
+<td align="right">1.04589</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.00491</td>
-<td align="right">0.04518</td>
-<td align="right">9.20748</td>
-</tr>
-<tr>
-<td align="left"><code>__ior__</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.00844</td>
-<td align="right">1.72589</td>
-</tr>
-<tr>
-<td align="left"><code>__ior__</code> (many)</td>
-<td align="right">0.00628</td>
-<td align="right">0.0422</td>
-<td align="right">6.72311</td>
+<td align="right">0.00251</td>
+<td align="right">0.119</td>
+<td align="right">47.40405</td>
 </tr>
 <tr>
 <td align="left"><code>items</code></td>
-<td align="right">0.00525</td>
-<td align="right">0.01233</td>
-<td align="right">2.35071</td>
+<td align="right">0.00281</td>
+<td align="right">0.00696</td>
+<td align="right">2.47938</td>
 </tr>
 <tr>
 <td align="left"><code>__iter__</code></td>
-<td align="right">0.0049</td>
-<td align="right">0.00875</td>
-<td align="right">1.78783</td>
+<td align="right">0.00264</td>
+<td align="right">0.00491</td>
+<td align="right">1.85799</td>
 </tr>
 <tr>
 <td align="left"><code>keys</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.00904</td>
-<td align="right">1.86031</td>
+<td align="right">0.00251</td>
+<td align="right">0.00496</td>
+<td align="right">1.97266</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.00481</td>
-<td align="right">0.99525</td>
+<td align="right">0.00247</td>
+<td align="right">0.00267</td>
+<td align="right">1.08226</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00489</td>
-<td align="right">0.00484</td>
-<td align="right">0.98886</td>
-</tr>
-<tr>
-<td align="left"><code>__or__</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.06065</td>
-<td align="right">12.47129</td>
-</tr>
-<tr>
-<td align="left"><code>__or__</code> (many)</td>
-<td align="right">0.00646</td>
-<td align="right">0.11232</td>
-<td align="right">17.3848</td>
+<td align="right">0.00245</td>
+<td align="right">0.00252</td>
+<td align="right">1.02836</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.00497</td>
-<td align="right">0.00933</td>
-<td align="right">1.87602</td>
+<td align="right">0.00252</td>
+<td align="right">0.05773</td>
+<td align="right">22.87234</td>
 </tr>
 <tr>
 <td align="left"><code>pop (unsuccessful search)</code></td>
-<td align="right">0.00492</td>
-<td align="right">0.00703</td>
-<td align="right">1.42766</td>
+<td align="right">0.0025</td>
+<td align="right">0.01977</td>
+<td align="right">7.90263</td>
 </tr>
 <tr>
 <td align="left"><code>popitem</code></td>
-<td align="right">0.00491</td>
-<td align="right">0.0089</td>
-<td align="right">1.81399</td>
+<td align="right">0.0025</td>
+<td align="right">0.0366</td>
+<td align="right">14.66012</td>
 </tr>
 <tr>
 <td align="left"><code>reversed</code></td>
-<td align="right">0.00618</td>
-<td align="right">0.00856</td>
-<td align="right">1.3844</td>
+<td align="right">0.00252</td>
+<td align="right">0.0048</td>
+<td align="right">1.90291</td>
 </tr>
 <tr>
 <td align="left"><code>setdefault (unsuccessful search)</code></td>
-<td align="right">0.00484</td>
-<td align="right">0.0071</td>
-<td align="right">1.46499</td>
+<td align="right">0.00248</td>
+<td align="right">0.01965</td>
+<td align="right">7.91289</td>
 </tr>
 <tr>
 <td align="left"><code>setdefault</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.00707</td>
-<td align="right">1.46332</td>
+<td align="right">0.00248</td>
+<td align="right">0.01907</td>
+<td align="right">7.69399</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (add new item)</td>
-<td align="right">0.00495</td>
-<td align="right">0.00834</td>
-<td align="right">1.68388</td>
+<td align="right">0.00251</td>
+<td align="right">0.03885</td>
+<td align="right">15.49551</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (replace)</td>
-<td align="right">0.00492</td>
-<td align="right">0.00893</td>
-<td align="right">1.8168</td>
+<td align="right">0.00251</td>
+<td align="right">0.03977</td>
+<td align="right">15.83138</td>
 </tr>
 <tr>
 <td align="left"><code>update</code></td>
-<td align="right">0.00503</td>
-<td align="right">0.00833</td>
-<td align="right">1.65571</td>
+<td align="right">0.00249</td>
+<td align="right">0.03882</td>
+<td align="right">15.61161</td>
 </tr>
 <tr>
 <td align="left"><code>update</code> (many)</td>
-<td align="right">0.00589</td>
-<td align="right">0.04279</td>
-<td align="right">7.26654</td>
+<td align="right">0.00328</td>
+<td align="right">0.06291</td>
+<td align="right">19.1772</td>
 </tr>
 <tr>
 <td align="left"><code>values</code></td>
-<td align="right">0.00479</td>
-<td align="right">0.00857</td>
-<td align="right">1.78913</td>
+<td align="right">0.00253</td>
+<td align="right">0.00481</td>
+<td align="right">1.90563</td>
+</tr>
+</tbody>
+</table>
+<p>approximate memory usage</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.05859</td>
+<td align="right">0.00781</td>
+<td align="right">0.13333</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>get</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>get (unsuccessful search)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>items</code></td>
+<td align="right">0.03906</td>
+<td align="right">0.13672</td>
+<td align="right">3.5</td>
+</tr>
+<tr>
+<td align="left"><code>__iter__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>keys</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>pop (unsuccessful search)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>popitem</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>reversed</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>setdefault (unsuccessful search)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>setdefault</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (add new item)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (replace)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>update</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>update</code> (many)</td>
+<td align="right">0.14062</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+</tr>
+<tr>
+<td align="left"><code>values</code></td>
+<td align="right">0.125</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tabbed-block">
+<p>timing</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>__add__</code></td>
+<td align="right">0.00255</td>
+<td align="right">0.11595</td>
+<td align="right">45.53294</td>
+</tr>
+<tr>
+<td align="left"><code>append</code></td>
+<td align="right">0.00273</td>
+<td align="right">0.03484</td>
+<td align="right">12.74962</td>
+</tr>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.00256</td>
+<td align="right">0.03597</td>
+<td align="right">14.06439</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.00251</td>
+<td align="right">0.00264</td>
+<td align="right">1.05012</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.00262</td>
+<td align="right">0.10217</td>
+<td align="right">38.98635</td>
+</tr>
+<tr>
+<td align="left"><code>count</code></td>
+<td align="right">0.00251</td>
+<td align="right">0.00263</td>
+<td align="right">1.04675</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.00257</td>
+<td align="right">0.10296</td>
+<td align="right">40.0706</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code></td>
+<td align="right">0.0025</td>
+<td align="right">0.03954</td>
+<td align="right">15.81828</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code> (slice)</td>
+<td align="right">0.00254</td>
+<td align="right">0.04347</td>
+<td align="right">17.09779</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code> (slice with skip)</td>
+<td align="right">0.00265</td>
+<td align="right">0.04519</td>
+<td align="right">17.0426</td>
+</tr>
+<tr>
+<td align="left"><code>extend</code></td>
+<td align="right">0.00251</td>
+<td align="right">0.03825</td>
+<td align="right">15.21194</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code></td>
+<td align="right">0.0025</td>
+<td align="right">0.00256</td>
+<td align="right">1.02448</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code> (slice)</td>
+<td align="right">0.00251</td>
+<td align="right">0.09847</td>
+<td align="right">39.25633</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code> (slice with skip)</td>
+<td align="right">0.00256</td>
+<td align="right">0.09377</td>
+<td align="right">36.69234</td>
+</tr>
+<tr>
+<td align="left"><code>__iadd__</code></td>
+<td align="right">0.0025</td>
+<td align="right">0.03489</td>
+<td align="right">13.96112</td>
+</tr>
+<tr>
+<td align="left"><code>__imult__</code></td>
+<td align="right">0.00253</td>
+<td align="right">0.04921</td>
+<td align="right">19.44692</td>
+</tr>
+<tr>
+<td align="left"><code>index</code></td>
+<td align="right">0.00252</td>
+<td align="right">0.00272</td>
+<td align="right">1.08178</td>
+</tr>
+<tr>
+<td align="left"><code>index</code> (unsuccessful search)</td>
+<td align="right">0.00251</td>
+<td align="right">0.00275</td>
+<td align="right">1.09544</td>
+</tr>
+<tr>
+<td align="left"><code>insert</code></td>
+<td align="right">0.00257</td>
+<td align="right">0.04012</td>
+<td align="right">15.5976</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.00248</td>
+<td align="right">0.00252</td>
+<td align="right">1.01549</td>
+</tr>
+<tr>
+<td align="left"><code>__mult__</code></td>
+<td align="right">0.00255</td>
+<td align="right">0.13636</td>
+<td align="right">53.53924</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.00253</td>
+<td align="right">0.00262</td>
+<td align="right">1.03557</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.03854</td>
+<td align="right">15.46923</td>
+</tr>
+<tr>
+<td align="left"><code>remove</code></td>
+<td align="right">0.00256</td>
+<td align="right">0.04054</td>
+<td align="right">15.86224</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code></td>
+<td align="right">0.00251</td>
+<td align="right">0.03494</td>
+<td align="right">13.94153</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (slice)</td>
+<td align="right">0.00255</td>
+<td align="right">2.23388</td>
+<td align="right">874.9564</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (slice with skip)</td>
+<td align="right">0.00251</td>
+<td align="right">0.03601</td>
+<td align="right">14.34104</td>
+</tr>
+<tr>
+<td align="left"><code>sort</code></td>
+<td align="right">0.00257</td>
+<td align="right">0.09482</td>
+<td align="right">36.85057</td>
+</tr>
+</tbody>
+</table>
+<p>approximate memory usage</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>__add__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>append</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>count</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code> (slice)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code> (slice with skip)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>extend</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code> (slice)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code> (slice with skip)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__iadd__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__imult__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>index</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>index</code> (unsuccessful search)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>insert</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__mult__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>remove</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (slice)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (slice with skip)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>sort</code></td>
+<td align="right">0.0</td>
+<td align="right">0.94531</td>
+<td align="right">inf</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tabbed-block">
+<p>timing</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>add (existing item)</code></td>
+<td align="right">0.00252</td>
+<td align="right">0.01844</td>
+<td align="right">7.30488</td>
+</tr>
+<tr>
+<td align="left"><code>add (new item)</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.03525</td>
+<td align="right">14.17191</td>
+</tr>
+<tr>
+<td align="left"><code>__and__</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.13865</td>
+<td align="right">55.7689</td>
+</tr>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.03532</td>
+<td align="right">14.20015</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.00248</td>
+<td align="right">0.00255</td>
+<td align="right">1.02683</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.00247</td>
+<td align="right">0.09242</td>
+<td align="right">37.37212</td>
+</tr>
+<tr>
+<td align="left"><code>difference</code></td>
+<td align="right">0.0025</td>
+<td align="right">0.0905</td>
+<td align="right">36.26495</td>
+</tr>
+<tr>
+<td align="left"><code>discard</code></td>
+<td align="right">0.00248</td>
+<td align="right">0.03325</td>
+<td align="right">13.38887</td>
+</tr>
+<tr>
+<td align="left"><code>discard (no changes)</code></td>
+<td align="right">0.00248</td>
+<td align="right">0.01843</td>
+<td align="right">7.43311</td>
+</tr>
+<tr>
+<td align="left"><code>__ge__</code></td>
+<td align="right">0.00246</td>
+<td align="right">0.00247</td>
+<td align="right">1.00339</td>
+</tr>
+<tr>
+<td align="left"><code>__ge__</code> (not greater than or equals to)</td>
+<td align="right">0.00246</td>
+<td align="right">0.00282</td>
+<td align="right">1.14714</td>
+</tr>
+<tr>
+<td align="left"><code>__gt__</code></td>
+<td align="right">0.00243</td>
+<td align="right">0.03776</td>
+<td align="right">15.51739</td>
+</tr>
+<tr>
+<td align="left"><code>__gt__</code> (not greater than)</td>
+<td align="right">0.00247</td>
+<td align="right">0.03136</td>
+<td align="right">12.67762</td>
+</tr>
+<tr>
+<td align="left"><code>__iand__</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.05189</td>
+<td align="right">20.80039</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.0025</td>
+<td align="right">0.09977</td>
+<td align="right">39.85901</td>
+</tr>
+<tr>
+<td align="left"><code>intersection</code></td>
+<td align="right">0.00247</td>
+<td align="right">0.1283</td>
+<td align="right">51.9368</td>
+</tr>
+<tr>
+<td align="left"><code>intersection_update</code></td>
+<td align="right">0.00256</td>
+<td align="right">0.0527</td>
+<td align="right">20.5943</td>
+</tr>
+<tr>
+<td align="left"><code>__ior__</code></td>
+<td align="right">0.00246</td>
+<td align="right">0.03623</td>
+<td align="right">14.72078</td>
+</tr>
+<tr>
+<td align="left"><code>isdisjoint</code></td>
+<td align="right">0.00245</td>
+<td align="right">0.00255</td>
+<td align="right">1.03822</td>
+</tr>
+<tr>
+<td align="left"><code>isdisjoint</code> (not disjoint)</td>
+<td align="right">0.00246</td>
+<td align="right">0.00253</td>
+<td align="right">1.02812</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code></td>
+<td align="right">0.0025</td>
+<td align="right">0.13837</td>
+<td align="right">55.31517</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code> (not subset)</td>
+<td align="right">0.00246</td>
+<td align="right">0.12799</td>
+<td align="right">51.98504</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code></td>
+<td align="right">0.0025</td>
+<td align="right">0.00612</td>
+<td align="right">2.45041</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code> (not superset)</td>
+<td align="right">0.00247</td>
+<td align="right">0.00283</td>
+<td align="right">1.14601</td>
+</tr>
+<tr>
+<td align="left"><code>__ixor__</code></td>
+<td align="right">0.00248</td>
+<td align="right">0.06505</td>
+<td align="right">26.20958</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code></td>
+<td align="right">0.00247</td>
+<td align="right">0.00311</td>
+<td align="right">1.25883</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code> (not less than or equals to)</td>
+<td align="right">0.00246</td>
+<td align="right">0.00255</td>
+<td align="right">1.03788</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.00246</td>
+<td align="right">0.00254</td>
+<td align="right">1.03174</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code></td>
+<td align="right">0.0025</td>
+<td align="right">0.00318</td>
+<td align="right">1.2719</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code> (not less than)</td>
+<td align="right">0.00249</td>
+<td align="right">0.0028</td>
+<td align="right">1.12541</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.00247</td>
+<td align="right">0.00255</td>
+<td align="right">1.03248</td>
+</tr>
+<tr>
+<td align="left"><code>__or__</code></td>
+<td align="right">0.00248</td>
+<td align="right">0.10283</td>
+<td align="right">41.43747</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.00246</td>
+<td align="right">0.03645</td>
+<td align="right">14.83181</td>
+</tr>
+<tr>
+<td align="left"><code>remove</code></td>
+<td align="right">0.00246</td>
+<td align="right">0.03553</td>
+<td align="right">14.42095</td>
+</tr>
+<tr>
+<td align="left"><code>__sub__</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.08948</td>
+<td align="right">35.86762</td>
+</tr>
+<tr>
+<td align="left"><code>symmetric_difference</code></td>
+<td align="right">0.00247</td>
+<td align="right">0.14077</td>
+<td align="right">57.01339</td>
+</tr>
+<tr>
+<td align="left"><code>symmetric_difference_update</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.06772</td>
+<td align="right">27.24528</td>
+</tr>
+<tr>
+<td align="left"><code>union</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.10674</td>
+<td align="right">42.82201</td>
+</tr>
+<tr>
+<td align="left"><code>update</code></td>
+<td align="right">0.00245</td>
+<td align="right">0.03477</td>
+<td align="right">14.19971</td>
+</tr>
+<tr>
+<td align="left"><code>__xor__</code></td>
+<td align="right">0.00249</td>
+<td align="right">0.13819</td>
+<td align="right">55.44565</td>
+</tr>
+</tbody>
+</table>
+<p>approximate memory usage</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>add (existing item)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>add (new item)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__and__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>difference</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>discard</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>discard (no changes)</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__ge__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__ge__</code> (not greater than or equals to)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__gt__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__gt__</code> (not greater than)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__iand__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>intersection</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>intersection_update</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__ior__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>isdisjoint</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>isdisjoint</code> (not disjoint)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>issubset</code> (not subset)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>issuperset</code> (not superset)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__ixor__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__le__</code> (not less than or equals to)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__lt__</code> (not less than)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__or__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>remove</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__sub__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>symmetric_difference</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>symmetric_difference_update</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>union</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>update</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+<tr>
+<td align="left"><code>__xor__</code></td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">1.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="tabbed-block">
+<div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">dict</label><label for="__tabbed_5_2">list</label><label for="__tabbed_5_3">set</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>timing</p>
+<table>
+<thead>
+<tr>
+<th align="left">subject</th>
+<th align="right"><code>builtin</code></th>
+<th align="right"><code>sqlitecollections</code></th>
+<th align="right">ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>clear</code></td>
+<td align="right">0.00341</td>
+<td align="right">0.00808</td>
+<td align="right">2.36558</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code></td>
+<td align="right">0.00351</td>
+<td align="right">0.00353</td>
+<td align="right">1.00609</td>
+</tr>
+<tr>
+<td align="left"><code>copy</code></td>
+<td align="right">0.00357</td>
+<td align="right">0.05848</td>
+<td align="right">16.39132</td>
+</tr>
+<tr>
+<td align="left"><code>__delitem__</code></td>
+<td align="right">0.00357</td>
+<td align="right">0.00856</td>
+<td align="right">2.3969</td>
+</tr>
+<tr>
+<td align="left"><code>get</code></td>
+<td align="right">0.00351</td>
+<td align="right">0.00358</td>
+<td align="right">1.02009</td>
+</tr>
+<tr>
+<td align="left"><code>get (unsuccessful search)</code></td>
+<td align="right">0.00354</td>
+<td align="right">0.00352</td>
+<td align="right">0.99326</td>
+</tr>
+<tr>
+<td align="left"><code>__getitem__</code></td>
+<td align="right">0.00354</td>
+<td align="right">0.00352</td>
+<td align="right">0.99577</td>
+</tr>
+<tr>
+<td align="left"><code>__init__</code></td>
+<td align="right">0.00361</td>
+<td align="right">0.04297</td>
+<td align="right">11.9174</td>
+</tr>
+<tr>
+<td align="left"><code>__ior__</code></td>
+<td align="right">0.00362</td>
+<td align="right">0.00871</td>
+<td align="right">2.40364</td>
+</tr>
+<tr>
+<td align="left"><code>__ior__</code> (many)</td>
+<td align="right">0.00465</td>
+<td align="right">0.03691</td>
+<td align="right">7.93739</td>
+</tr>
+<tr>
+<td align="left"><code>items</code></td>
+<td align="right">0.00392</td>
+<td align="right">0.00979</td>
+<td align="right">2.49983</td>
+</tr>
+<tr>
+<td align="left"><code>__iter__</code></td>
+<td align="right">0.00357</td>
+<td align="right">0.00699</td>
+<td align="right">1.95904</td>
+</tr>
+<tr>
+<td align="left"><code>keys</code></td>
+<td align="right">0.00354</td>
+<td align="right">0.00703</td>
+<td align="right">1.98476</td>
+</tr>
+<tr>
+<td align="left"><code>__len__</code></td>
+<td align="right">0.00349</td>
+<td align="right">0.00352</td>
+<td align="right">1.00762</td>
+</tr>
+<tr>
+<td align="left"><code>__contains__</code> (unsuccessful search)</td>
+<td align="right">0.00353</td>
+<td align="right">0.00357</td>
+<td align="right">1.01336</td>
+</tr>
+<tr>
+<td align="left"><code>__or__</code></td>
+<td align="right">0.00356</td>
+<td align="right">0.05923</td>
+<td align="right">16.64338</td>
+</tr>
+<tr>
+<td align="left"><code>__or__</code> (many)</td>
+<td align="right">0.0048</td>
+<td align="right">0.09621</td>
+<td align="right">20.05526</td>
+</tr>
+<tr>
+<td align="left"><code>pop</code></td>
+<td align="right">0.00359</td>
+<td align="right">0.00774</td>
+<td align="right">2.1569</td>
+</tr>
+<tr>
+<td align="left"><code>pop (unsuccessful search)</code></td>
+<td align="right">0.00358</td>
+<td align="right">0.00609</td>
+<td align="right">1.70173</td>
+</tr>
+<tr>
+<td align="left"><code>popitem</code></td>
+<td align="right">0.00363</td>
+<td align="right">0.00911</td>
+<td align="right">2.51319</td>
+</tr>
+<tr>
+<td align="left"><code>reversed</code></td>
+<td align="right">0.00355</td>
+<td align="right">0.00679</td>
+<td align="right">1.91214</td>
+</tr>
+<tr>
+<td align="left"><code>setdefault (unsuccessful search)</code></td>
+<td align="right">0.00358</td>
+<td align="right">0.00639</td>
+<td align="right">1.78598</td>
+</tr>
+<tr>
+<td align="left"><code>setdefault</code></td>
+<td align="right">0.00362</td>
+<td align="right">0.00665</td>
+<td align="right">1.8378</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (add new item)</td>
+<td align="right">0.00361</td>
+<td align="right">0.00824</td>
+<td align="right">2.28443</td>
+</tr>
+<tr>
+<td align="left"><code>__setitem__</code> (replace)</td>
+<td align="right">0.0036</td>
+<td align="right">0.02161</td>
+<td align="right">6.01231</td>
+</tr>
+<tr>
+<td align="left"><code>update</code></td>
+<td align="right">0.00361</td>
+<td align="right">0.00895</td>
+<td align="right">2.47765</td>
+</tr>
+<tr>
+<td align="left"><code>update</code> (many)</td>
+<td align="right">0.00459</td>
+<td align="right">0.03738</td>
+<td align="right">8.14012</td>
+</tr>
+<tr>
+<td align="left"><code>values</code></td>
+<td align="right">0.00363</td>
+<td align="right">0.00691</td>
+<td align="right">1.90356</td>
 </tr>
 </tbody>
 </table>
@@ -4314,7 +4327,7 @@
 </tr>
 <tr>
 <td align="left"><code>__ior__</code> (many)</td>
-<td align="right">0.11328</td>
+<td align="right">0.10938</td>
 <td align="right">0.0</td>
 <td align="right">0.0</td>
 </tr>
@@ -4356,7 +4369,7 @@
 </tr>
 <tr>
 <td align="left"><code>__or__</code> (many)</td>
-<td align="right">0.00391</td>
+<td align="right">0.07031</td>
 <td align="right">0.0</td>
 <td align="right">0.0</td>
 </tr>
@@ -4429,7 +4442,7 @@
 </tbody>
 </table>
 </div>
-<input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><label for="__tabbed_5_2">list</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -4443,171 +4456,171 @@
 <tbody>
 <tr>
 <td align="left"><code>__add__</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.03707</td>
-<td align="right">7.57677</td>
+<td align="right">0.00374</td>
+<td align="right">0.03866</td>
+<td align="right">10.33282</td>
 </tr>
 <tr>
 <td align="left"><code>append</code></td>
-<td align="right">0.00496</td>
-<td align="right">0.00771</td>
-<td align="right">1.55544</td>
+<td align="right">0.00372</td>
+<td align="right">0.00887</td>
+<td align="right">2.38081</td>
 </tr>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.00482</td>
-<td align="right">0.00817</td>
-<td align="right">1.69352</td>
+<td align="right">0.00365</td>
+<td align="right">0.00802</td>
+<td align="right">2.19777</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.00487</td>
-<td align="right">0.00493</td>
-<td align="right">1.01117</td>
+<td align="right">0.00365</td>
+<td align="right">0.0037</td>
+<td align="right">1.01403</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.00491</td>
-<td align="right">0.03455</td>
-<td align="right">7.03899</td>
+<td align="right">0.00364</td>
+<td align="right">0.03291</td>
+<td align="right">9.03734</td>
 </tr>
 <tr>
 <td align="left"><code>count</code></td>
-<td align="right">0.00484</td>
-<td align="right">0.00491</td>
-<td align="right">1.01648</td>
+<td align="right">0.00362</td>
+<td align="right">0.00374</td>
+<td align="right">1.03361</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.0049</td>
-<td align="right">0.02544</td>
-<td align="right">5.18872</td>
+<td align="right">0.00385</td>
+<td align="right">0.02542</td>
+<td align="right">6.60216</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code></td>
-<td align="right">0.0049</td>
-<td align="right">0.01248</td>
-<td align="right">2.54816</td>
+<td align="right">0.00374</td>
+<td align="right">0.01235</td>
+<td align="right">3.30198</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code> (slice)</td>
-<td align="right">0.00487</td>
-<td align="right">0.01665</td>
-<td align="right">3.42145</td>
+<td align="right">0.00366</td>
+<td align="right">0.01541</td>
+<td align="right">4.21429</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code> (slice with skip)</td>
-<td align="right">0.00488</td>
-<td align="right">0.01656</td>
-<td align="right">3.39052</td>
+<td align="right">0.00366</td>
+<td align="right">0.01654</td>
+<td align="right">4.51795</td>
 </tr>
 <tr>
 <td align="left"><code>extend</code></td>
-<td align="right">0.00491</td>
-<td align="right">0.00771</td>
-<td align="right">1.57049</td>
+<td align="right">0.00368</td>
+<td align="right">0.00804</td>
+<td align="right">2.18324</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code></td>
-<td align="right">0.0049</td>
-<td align="right">0.00483</td>
-<td align="right">0.98547</td>
+<td align="right">0.00361</td>
+<td align="right">0.00363</td>
+<td align="right">1.00562</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code> (slice)</td>
-<td align="right">0.0049</td>
-<td align="right">0.02053</td>
-<td align="right">4.1933</td>
+<td align="right">0.00362</td>
+<td align="right">0.02232</td>
+<td align="right">6.15852</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code> (slice with skip)</td>
-<td align="right">0.00485</td>
-<td align="right">0.01295</td>
-<td align="right">2.66979</td>
+<td align="right">0.00363</td>
+<td align="right">0.01785</td>
+<td align="right">4.91126</td>
 </tr>
 <tr>
 <td align="left"><code>__iadd__</code></td>
-<td align="right">0.00492</td>
-<td align="right">0.00774</td>
-<td align="right">1.57284</td>
+<td align="right">0.00369</td>
+<td align="right">0.01339</td>
+<td align="right">3.63037</td>
 </tr>
 <tr>
 <td align="left"><code>__imult__</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.02314</td>
-<td align="right">4.75685</td>
+<td align="right">0.00368</td>
+<td align="right">0.02325</td>
+<td align="right">6.31986</td>
 </tr>
 <tr>
 <td align="left"><code>index</code></td>
-<td align="right">0.00481</td>
-<td align="right">0.00513</td>
-<td align="right">1.06499</td>
+<td align="right">0.00366</td>
+<td align="right">0.00388</td>
+<td align="right">1.05981</td>
 </tr>
 <tr>
 <td align="left"><code>index</code> (unsuccessful search)</td>
-<td align="right">0.00484</td>
-<td align="right">0.00514</td>
-<td align="right">1.06192</td>
+<td align="right">0.00364</td>
+<td align="right">0.00387</td>
+<td align="right">1.06415</td>
 </tr>
 <tr>
 <td align="left"><code>insert</code></td>
-<td align="right">0.00492</td>
-<td align="right">0.01415</td>
-<td align="right">2.87754</td>
+<td align="right">0.00369</td>
+<td align="right">0.01299</td>
+<td align="right">3.51942</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00485</td>
-<td align="right">0.00485</td>
-<td align="right">1.00044</td>
+<td align="right">0.00363</td>
+<td align="right">0.00364</td>
+<td align="right">1.00411</td>
 </tr>
 <tr>
 <td align="left"><code>__mult__</code></td>
-<td align="right">0.00491</td>
-<td align="right">0.05802</td>
-<td align="right">11.82526</td>
+<td align="right">0.00368</td>
+<td align="right">0.05533</td>
+<td align="right">15.02449</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00489</td>
-<td align="right">0.00496</td>
-<td align="right">1.01421</td>
+<td align="right">0.00365</td>
+<td align="right">0.00378</td>
+<td align="right">1.03396</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.00498</td>
-<td align="right">0.01224</td>
-<td align="right">2.45672</td>
+<td align="right">0.00374</td>
+<td align="right">0.01244</td>
+<td align="right">3.32638</td>
 </tr>
 <tr>
 <td align="left"><code>remove</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.01435</td>
-<td align="right">2.95026</td>
+<td align="right">0.00367</td>
+<td align="right">0.01369</td>
+<td align="right">3.73488</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code></td>
-<td align="right">0.00495</td>
-<td align="right">0.00811</td>
-<td align="right">1.6397</td>
+<td align="right">0.00371</td>
+<td align="right">0.00894</td>
+<td align="right">2.41254</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (slice)</td>
-<td align="right">0.00495</td>
-<td align="right">0.74917</td>
-<td align="right">151.22877</td>
+<td align="right">0.00364</td>
+<td align="right">0.78892</td>
+<td align="right">216.80531</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (slice with skip)</td>
-<td align="right">0.00487</td>
-<td align="right">0.00841</td>
-<td align="right">1.72683</td>
+<td align="right">0.00373</td>
+<td align="right">0.00751</td>
+<td align="right">2.01261</td>
 </tr>
 <tr>
 <td align="left"><code>sort</code></td>
-<td align="right">0.00496</td>
-<td align="right">0.11201</td>
-<td align="right">22.57322</td>
+<td align="right">0.0037</td>
+<td align="right">0.08681</td>
+<td align="right">23.44887</td>
 </tr>
 </tbody>
 </table>
@@ -4787,13 +4800,13 @@
 <tr>
 <td align="left"><code>sort</code></td>
 <td align="right">0.0</td>
-<td align="right">0.68359</td>
+<td align="right">0.63672</td>
 <td align="right">inf</td>
 </tr>
 </tbody>
 </table>
 </div>
-<input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><label for="__tabbed_5_3">set</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -4807,243 +4820,243 @@
 <tbody>
 <tr>
 <td align="left"><code>add (existing item)</code></td>
-<td align="right">0.00562</td>
-<td align="right">0.00745</td>
-<td align="right">1.32579</td>
+<td align="right">0.0037</td>
+<td align="right">0.0059</td>
+<td align="right">1.59357</td>
 </tr>
 <tr>
 <td align="left"><code>add (new item)</code></td>
-<td align="right">0.00502</td>
-<td align="right">0.00813</td>
-<td align="right">1.61985</td>
+<td align="right">0.00438</td>
+<td align="right">0.00941</td>
+<td align="right">2.14719</td>
 </tr>
 <tr>
 <td align="left"><code>__and__</code></td>
-<td align="right">0.0051</td>
-<td align="right">0.02467</td>
-<td align="right">4.83758</td>
+<td align="right">0.00371</td>
+<td align="right">0.02388</td>
+<td align="right">6.43847</td>
 </tr>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.00482</td>
-<td align="right">0.00793</td>
-<td align="right">1.64504</td>
+<td align="right">0.00362</td>
+<td align="right">0.02325</td>
+<td align="right">6.41796</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.0048</td>
-<td align="right">0.00477</td>
-<td align="right">0.99375</td>
+<td align="right">0.00362</td>
+<td align="right">0.00362</td>
+<td align="right">1.00054</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.00484</td>
-<td align="right">0.01997</td>
-<td align="right">4.12639</td>
+<td align="right">0.00362</td>
+<td align="right">0.02672</td>
+<td align="right">7.37332</td>
 </tr>
 <tr>
 <td align="left"><code>difference</code></td>
-<td align="right">0.00479</td>
-<td align="right">0.01911</td>
-<td align="right">3.98584</td>
+<td align="right">0.00366</td>
+<td align="right">0.0223</td>
+<td align="right">6.09832</td>
 </tr>
 <tr>
 <td align="left"><code>discard</code></td>
-<td align="right">0.00485</td>
-<td align="right">0.00796</td>
-<td align="right">1.6436</td>
+<td align="right">0.00361</td>
+<td align="right">0.00889</td>
+<td align="right">2.46129</td>
 </tr>
 <tr>
 <td align="left"><code>discard (no changes)</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.00653</td>
-<td align="right">1.33522</td>
+<td align="right">0.00363</td>
+<td align="right">0.00617</td>
+<td align="right">1.7015</td>
 </tr>
 <tr>
 <td align="left"><code>__ge__</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.00476</td>
-<td align="right">0.98016</td>
+<td align="right">0.00365</td>
+<td align="right">0.00362</td>
+<td align="right">0.99049</td>
 </tr>
 <tr>
 <td align="left"><code>__ge__</code> (not greater than or equals to)</td>
-<td align="right">0.00475</td>
-<td align="right">0.00482</td>
-<td align="right">1.0144</td>
+<td align="right">0.00362</td>
+<td align="right">0.00409</td>
+<td align="right">1.12965</td>
 </tr>
 <tr>
 <td align="left"><code>__gt__</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.00809</td>
-<td align="right">1.6756</td>
+<td align="right">0.00359</td>
+<td align="right">0.00966</td>
+<td align="right">2.68952</td>
 </tr>
 <tr>
 <td align="left"><code>__gt__</code> (not greater than)</td>
-<td align="right">0.00483</td>
-<td align="right">0.02119</td>
-<td align="right">4.38659</td>
+<td align="right">0.0036</td>
+<td align="right">0.01935</td>
+<td align="right">5.3837</td>
 </tr>
 <tr>
 <td align="left"><code>__iand__</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.01066</td>
-<td align="right">2.19231</td>
+<td align="right">0.00357</td>
+<td align="right">0.01157</td>
+<td align="right">3.24074</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.00479</td>
-<td align="right">0.0194</td>
-<td align="right">4.05307</td>
+<td align="right">0.00363</td>
+<td align="right">0.02221</td>
+<td align="right">6.1253</td>
 </tr>
 <tr>
 <td align="left"><code>intersection</code></td>
-<td align="right">0.00474</td>
-<td align="right">0.02424</td>
-<td align="right">5.11281</td>
+<td align="right">0.00361</td>
+<td align="right">0.02593</td>
+<td align="right">7.17277</td>
 </tr>
 <tr>
 <td align="left"><code>intersection_update</code></td>
-<td align="right">0.0048</td>
-<td align="right">0.01133</td>
-<td align="right">2.36028</td>
+<td align="right">0.00358</td>
+<td align="right">0.01257</td>
+<td align="right">3.51278</td>
 </tr>
 <tr>
 <td align="left"><code>__ior__</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.00879</td>
-<td align="right">1.82045</td>
+<td align="right">0.00362</td>
+<td align="right">0.00944</td>
+<td align="right">2.6038</td>
 </tr>
 <tr>
 <td align="left"><code>isdisjoint</code></td>
-<td align="right">0.00481</td>
-<td align="right">0.00472</td>
-<td align="right">0.98223</td>
+<td align="right">0.00362</td>
+<td align="right">0.00369</td>
+<td align="right">1.01813</td>
 </tr>
 <tr>
 <td align="left"><code>isdisjoint</code> (not disjoint)</td>
-<td align="right">0.00476</td>
-<td align="right">0.00474</td>
-<td align="right">0.99588</td>
+<td align="right">0.00365</td>
+<td align="right">0.0037</td>
+<td align="right">1.01282</td>
 </tr>
 <tr>
 <td align="left"><code>issubset</code></td>
-<td align="right">0.00476</td>
-<td align="right">0.04902</td>
-<td align="right">10.28998</td>
+<td align="right">0.00359</td>
+<td align="right">0.04569</td>
+<td align="right">12.74074</td>
 </tr>
 <tr>
 <td align="left"><code>issubset</code> (not subset)</td>
-<td align="right">0.00492</td>
-<td align="right">0.02415</td>
-<td align="right">4.91228</td>
+<td align="right">0.00361</td>
+<td align="right">0.02652</td>
+<td align="right">7.35039</td>
 </tr>
 <tr>
 <td align="left"><code>issuperset</code></td>
-<td align="right">0.00482</td>
-<td align="right">0.0128</td>
-<td align="right">2.65611</td>
+<td align="right">0.00386</td>
+<td align="right">0.01041</td>
+<td align="right">2.69505</td>
 </tr>
 <tr>
 <td align="left"><code>issuperset</code> (not superset)</td>
-<td align="right">0.00478</td>
-<td align="right">0.00485</td>
-<td align="right">1.01463</td>
+<td align="right">0.00359</td>
+<td align="right">0.00416</td>
+<td align="right">1.15862</td>
 </tr>
 <tr>
 <td align="left"><code>__ixor__</code></td>
-<td align="right">0.00481</td>
-<td align="right">0.02977</td>
-<td align="right">6.19205</td>
+<td align="right">0.00365</td>
+<td align="right">0.02801</td>
+<td align="right">7.68274</td>
 </tr>
 <tr>
 <td align="left"><code>__le__</code></td>
-<td align="right">0.00479</td>
-<td align="right">0.00558</td>
-<td align="right">1.16559</td>
+<td align="right">0.0036</td>
+<td align="right">0.0044</td>
+<td align="right">1.22021</td>
 </tr>
 <tr>
 <td align="left"><code>__le__</code> (not less than or equals to)</td>
-<td align="right">0.00476</td>
-<td align="right">0.00472</td>
-<td align="right">0.99296</td>
+<td align="right">0.00362</td>
+<td align="right">0.00367</td>
+<td align="right">1.01407</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00488</td>
-<td align="right">0.00489</td>
-<td align="right">1.0022</td>
+<td align="right">0.00363</td>
+<td align="right">0.00363</td>
+<td align="right">0.99916</td>
 </tr>
 <tr>
 <td align="left"><code>__lt__</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.0058</td>
-<td align="right">1.19434</td>
+<td align="right">0.00356</td>
+<td align="right">0.00442</td>
+<td align="right">1.23975</td>
 </tr>
 <tr>
 <td align="left"><code>__lt__</code> (not less than)</td>
-<td align="right">0.00484</td>
-<td align="right">0.0049</td>
-<td align="right">1.01145</td>
+<td align="right">0.00364</td>
+<td align="right">0.00362</td>
+<td align="right">0.99298</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00479</td>
-<td align="right">0.00488</td>
-<td align="right">1.01951</td>
+<td align="right">0.00358</td>
+<td align="right">0.00363</td>
+<td align="right">1.01264</td>
 </tr>
 <tr>
 <td align="left"><code>__or__</code></td>
-<td align="right">0.00523</td>
-<td align="right">0.0211</td>
-<td align="right">4.03314</td>
+<td align="right">0.0036</td>
+<td align="right">0.0243</td>
+<td align="right">6.74116</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.00477</td>
-<td align="right">0.00792</td>
-<td align="right">1.66051</td>
+<td align="right">0.00367</td>
+<td align="right">0.00882</td>
+<td align="right">2.40276</td>
 </tr>
 <tr>
 <td align="left"><code>remove</code></td>
-<td align="right">0.00514</td>
-<td align="right">0.00822</td>
-<td align="right">1.60017</td>
+<td align="right">0.00359</td>
+<td align="right">0.00863</td>
+<td align="right">2.40039</td>
 </tr>
 <tr>
 <td align="left"><code>__sub__</code></td>
-<td align="right">0.00481</td>
-<td align="right">0.01933</td>
-<td align="right">4.01738</td>
+<td align="right">0.00357</td>
+<td align="right">0.02151</td>
+<td align="right">6.02089</td>
 </tr>
 <tr>
 <td align="left"><code>symmetric_difference</code></td>
-<td align="right">0.00484</td>
-<td align="right">0.04891</td>
-<td align="right">10.09548</td>
+<td align="right">0.00359</td>
+<td align="right">0.05</td>
+<td align="right">13.93122</td>
 </tr>
 <tr>
 <td align="left"><code>symmetric_difference_update</code></td>
-<td align="right">0.00479</td>
-<td align="right">0.02922</td>
-<td align="right">6.09709</td>
+<td align="right">0.00365</td>
+<td align="right">0.02903</td>
+<td align="right">7.94993</td>
 </tr>
 <tr>
 <td align="left"><code>union</code></td>
-<td align="right">0.00479</td>
-<td align="right">0.0204</td>
-<td align="right">4.26068</td>
+<td align="right">0.00362</td>
+<td align="right">0.01841</td>
+<td align="right">5.08792</td>
 </tr>
 <tr>
 <td align="left"><code>update</code></td>
-<td align="right">0.00488</td>
-<td align="right">0.0093</td>
-<td align="right">1.90341</td>
+<td align="right">0.00358</td>
+<td align="right">0.00749</td>
+<td align="right">2.08941</td>
 </tr>
 <tr>
 <td align="left"><code>__xor__</code></td>
-<td align="right">0.00473</td>
-<td align="right">0.04844</td>
-<td align="right">10.23437</td>
+<td align="right">0.00362</td>
+<td align="right">0.04412</td>
+<td align="right">12.20299</td>
 </tr>
 </tbody>
 </table>
@@ -5303,8 +5316,11 @@
 </div>
 </div>
 </div>
-<input id="__tabbed_1_5" name="__tabbed_1" type="radio" /><label for="__tabbed_1_5">py310</label><div class="tabbed-content">
-<div class="tabbed-set" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><label for="__tabbed_6_1">dict</label><div class="tabbed-content">
+</div>
+<div class="tabbed-block">
+<div class="tabbed-set tabbed-alternate" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">dict</label><label for="__tabbed_6_2">list</label><label for="__tabbed_6_3">set</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -5318,171 +5334,171 @@
 <tbody>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.00504</td>
-<td align="right">0.00919</td>
-<td align="right">1.82418</td>
+<td align="right">0.00363</td>
+<td align="right">0.00705</td>
+<td align="right">1.94317</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.00516</td>
-<td align="right">0.00482</td>
-<td align="right">0.9342</td>
+<td align="right">0.00364</td>
+<td align="right">0.00363</td>
+<td align="right">0.99516</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.00574</td>
-<td align="right">0.0585</td>
-<td align="right">10.19061</td>
+<td align="right">0.00368</td>
+<td align="right">0.04902</td>
+<td align="right">13.32029</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code></td>
-<td align="right">0.00547</td>
-<td align="right">0.00919</td>
-<td align="right">1.67982</td>
+<td align="right">0.00386</td>
+<td align="right">0.00671</td>
+<td align="right">1.73749</td>
 </tr>
 <tr>
 <td align="left"><code>get</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.00491</td>
-<td align="right">1.01692</td>
+<td align="right">0.00368</td>
+<td align="right">0.00364</td>
+<td align="right">0.98935</td>
 </tr>
 <tr>
 <td align="left"><code>get (unsuccessful search)</code></td>
-<td align="right">0.00497</td>
-<td align="right">0.00478</td>
-<td align="right">0.96113</td>
+<td align="right">0.00362</td>
+<td align="right">0.00378</td>
+<td align="right">1.04456</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code></td>
-<td align="right">0.00476</td>
-<td align="right">0.00487</td>
-<td align="right">1.02265</td>
+<td align="right">0.00361</td>
+<td align="right">0.00363</td>
+<td align="right">1.005</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.00482</td>
-<td align="right">0.04762</td>
-<td align="right">9.87648</td>
+<td align="right">0.00366</td>
+<td align="right">0.03834</td>
+<td align="right">10.46994</td>
 </tr>
 <tr>
 <td align="left"><code>__ior__</code></td>
-<td align="right">0.00519</td>
-<td align="right">0.00883</td>
-<td align="right">1.7006</td>
+<td align="right">0.00364</td>
+<td align="right">0.00703</td>
+<td align="right">1.93197</td>
 </tr>
 <tr>
 <td align="left"><code>__ior__</code> (many)</td>
-<td align="right">0.00593</td>
-<td align="right">0.04225</td>
-<td align="right">7.12726</td>
+<td align="right">0.00457</td>
+<td align="right">0.03454</td>
+<td align="right">7.55353</td>
 </tr>
 <tr>
 <td align="left"><code>items</code></td>
-<td align="right">0.00518</td>
-<td align="right">0.01207</td>
-<td align="right">2.33005</td>
+<td align="right">0.00398</td>
+<td align="right">0.00997</td>
+<td align="right">2.50265</td>
 </tr>
 <tr>
 <td align="left"><code>__iter__</code></td>
-<td align="right">0.0049</td>
-<td align="right">0.0088</td>
-<td align="right">1.79709</td>
+<td align="right">0.00366</td>
+<td align="right">0.0071</td>
+<td align="right">1.93599</td>
 </tr>
 <tr>
 <td align="left"><code>keys</code></td>
-<td align="right">0.00493</td>
-<td align="right">0.00883</td>
-<td align="right">1.78966</td>
+<td align="right">0.00366</td>
+<td align="right">0.0072</td>
+<td align="right">1.97076</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00493</td>
-<td align="right">0.00518</td>
-<td align="right">1.04919</td>
+<td align="right">0.00357</td>
+<td align="right">0.0036</td>
+<td align="right">1.00743</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00499</td>
-<td align="right">0.00473</td>
-<td align="right">0.94822</td>
+<td align="right">0.00358</td>
+<td align="right">0.00356</td>
+<td align="right">0.99392</td>
 </tr>
 <tr>
 <td align="left"><code>__or__</code></td>
-<td align="right">0.00476</td>
-<td align="right">0.05979</td>
-<td align="right">12.55722</td>
+<td align="right">0.00361</td>
+<td align="right">0.05198</td>
+<td align="right">14.38252</td>
 </tr>
 <tr>
 <td align="left"><code>__or__</code> (many)</td>
-<td align="right">0.00629</td>
-<td align="right">0.1113</td>
-<td align="right">17.6942</td>
+<td align="right">0.00469</td>
+<td align="right">0.09406</td>
+<td align="right">20.05571</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.00915</td>
-<td align="right">1.89381</td>
+<td align="right">0.00368</td>
+<td align="right">0.00687</td>
+<td align="right">1.86402</td>
 </tr>
 <tr>
 <td align="left"><code>pop (unsuccessful search)</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.00755</td>
-<td align="right">1.54264</td>
+<td align="right">0.00381</td>
+<td align="right">0.00582</td>
+<td align="right">1.52803</td>
 </tr>
 <tr>
 <td align="left"><code>popitem</code></td>
-<td align="right">0.00513</td>
-<td align="right">0.00928</td>
-<td align="right">1.80926</td>
+<td align="right">0.00369</td>
+<td align="right">0.0072</td>
+<td align="right">1.95124</td>
 </tr>
 <tr>
 <td align="left"><code>reversed</code></td>
-<td align="right">0.0049</td>
-<td align="right">0.00861</td>
-<td align="right">1.75678</td>
+<td align="right">0.0036</td>
+<td align="right">0.00692</td>
+<td align="right">1.92097</td>
 </tr>
 <tr>
 <td align="left"><code>setdefault (unsuccessful search)</code></td>
-<td align="right">0.00493</td>
-<td align="right">0.00726</td>
-<td align="right">1.47153</td>
+<td align="right">0.00365</td>
+<td align="right">0.00609</td>
+<td align="right">1.67011</td>
 </tr>
 <tr>
 <td align="left"><code>setdefault</code></td>
-<td align="right">0.00498</td>
-<td align="right">0.00713</td>
-<td align="right">1.43117</td>
+<td align="right">0.00369</td>
+<td align="right">0.00601</td>
+<td align="right">1.62929</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (add new item)</td>
-<td align="right">0.00488</td>
-<td align="right">0.00887</td>
-<td align="right">1.817</td>
+<td align="right">0.00367</td>
+<td align="right">0.00727</td>
+<td align="right">1.9776</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (replace)</td>
-<td align="right">0.005</td>
-<td align="right">0.00934</td>
-<td align="right">1.86699</td>
+<td align="right">0.0037</td>
+<td align="right">0.00774</td>
+<td align="right">2.09346</td>
 </tr>
 <tr>
 <td align="left"><code>update</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.009</td>
-<td align="right">1.85324</td>
+<td align="right">0.00379</td>
+<td align="right">0.00791</td>
+<td align="right">2.08965</td>
 </tr>
 <tr>
 <td align="left"><code>update</code> (many)</td>
-<td align="right">0.00594</td>
-<td align="right">0.0421</td>
-<td align="right">7.0825</td>
+<td align="right">0.0047</td>
+<td align="right">0.03597</td>
+<td align="right">7.65309</td>
 </tr>
 <tr>
 <td align="left"><code>values</code></td>
-<td align="right">0.00479</td>
-<td align="right">0.00871</td>
-<td align="right">1.81788</td>
+<td align="right">0.00385</td>
+<td align="right">0.00731</td>
+<td align="right">1.8979</td>
 </tr>
 </tbody>
 </table>
@@ -5553,14 +5569,14 @@
 </tr>
 <tr>
 <td align="left"><code>__ior__</code> (many)</td>
-<td align="right">0.1875</td>
+<td align="right">0.18359</td>
 <td align="right">0.0</td>
 <td align="right">0.0</td>
 </tr>
 <tr>
 <td align="left"><code>items</code></td>
 <td align="right">0.0</td>
-<td align="right">0.21484</td>
+<td align="right">0.21875</td>
 <td align="right">inf</td>
 </tr>
 <tr>
@@ -5668,7 +5684,7 @@
 </tbody>
 </table>
 </div>
-<input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><label for="__tabbed_6_2">list</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -5682,171 +5698,171 @@
 <tbody>
 <tr>
 <td align="left"><code>__add__</code></td>
-<td align="right">0.0049</td>
-<td align="right">0.03549</td>
-<td align="right">7.24425</td>
+<td align="right">0.00375</td>
+<td align="right">0.03123</td>
+<td align="right">8.3391</td>
 </tr>
 <tr>
 <td align="left"><code>append</code></td>
-<td align="right">0.00491</td>
-<td align="right">0.00834</td>
-<td align="right">1.69863</td>
+<td align="right">0.00377</td>
+<td align="right">0.00641</td>
+<td align="right">1.70233</td>
 </tr>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.00493</td>
-<td align="right">0.0092</td>
-<td align="right">1.86624</td>
+<td align="right">0.0038</td>
+<td align="right">0.007</td>
+<td align="right">1.84355</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.00491</td>
-<td align="right">0.00492</td>
-<td align="right">1.00233</td>
+<td align="right">0.00374</td>
+<td align="right">0.00372</td>
+<td align="right">0.9931</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.00502</td>
-<td align="right">0.03659</td>
-<td align="right">7.29321</td>
+<td align="right">0.00378</td>
+<td align="right">0.03022</td>
+<td align="right">7.991</td>
 </tr>
 <tr>
 <td align="left"><code>count</code></td>
-<td align="right">0.00487</td>
-<td align="right">0.00494</td>
-<td align="right">1.015</td>
+<td align="right">0.00375</td>
+<td align="right">0.00377</td>
+<td align="right">1.00537</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.00493</td>
-<td align="right">0.02616</td>
-<td align="right">5.30399</td>
+<td align="right">0.00375</td>
+<td align="right">0.02152</td>
+<td align="right">5.74422</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code></td>
-<td align="right">0.00509</td>
-<td align="right">0.01278</td>
-<td align="right">2.5104</td>
+<td align="right">0.00379</td>
+<td align="right">0.01122</td>
+<td align="right">2.96224</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code> (slice)</td>
-<td align="right">0.00495</td>
-<td align="right">0.01748</td>
-<td align="right">3.53147</td>
+<td align="right">0.00373</td>
+<td align="right">0.01571</td>
+<td align="right">4.20844</td>
 </tr>
 <tr>
 <td align="left"><code>__delitem__</code> (slice with skip)</td>
-<td align="right">0.00515</td>
-<td align="right">0.01713</td>
-<td align="right">3.32874</td>
+<td align="right">0.00376</td>
+<td align="right">0.01538</td>
+<td align="right">4.09139</td>
 </tr>
 <tr>
 <td align="left"><code>extend</code></td>
-<td align="right">0.005</td>
-<td align="right">0.00839</td>
-<td align="right">1.67797</td>
+<td align="right">0.00378</td>
+<td align="right">0.00736</td>
+<td align="right">1.94549</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.0049</td>
-<td align="right">1.00178</td>
+<td align="right">0.00374</td>
+<td align="right">0.00377</td>
+<td align="right">1.00875</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code> (slice)</td>
-<td align="right">0.0049</td>
-<td align="right">0.02133</td>
-<td align="right">4.35215</td>
+<td align="right">0.00392</td>
+<td align="right">0.01849</td>
+<td align="right">4.71864</td>
 </tr>
 <tr>
 <td align="left"><code>__getitem__</code> (slice with skip)</td>
-<td align="right">0.00511</td>
-<td align="right">0.01436</td>
-<td align="right">2.81058</td>
+<td align="right">0.00373</td>
+<td align="right">0.01009</td>
+<td align="right">2.7063</td>
 </tr>
 <tr>
 <td align="left"><code>__iadd__</code></td>
-<td align="right">0.00497</td>
-<td align="right">0.00854</td>
-<td align="right">1.71862</td>
+<td align="right">0.00382</td>
+<td align="right">0.00661</td>
+<td align="right">1.72794</td>
 </tr>
 <tr>
 <td align="left"><code>__imult__</code></td>
-<td align="right">0.00485</td>
-<td align="right">0.02277</td>
-<td align="right">4.69854</td>
+<td align="right">0.00384</td>
+<td align="right">0.01869</td>
+<td align="right">4.86097</td>
 </tr>
 <tr>
 <td align="left"><code>index</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.0051</td>
-<td align="right">1.05682</td>
+<td align="right">0.0038</td>
+<td align="right">0.00397</td>
+<td align="right">1.04411</td>
 </tr>
 <tr>
 <td align="left"><code>index</code> (unsuccessful search)</td>
-<td align="right">0.00494</td>
-<td align="right">0.00516</td>
-<td align="right">1.04366</td>
+<td align="right">0.00387</td>
+<td align="right">0.00394</td>
+<td align="right">1.01905</td>
 </tr>
 <tr>
 <td align="left"><code>insert</code></td>
-<td align="right">0.00492</td>
-<td align="right">0.01493</td>
-<td align="right">3.03576</td>
+<td align="right">0.00375</td>
+<td align="right">0.0126</td>
+<td align="right">3.3616</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00488</td>
-<td align="right">0.0049</td>
-<td align="right">1.00351</td>
+<td align="right">0.00376</td>
+<td align="right">0.00373</td>
+<td align="right">0.99036</td>
 </tr>
 <tr>
 <td align="left"><code>__mult__</code></td>
-<td align="right">0.00492</td>
-<td align="right">0.05927</td>
-<td align="right">12.04539</td>
+<td align="right">0.00376</td>
+<td align="right">0.05082</td>
+<td align="right">13.51056</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00498</td>
-<td align="right">0.00506</td>
-<td align="right">1.01703</td>
+<td align="right">0.00378</td>
+<td align="right">0.00378</td>
+<td align="right">0.99946</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.00508</td>
-<td align="right">0.01322</td>
-<td align="right">2.60096</td>
+<td align="right">0.00378</td>
+<td align="right">0.01071</td>
+<td align="right">2.8342</td>
 </tr>
 <tr>
 <td align="left"><code>remove</code></td>
-<td align="right">0.00512</td>
-<td align="right">0.0149</td>
-<td align="right">2.91126</td>
+<td align="right">0.00385</td>
+<td align="right">0.01264</td>
+<td align="right">3.28536</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code></td>
-<td align="right">0.0052</td>
-<td align="right">0.00835</td>
-<td align="right">1.60687</td>
+<td align="right">0.00386</td>
+<td align="right">0.00702</td>
+<td align="right">1.82159</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (slice)</td>
-<td align="right">0.00503</td>
-<td align="right">0.76682</td>
-<td align="right">152.50235</td>
+<td align="right">0.00379</td>
+<td align="right">0.68631</td>
+<td align="right">181.17129</td>
 </tr>
 <tr>
 <td align="left"><code>__setitem__</code> (slice with skip)</td>
-<td align="right">0.00497</td>
-<td align="right">0.00903</td>
-<td align="right">1.81816</td>
+<td align="right">0.00382</td>
+<td align="right">0.00705</td>
+<td align="right">1.84795</td>
 </tr>
 <tr>
 <td align="left"><code>sort</code></td>
-<td align="right">0.00502</td>
-<td align="right">0.11257</td>
-<td align="right">22.43831</td>
+<td align="right">0.00384</td>
+<td align="right">0.08442</td>
+<td align="right">21.96481</td>
 </tr>
 </tbody>
 </table>
@@ -5984,7 +6000,7 @@
 <tr>
 <td align="left"><code>__mult__</code></td>
 <td align="right">0.0</td>
-<td align="right">0.00781</td>
+<td align="right">0.01562</td>
 <td align="right">inf</td>
 </tr>
 <tr>
@@ -6032,7 +6048,7 @@
 </tbody>
 </table>
 </div>
-<input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><label for="__tabbed_6_3">set</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p>timing</p>
 <table>
 <thead>
@@ -6046,243 +6062,243 @@
 <tbody>
 <tr>
 <td align="left"><code>add (existing item)</code></td>
-<td align="right">0.00501</td>
-<td align="right">0.00709</td>
-<td align="right">1.41512</td>
+<td align="right">0.00401</td>
+<td align="right">0.00549</td>
+<td align="right">1.36954</td>
 </tr>
 <tr>
 <td align="left"><code>add (new item)</code></td>
-<td align="right">0.00492</td>
-<td align="right">0.00866</td>
-<td align="right">1.75808</td>
+<td align="right">0.00371</td>
+<td align="right">0.0071</td>
+<td align="right">1.91362</td>
 </tr>
 <tr>
 <td align="left"><code>__and__</code></td>
-<td align="right">0.00492</td>
-<td align="right">0.02662</td>
-<td align="right">5.41026</td>
+<td align="right">0.00369</td>
+<td align="right">0.02307</td>
+<td align="right">6.24361</td>
 </tr>
 <tr>
 <td align="left"><code>clear</code></td>
-<td align="right">0.00498</td>
-<td align="right">0.00862</td>
-<td align="right">1.73108</td>
+<td align="right">0.00373</td>
+<td align="right">0.00667</td>
+<td align="right">1.78845</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code></td>
-<td align="right">0.00499</td>
-<td align="right">0.00478</td>
-<td align="right">0.95707</td>
+<td align="right">0.00371</td>
+<td align="right">0.00376</td>
+<td align="right">1.01421</td>
 </tr>
 <tr>
 <td align="left"><code>copy</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.02098</td>
-<td align="right">4.29121</td>
+<td align="right">0.00375</td>
+<td align="right">0.01703</td>
+<td align="right">4.54094</td>
 </tr>
 <tr>
 <td align="left"><code>difference</code></td>
-<td align="right">0.005</td>
-<td align="right">0.02202</td>
-<td align="right">4.40641</td>
+<td align="right">0.00372</td>
+<td align="right">0.01999</td>
+<td align="right">5.36875</td>
 </tr>
 <tr>
 <td align="left"><code>discard</code></td>
-<td align="right">0.00507</td>
-<td align="right">0.00888</td>
-<td align="right">1.75153</td>
+<td align="right">0.00384</td>
+<td align="right">0.00666</td>
+<td align="right">1.73568</td>
 </tr>
 <tr>
 <td align="left"><code>discard (no changes)</code></td>
-<td align="right">0.00498</td>
-<td align="right">0.00712</td>
-<td align="right">1.42822</td>
+<td align="right">0.004</td>
+<td align="right">0.00549</td>
+<td align="right">1.37168</td>
 </tr>
 <tr>
 <td align="left"><code>__ge__</code></td>
-<td align="right">0.00483</td>
-<td align="right">0.00487</td>
-<td align="right">1.0071</td>
+<td align="right">0.00368</td>
+<td align="right">0.00373</td>
+<td align="right">1.01404</td>
 </tr>
 <tr>
 <td align="left"><code>__ge__</code> (not greater than or equals to)</td>
-<td align="right">0.00498</td>
-<td align="right">0.00483</td>
-<td align="right">0.97106</td>
+<td align="right">0.00376</td>
+<td align="right">0.00379</td>
+<td align="right">1.00897</td>
 </tr>
 <tr>
 <td align="left"><code>__gt__</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.00882</td>
-<td align="right">1.81406</td>
+<td align="right">0.00378</td>
+<td align="right">0.01244</td>
+<td align="right">3.29118</td>
 </tr>
 <tr>
 <td align="left"><code>__gt__</code> (not greater than)</td>
-<td align="right">0.00488</td>
-<td align="right">0.02162</td>
-<td align="right">4.42906</td>
+<td align="right">0.00369</td>
+<td align="right">0.0176</td>
+<td align="right">4.77094</td>
 </tr>
 <tr>
 <td align="left"><code>__iand__</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.01157</td>
-<td align="right">2.36507</td>
+<td align="right">0.00374</td>
+<td align="right">0.008</td>
+<td align="right">2.14276</td>
 </tr>
 <tr>
 <td align="left"><code>__init__</code></td>
-<td align="right">0.00493</td>
-<td align="right">0.0216</td>
-<td align="right">4.38081</td>
+<td align="right">0.00371</td>
+<td align="right">0.01679</td>
+<td align="right">4.52057</td>
 </tr>
 <tr>
 <td align="left"><code>intersection</code></td>
-<td align="right">0.00499</td>
-<td align="right">0.02607</td>
-<td align="right">5.22911</td>
+<td align="right">0.00375</td>
+<td align="right">0.02051</td>
+<td align="right">5.46361</td>
 </tr>
 <tr>
 <td align="left"><code>intersection_update</code></td>
-<td align="right">0.00513</td>
-<td align="right">0.01151</td>
-<td align="right">2.24287</td>
+<td align="right">0.0038</td>
+<td align="right">0.00929</td>
+<td align="right">2.4447</td>
 </tr>
 <tr>
 <td align="left"><code>__ior__</code></td>
-<td align="right">0.00499</td>
-<td align="right">0.00998</td>
-<td align="right">2.00037</td>
+<td align="right">0.00413</td>
+<td align="right">0.00756</td>
+<td align="right">1.83241</td>
 </tr>
 <tr>
 <td align="left"><code>isdisjoint</code></td>
-<td align="right">0.0049</td>
-<td align="right">0.00495</td>
-<td align="right">1.00971</td>
+<td align="right">0.00372</td>
+<td align="right">0.00372</td>
+<td align="right">1.00101</td>
 </tr>
 <tr>
 <td align="left"><code>isdisjoint</code> (not disjoint)</td>
-<td align="right">0.005</td>
-<td align="right">0.00474</td>
-<td align="right">0.94846</td>
+<td align="right">0.00375</td>
+<td align="right">0.00384</td>
+<td align="right">1.02319</td>
 </tr>
 <tr>
 <td align="left"><code>issubset</code></td>
-<td align="right">0.00496</td>
-<td align="right">0.05111</td>
-<td align="right">10.31409</td>
+<td align="right">0.00372</td>
+<td align="right">0.0426</td>
+<td align="right">11.46471</td>
 </tr>
 <tr>
 <td align="left"><code>issubset</code> (not subset)</td>
-<td align="right">0.00496</td>
-<td align="right">0.02637</td>
-<td align="right">5.3153</td>
+<td align="right">0.00384</td>
+<td align="right">0.02119</td>
+<td align="right">5.52224</td>
 </tr>
 <tr>
 <td align="left"><code>issuperset</code></td>
-<td align="right">0.00496</td>
-<td align="right">0.01283</td>
-<td align="right">2.58372</td>
+<td align="right">0.00371</td>
+<td align="right">0.01028</td>
+<td align="right">2.76965</td>
 </tr>
 <tr>
 <td align="left"><code>issuperset</code> (not superset)</td>
-<td align="right">0.005</td>
-<td align="right">0.00501</td>
-<td align="right">1.00246</td>
+<td align="right">0.00376</td>
+<td align="right">0.00374</td>
+<td align="right">0.99425</td>
 </tr>
 <tr>
 <td align="left"><code>__ixor__</code></td>
-<td align="right">0.00494</td>
-<td align="right">0.03101</td>
-<td align="right">6.27748</td>
+<td align="right">0.00377</td>
+<td align="right">0.02515</td>
+<td align="right">6.66974</td>
 </tr>
 <tr>
 <td align="left"><code>__le__</code></td>
-<td align="right">0.00518</td>
-<td align="right">0.00566</td>
-<td align="right">1.09378</td>
+<td align="right">0.00367</td>
+<td align="right">0.00436</td>
+<td align="right">1.18833</td>
 </tr>
 <tr>
 <td align="left"><code>__le__</code> (not less than or equals to)</td>
-<td align="right">0.00529</td>
-<td align="right">0.00485</td>
-<td align="right">0.91783</td>
+<td align="right">0.00368</td>
+<td align="right">0.0037</td>
+<td align="right">1.00556</td>
 </tr>
 <tr>
 <td align="left"><code>__len__</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.00533</td>
-<td align="right">1.08941</td>
+<td align="right">0.00368</td>
+<td align="right">0.00367</td>
+<td align="right">0.99694</td>
 </tr>
 <tr>
 <td align="left"><code>__lt__</code></td>
-<td align="right">0.00487</td>
-<td align="right">0.00563</td>
-<td align="right">1.15729</td>
+<td align="right">0.00368</td>
+<td align="right">0.00448</td>
+<td align="right">1.21575</td>
 </tr>
 <tr>
 <td align="left"><code>__lt__</code> (not less than)</td>
-<td align="right">0.00509</td>
-<td align="right">0.00496</td>
-<td align="right">0.97386</td>
+<td align="right">0.00368</td>
+<td align="right">0.00364</td>
+<td align="right">0.98892</td>
 </tr>
 <tr>
 <td align="left"><code>__contains__</code> (unsuccessful search)</td>
-<td align="right">0.00502</td>
-<td align="right">0.00488</td>
-<td align="right">0.97122</td>
+<td align="right">0.00365</td>
+<td align="right">0.00366</td>
+<td align="right">1.00243</td>
 </tr>
 <tr>
 <td align="left"><code>__or__</code></td>
-<td align="right">0.00486</td>
-<td align="right">0.02171</td>
-<td align="right">4.46251</td>
+<td align="right">0.00369</td>
+<td align="right">0.01985</td>
+<td align="right">5.37913</td>
 </tr>
 <tr>
 <td align="left"><code>pop</code></td>
-<td align="right">0.00499</td>
-<td align="right">0.00858</td>
-<td align="right">1.72018</td>
+<td align="right">0.00379</td>
+<td align="right">0.00726</td>
+<td align="right">1.91803</td>
 </tr>
 <tr>
 <td align="left"><code>remove</code></td>
-<td align="right">0.00522</td>
-<td align="right">0.00866</td>
-<td align="right">1.65943</td>
+<td align="right">0.00371</td>
+<td align="right">0.00693</td>
+<td align="right">1.86708</td>
 </tr>
 <tr>
 <td align="left"><code>__sub__</code></td>
-<td align="right">0.00496</td>
-<td align="right">0.0217</td>
-<td align="right">4.37478</td>
+<td align="right">0.00368</td>
+<td align="right">0.01691</td>
+<td align="right">4.59962</td>
 </tr>
 <tr>
 <td align="left"><code>symmetric_difference</code></td>
-<td align="right">0.00487</td>
-<td align="right">0.05112</td>
-<td align="right">10.49234</td>
+<td align="right">0.00377</td>
+<td align="right">0.04235</td>
+<td align="right">11.2323</td>
 </tr>
 <tr>
 <td align="left"><code>symmetric_difference_update</code></td>
-<td align="right">0.00496</td>
-<td align="right">0.03025</td>
-<td align="right">6.09254</td>
+<td align="right">0.00372</td>
+<td align="right">0.02542</td>
+<td align="right">6.83102</td>
 </tr>
 <tr>
 <td align="left"><code>union</code></td>
-<td align="right">0.00489</td>
-<td align="right">0.02239</td>
-<td align="right">4.578</td>
+<td align="right">0.00375</td>
+<td align="right">0.02073</td>
+<td align="right">5.52778</td>
 </tr>
 <tr>
 <td align="left"><code>update</code></td>
-<td align="right">0.00501</td>
-<td align="right">0.00976</td>
-<td align="right">1.94704</td>
+<td align="right">0.00373</td>
+<td align="right">0.00743</td>
+<td align="right">1.9916</td>
 </tr>
 <tr>
 <td align="left"><code>__xor__</code></td>
-<td align="right">0.00565</td>
-<td align="right">0.05186</td>
-<td align="right">9.17512</td>
+<td align="right">0.00375</td>
+<td align="right">0.04152</td>
+<td align="right">11.08696</td>
 </tr>
 </tbody>
 </table>
@@ -6539,6 +6555,8 @@
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -6598,7 +6616,7 @@
     <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b97dbffb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.0238f547.min.js"></script>
+      <script src="../assets/javascripts/bundle.6c7ad80a.min.js"></script>
       
     
   </body>
