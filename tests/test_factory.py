@@ -9,9 +9,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import Callable, Iterable
 
-from sqlitecollections import base, factory
-
 from test_base import ConcreteSqliteCollectionClass
+
+from sqlitecollections import base, factory
 
 
 class ConcreteFactory(factory.SequenceFactoryBase[str]):

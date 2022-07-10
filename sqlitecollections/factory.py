@@ -44,14 +44,6 @@ class FactoryBase(Generic[T], metaclass=ABCMeta):
     def table_name(self) -> Union[str, None]:
         return self._table_name
 
-    def __getitem__(self, table_name: str) -> "FactoryBase[T]":
-        return self.__class__(
-            connection=self.connection,
-            table_name=table_name,
-            serializer=self.serializer,
-            deserializer=self.deserializer,
-        )
-
     @classmethod
     @abstractmethod
     def _get_container_class(
@@ -73,6 +65,14 @@ class SequenceFactoryBase(FactoryBase[T]):
             __data,
             connection=self.connection,
             table_name=self.table_name,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+        )
+
+    def __getitem__(self, table_name: str) -> "SequenceFactoryBase[T]":
+        return self.__class__(
+            connection=self.connection,
+            table_name=table_name,
             serializer=self.serializer,
             deserializer=self.deserializer,
         )
@@ -133,7 +133,7 @@ class DictFactory(FactoryBase[KT], Generic[KT, VT]):
     def value_deserializer(self) -> Callable[[bytes], VT]:
         return self._value_deserializer
 
-    def __getitem__(self, table_name: str) -> "FactoryBase[T]":
+    def __getitem__(self, table_name: str) -> "DictFactory[KT, VT]":
         return self.__class__(
             connection=self.connection,
             table_name=table_name,
