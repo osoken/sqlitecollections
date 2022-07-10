@@ -19,10 +19,12 @@ class FactoryBase(Generic[T], metaclass=ABCMeta):
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
+        table_name: Optional[str] = None,
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
     ):
         self._connection = tidy_connection(connection)
+        self._table_name = table_name
         self._serializer = SqliteCollectionBase._default_serializer if serializer is None else serializer
         self._deserializer = SqliteCollectionBase._default_deserializer if deserializer is None else deserializer
 
@@ -38,6 +40,18 @@ class FactoryBase(Generic[T], metaclass=ABCMeta):
     def deserializer(self) -> Callable[[bytes], T]:
         return self._deserializer
 
+    @property
+    def table_name(self) -> Union[str, None]:
+        return self._table_name
+
+    def __getitem__(self, table_name: str) -> "FactoryBase[T]":
+        return self.__class__(
+            connection=self.connection,
+            table_name=table_name,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
+        )
+
     @classmethod
     @abstractmethod
     def _get_container_class(
@@ -50,10 +64,17 @@ class SequenceFactoryBase(FactoryBase[T]):
     def create(self, __data: Optional[Iterable[T]] = None) -> SqliteCollectionBase[T]:
         if __data is None:
             return self._get_container_class()(
-                connection=self.connection, serializer=self.serializer, deserializer=self.deserializer
+                connection=self.connection,
+                table_name=self.table_name,
+                serializer=self.serializer,
+                deserializer=self.deserializer,
             )
         return self._get_container_class()(
-            __data, connection=self.connection, serializer=self.serializer, deserializer=self.deserializer
+            __data,
+            connection=self.connection,
+            table_name=self.table_name,
+            serializer=self.serializer,
+            deserializer=self.deserializer,
         )
 
     def __call__(self, __data: Optional[Iterable[T]] = None) -> SqliteCollectionBase[T]:
@@ -76,13 +97,14 @@ class DictFactory(FactoryBase[KT], Generic[KT, VT]):
     def __init__(
         self,
         connection: Optional[Union[str, sqlite3.Connection]] = None,
+        table_name: Optional[str] = None,
         key_serializer: Optional[Callable[[KT], bytes]] = None,
         key_deserializer: Optional[Callable[[bytes], KT]] = None,
         value_serializer: Optional[Callable[[VT], bytes]] = None,
         value_deserializer: Optional[Callable[[bytes], VT]] = None,
     ):
         super(DictFactory, self).__init__(
-            connection=connection, serializer=key_serializer, deserializer=key_deserializer
+            connection=connection, table_name=table_name, serializer=key_serializer, deserializer=key_deserializer
         )
         self._value_serializer = (
             cast(Callable[[VT], bytes], self.key_serializer) if value_serializer is None else value_serializer
@@ -111,6 +133,16 @@ class DictFactory(FactoryBase[KT], Generic[KT, VT]):
     def value_deserializer(self) -> Callable[[bytes], VT]:
         return self._value_deserializer
 
+    def __getitem__(self, table_name: str) -> "FactoryBase[T]":
+        return self.__class__(
+            connection=self.connection,
+            table_name=table_name,
+            key_serializer=self.key_serializer,
+            key_deserializer=self.key_deserializer,
+            value_serializer=self.value_serializer,
+            value_deserializer=self.value_deserializer,
+        )
+
     def create(
         self, __data: Optional[Union[Iterable[Tuple[KT, VT]], Mapping[KT, VT]]] = None, **kwargs: VT
     ) -> Dict[KT, VT]:
@@ -118,6 +150,7 @@ class DictFactory(FactoryBase[KT], Generic[KT, VT]):
             if len(kwargs) == 0:
                 return self._get_container_class()(
                     connection=self.connection,
+                    table_name=self.table_name,
                     key_serializer=self.key_serializer,
                     key_deserializer=self.key_deserializer,
                     value_serializer=self.value_serializer,
@@ -126,6 +159,7 @@ class DictFactory(FactoryBase[KT], Generic[KT, VT]):
             return self._get_container_class()(
                 kwargs,
                 connection=self.connection,
+                table_name=self.table_name,
                 key_serializer=self.key_serializer,
                 key_deserializer=self.key_deserializer,
                 value_serializer=self.value_serializer,
@@ -134,6 +168,7 @@ class DictFactory(FactoryBase[KT], Generic[KT, VT]):
         return self._get_container_class()(
             chain(__data.items() if isinstance(__data, Mapping) else __data, kwargs.items()),
             connection=self.connection,
+            table_name=self.table_name,
             key_serializer=self.key_serializer,
             key_deserializer=self.key_deserializer,
             value_serializer=self.value_serializer,

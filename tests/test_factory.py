@@ -9,9 +9,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import Callable, Iterable
 
-from test_base import ConcreteSqliteCollectionClass
-
 from sqlitecollections import base, factory
+
+from test_base import ConcreteSqliteCollectionClass
 
 
 class ConcreteFactory(factory.SequenceFactoryBase[str]):
@@ -42,6 +42,23 @@ class FactoryBaseTestCase(TestCase):
         self.assertEqual(sut.deserializer, deserializer)
         tidy_connection.assert_called_once_with(connection)
 
+    @patch.object(ConcreteSqliteCollectionClass, "__init__", return_value=None)
+    @patch("sqlitecollections.factory.tidy_connection")
+    def test_getitem_specifies_table_name(
+        self, tidy_connection: MagicMock, ConcreteSqliteCollectionClass_init: MagicMock
+    ) -> None:
+        connection = MagicMock(spec=str)
+        serializer = MagicMock(spec=Callable[[str], bytes])
+        deserializer = MagicMock(spec=Callable[[bytes], str])
+        sut = ConcreteFactory(connection=connection, serializer=serializer, deserializer=deserializer)
+        actual = sut["testtablename"]()
+        ConcreteSqliteCollectionClass_init.assert_called_once_with(
+            connection=tidy_connection.return_value,
+            table_name="testtablename",
+            serializer=serializer,
+            deserializer=deserializer,
+        )
+
 
 class SequenceFactoryBaseTestCase(TestCase):
     @patch.object(ConcreteFactory, "_get_container_class")
@@ -52,7 +69,7 @@ class SequenceFactoryBaseTestCase(TestCase):
         actual = sut.create()
         self.assertEqual(actual, expected)
         ConcreteFactory_get_container_class.return_value.assert_called_once_with(
-            connection=sut.connection, serializer=sut.serializer, deserializer=sut.deserializer
+            connection=sut.connection, table_name=None, serializer=sut.serializer, deserializer=sut.deserializer
         )
 
     @patch.object(ConcreteFactory, "_get_container_class")
@@ -64,7 +81,7 @@ class SequenceFactoryBaseTestCase(TestCase):
         actual = sut.create(data)
         self.assertEqual(actual, expected)
         ConcreteFactory_get_container_class.return_value.assert_called_once_with(
-            data, connection=sut.connection, serializer=sut.serializer, deserializer=sut.deserializer
+            data, connection=sut.connection, table_name=None, serializer=sut.serializer, deserializer=sut.deserializer
         )
 
     @patch("sqlitecollections.factory.SequenceFactoryBase.create")
@@ -89,7 +106,7 @@ class SetFactoryTestCase(TestCase):
         actual = sut()
         self.assertEqual(actual, expected)
         Set.__getitem__.return_value.assert_called_once_with(
-            connection=conn, serializer=serializer, deserializer=deserializer
+            connection=conn, table_name=None, serializer=serializer, deserializer=deserializer
         )
 
     @patch("sqlitecollections.factory.Set")
@@ -102,7 +119,7 @@ class SetFactoryTestCase(TestCase):
         actual = sut(["1", "2", "3"])
         self.assertEqual(actual, expected)
         Set.__getitem__.return_value.assert_called_once_with(
-            ["1", "2", "3"], connection=conn, serializer=serializer, deserializer=deserializer
+            ["1", "2", "3"], connection=conn, table_name=None, serializer=serializer, deserializer=deserializer
         )
 
 
@@ -117,7 +134,7 @@ class ListFactoryTestCase(TestCase):
         actual = sut()
         self.assertEqual(actual, expected)
         List.__getitem__.return_value.assert_called_once_with(
-            connection=conn, serializer=serializer, deserializer=deserializer
+            connection=conn, table_name=None, serializer=serializer, deserializer=deserializer
         )
 
     @patch("sqlitecollections.factory.List")
@@ -130,7 +147,7 @@ class ListFactoryTestCase(TestCase):
         actual = sut(["1", "2", "3"])
         self.assertEqual(actual, expected)
         List.__getitem__.return_value.assert_called_once_with(
-            ["1", "2", "3"], connection=conn, serializer=serializer, deserializer=deserializer
+            ["1", "2", "3"], connection=conn, table_name=None, serializer=serializer, deserializer=deserializer
         )
 
 
@@ -154,6 +171,7 @@ class DictFactoryTestCase(TestCase):
         self.assertEqual(actual, expected)
         Dict.__getitem__.return_value.assert_called_once_with(
             connection=conn,
+            table_name=None,
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
             value_serializer=value_serializer,
@@ -183,6 +201,7 @@ class DictFactoryTestCase(TestCase):
         Dict.__getitem__.return_value.assert_called_once_with(
             chain.return_value,
             connection=conn,
+            table_name=None,
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
             value_serializer=value_serializer,
@@ -210,6 +229,34 @@ class DictFactoryTestCase(TestCase):
         Dict.__getitem__.return_value.assert_called_once_with(
             {"a": 1, "b": 2},
             connection=conn,
+            table_name=None,
+            key_serializer=key_serializer,
+            key_deserializer=key_deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
+        )
+
+    @patch("sqlitecollections.factory.Dict")
+    def test_getitem(self, Dict: MagicMock) -> None:
+        conn = MagicMock(spec=sqlite3.Connection)
+        key_serializer = MagicMock(spec=Callable[[str], bytes])
+        key_deserializer = MagicMock(spec=Callable[[bytes], str])
+        value_serializer = MagicMock(spec=Callable[[int], bytes])
+        value_deserializer = MagicMock(spec=Callable[[bytes], int])
+        sut = factory.DictFactory[str, int](
+            connection=conn,
+            key_serializer=key_serializer,
+            key_deserializer=key_deserializer,
+            value_serializer=value_serializer,
+            value_deserializer=value_deserializer,
+        )
+        expected = Dict.__getitem__.return_value.return_value
+        actual = sut["table_name"](a=1, b=2)
+        self.assertEqual(actual, expected)
+        Dict.__getitem__.return_value.assert_called_once_with(
+            {"a": 1, "b": 2},
+            connection=conn,
+            table_name="table_name",
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
             value_serializer=value_serializer,
