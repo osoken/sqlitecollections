@@ -6,6 +6,8 @@ They replace constructors of each container that require extra arguments such as
 
 ## Example
 
+### Basic usage
+
 The results of the following two examples are almost the same (except for the auto-generated table names).
 
 Without factory:
@@ -48,6 +50,29 @@ l2 = list_(["Dave"])
 l3 = list_(["Erin"])
 ```
 
+### Specifying a table name
+
+If you want to specify table names of containers from a factory, you can do that as follows:
+
+```
+import sqlite3
+from sqlitecollections import factory
+
+conn = sqlite3.connect("path/to/file.db")
+
+def encode(x: str) -> bytes:
+    return x.encode("utf-8")
+
+def decode(x: bytes) -> str:
+    return x.decode("utf-8")
+
+list_ = factory.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
+
+l1 = list_["first_table_name"](["Alice", "Bob", "Carol"])
+
+assert l1.table_name == "first_table_name"
+```
+
 # ListFactory
 
 ## `ListFactory[T](...)`
@@ -61,6 +86,7 @@ Constructor of `ListFactory` which constructs `List`.
 ### Arguments:
 
 - `connection`: `str` or `sqlite3.Connection`, optional, default=`None`; If `None`, temporary file is automatically created. If `connection` is a `str`, it will be used as the sqlite3 database file name. You can pass a `sqlite3.Connection` directly.
+- `table_name`: `str`, optional, default=`None`; Table name of containers from this factory. This argument is assumed not to be specified directly by users. If `None`, an auto-generated unique name will be used.
 - `serializer`: `Callable[[T], bytes]`, optional, default=`None`; Function to serialize value. If `None`, `pickle.dumps` is used.
 - `deserializer`: `Callable[[bytes], T]`, optional, default=`None`; Function to deserialize value. If `None`, `pickle.loads` is used.
 
@@ -92,6 +118,20 @@ Construct `List[T]` with connection, serializer and deserializer preset from the
 
 `List[T]`: connection, serializer and deserializer are the same as those of the factory.
 
+---
+
+## `f[t]`
+
+Return a copy of this factory `f` that creates container with table name `t`.
+
+### Arguments:
+
+- `t`: `str`; the table name
+
+### Return value:
+
+`ListFactory[T]`: connection, serializer and deserializer are the same as those of this factory and the table name of the `List[T]` from this return value will be set to `t`.
+
 ===
 
 # DictFactory
@@ -108,6 +148,7 @@ Constructor of `DictFactory` which constructs `Dict`.
 ### Arguments:
 
 - `connection`: `str` or `sqlite3.Connection`, optional, default=`None`; If `None`, temporary file is automatically created. If `connection` is a `str`, it will be used as the sqlite3 database file name. You can pass a `sqlite3.Connection` directly.
+- `table_name`: `str`, optional, default=`None`; Table name of containers from this factory. This argument is assumed not to be specified directly by users. If `None`, an auto-generated unique name will be used.
 - `key_serializer`: `Callable[[KT], bytes]`, optional, default=`None`; Function to serialize key. If `None`, `pickle.dumps` is used.
 - `key_deserializer`: `Callable[[bytes], KT]`, optional, default=`None`; Function to deserialize key. If `None`, `pickle.loads` is used.
 - `value_serializer`: `Callable[[VT], bytes]`, optional, default=`None`; Function to serialize value. If `None`, `key_serializer` is used.
@@ -143,6 +184,20 @@ Construct `Dict[KT, VT]` with connection, key_serializer, etc., preset from the 
 
 `Dict[KT, VT]`: connection, key_serializers, etc., are the same as those of the factory.
 
+---
+
+## `f[t]`
+
+Return a copy of this factory `f` that creates container with table name `t`.
+
+### Arguments:
+
+- `t`: `str`; the table name
+
+### Return value:
+
+`DictFactory[KT, VT]`: connection, key_serializer, key_deserializer, value_serializer and value_deserializer are the same as those of this factory and the table name of the `Dict[KT, VT]` from this return value will be set to `t`.
+
 ===
 
 # SetFactory
@@ -158,6 +213,7 @@ Constructor of `SetFactory` which constructs `Set`.
 ### Arguments:
 
 - `connection`: `str` or `sqlite3.Connection`, optional, default=`None`; If `None`, temporary file is automatically created. If `connection` is a `str`, it will be used as the sqlite3 database file name. You can pass a `sqlite3.Connection` directly.
+- `table_name`: `str`, optional, default=`None`; Table name of containers from this factory. This argument is assumed not to be specified directly by users. If `None`, an auto-generated unique name will be used.
 - `serializer`: `Callable[[T], bytes]`, optional, default=`None`; Function to serialize value. If `None`, `pickle.dumps` is used.
 - `deserializer`: `Callable[[bytes], T]`, optional, default=`None`; Function to deserialize value. If `None`, `pickle.loads` is used.
 
@@ -188,5 +244,17 @@ Construct `Set[T]` with connection, serializer and deserializer preset from the 
 ### Return value:
 
 `Set[T]`: connection, serializer and deserializer are the same as those of the factory.
+
+## `f[t]`
+
+Return a copy of this factory `f` that creates container with table name `t`.
+
+### Arguments:
+
+- `t`: `str`; the table name
+
+### Return value:
+
+`SetFactory[T]`: connection, serializer and deserializer are the same as those of this factory and the table name of the `Set[T]` from this return value will be set to `t`.
 
 ===
