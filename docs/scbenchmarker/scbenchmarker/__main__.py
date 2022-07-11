@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 from typing import Tuple, TypeVar
 
 import sqlitecollections as sc
+from sqlitecollections import factory
 
 if sys.version_info >= (3, 9):
     from collections.abc import Callable, Iterable
@@ -56,14 +57,11 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    cache_path = args.result_cache or os.path.join(
-        os.path.dirname(os.path.dirname(wd)), "temp", f"benchmark_{args.prefix}.db"
-    )
+    cache_path = args.result_cache or os.path.join(os.path.dirname(os.path.dirname(wd)), "temp", "benchmark.db")
     cache_dir = os.path.dirname(cache_path)
 
-    cache_dict = sc.Dict[str, dict](
+    dict_ = factory.DictFactory[str, dict](
         connection=cache_path,
-        table_name="benchmark_results",
         key_serializer=lambda x: x.encode("utf-8"),
         key_deserializer=lambda x: x.decode("utf-8"),
         value_serializer=lambda x: json.dumps(x).encode("utf-8"),
@@ -73,6 +71,7 @@ if __name__ == "__main__":
     if args.subcommand == "benchmarking":
         for fn in filter(lambda x: x.startswith("benchmark_") and x.endswith(".py"), os.listdir(wd)):
             container_type_str = re.sub(r"benchmark_([a-z]+)\.py", "\\1", fn)
+            cache_dict = dict_[args.prefix]()
             m = importlib.import_module("scbenchmarker.{}".format(re.sub('\\.py$', '', fn)))
             builtin_base = getattr(
                 m, get_element_by_condition(lambda s: re.match(r"Builtin[A-Za-z]+BenchmarkBase", s), dir(m))
@@ -80,8 +79,9 @@ if __name__ == "__main__":
             sqlitecollections_base = getattr(
                 m, get_element_by_condition(lambda s: re.match(r"SqliteCollections[A-Za-z]+BenchmarkBase", s), dir(m))
             )
-            for benchmark_cls in (
-                getattr(m, cn) for cn in filter(lambda x: re.match(r"^Benchmark.+Base$", x) is not None, dir(m))
+            for benchmark_name, benchmark_cls in (
+                (re.sub("Base$", "", cn), getattr(m, cn))
+                for cn in filter(lambda x: re.match(r"^Benchmark.+Base$", x) is not None, dir(m))
             ):
                 try:
                     builtin_benchmark_class = get_element_by_condition(
@@ -109,7 +109,7 @@ if __name__ == "__main__":
                     builtin_benchmark_class(timeout=args.timeout, debug=args.debug),
                     sqlitecollections_benchmark_class(timeout=args.timeout, debug=args.debug),
                 )
-                cache_dict[f"{fn}::{comp._subject}"] = comp().dict()
+                cache_dict[f"{fn}::{benchmark_name}"] = comp().dict()
                 print(".", end="")
             print("")
     elif args.subcommand == "render":
