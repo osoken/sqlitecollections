@@ -67,9 +67,12 @@ if __name__ == "__main__":
         value_serializer=lambda x: json.dumps(x).encode("utf-8"),
         value_deserializer=lambda x: json.loads(x.decode("utf-8")),
     )
+    filter_set = set(parse_target(t) for t in args.targets)
+    benchmark_filter = (lambda x: True) if len(filter_set) == 0 else (lambda x: x in filter_set)
 
     if args.subcommand == "benchmarking":
         for fn in filter(lambda x: x.startswith("benchmark_") and x.endswith(".py"), os.listdir(wd)):
+            printed = False
             container_type_str = re.sub(r"benchmark_([a-z]+)\.py", "\\1", fn)
             cache_dict = dict_[args.prefix]()
             m = importlib.import_module("scbenchmarker.{}".format(re.sub('\\.py$', '', fn)))
@@ -83,6 +86,8 @@ if __name__ == "__main__":
                 (re.sub("Base$", "", cn), getattr(m, cn))
                 for cn in filter(lambda x: re.match(r"^Benchmark.+Base$", x) is not None, dir(m))
             ):
+                if not benchmark_filter((fn, benchmark_name)):
+                    continue
                 try:
                     builtin_benchmark_class = get_element_by_condition(
                         lambda x: is_special_benchmark_class(x, builtin_base, benchmark_cls),
@@ -111,7 +116,9 @@ if __name__ == "__main__":
                 )
                 cache_dict[f"{fn}::{benchmark_name}"] = comp().dict()
                 print(".", end="")
-            print("")
+                printed = True
+            if printed:
+                print("")
     elif args.subcommand == "render":
         ...
     else:
