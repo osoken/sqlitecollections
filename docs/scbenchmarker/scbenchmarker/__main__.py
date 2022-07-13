@@ -4,6 +4,7 @@ import os
 import re
 import sys
 from argparse import ArgumentParser
+from collections import defaultdict
 from typing import Tuple, TypeVar
 
 import sqlitecollections as sc
@@ -38,6 +39,10 @@ def parse_target(s: str) -> Tuple[str]:
     return tuple(s.split("::"))
 
 
+def get_container_type_str(s: str) -> str:
+    return re.sub(r"benchmark_([a-z]+)\.py", "\\1", s)
+
+
 if __name__ == "__main__":
     wd = os.path.dirname(os.path.abspath(__file__))
 
@@ -54,11 +59,14 @@ if __name__ == "__main__":
     benchmarking_parser.add_argument("targets", nargs="*")
 
     render_parser = subcommand_parser.add_parser("render")
+    render_parser.add_argument("--output-dir")
 
     args = parser.parse_args()
 
     cache_path = args.result_cache or os.path.join(os.path.dirname(os.path.dirname(wd)), "temp", "benchmark.db")
     cache_dir = os.path.dirname(cache_path)
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
 
     dict_ = factory.DictFactory[str, dict](
         connection=cache_path,
@@ -67,14 +75,14 @@ if __name__ == "__main__":
         value_serializer=lambda x: json.dumps(x).encode("utf-8"),
         value_deserializer=lambda x: json.loads(x.decode("utf-8")),
     )
-    filter_set = set(parse_target(t) for t in args.targets)
-    benchmark_filter = (lambda x: True) if len(filter_set) == 0 else (lambda x: x in filter_set)
+    cache_dict = dict_[args.prefix]()
 
     if args.subcommand == "benchmarking":
+        filter_set = set(parse_target(t) for t in args.targets)
+        benchmark_filter = (lambda x: True) if len(filter_set) == 0 else (lambda x: x in filter_set)
         for fn in filter(lambda x: x.startswith("benchmark_") and x.endswith(".py"), os.listdir(wd)):
             printed = False
-            container_type_str = re.sub(r"benchmark_([a-z]+)\.py", "\\1", fn)
-            cache_dict = dict_[args.prefix]()
+            container_type_str = get_container_type_str(fn)
             m = importlib.import_module("scbenchmarker.{}".format(re.sub('\\.py$', '', fn)))
             builtin_base = getattr(
                 m, get_element_by_condition(lambda s: re.match(r"Builtin[A-Za-z]+BenchmarkBase", s), dir(m))
@@ -120,6 +128,20 @@ if __name__ == "__main__":
             if printed:
                 print("")
     elif args.subcommand == "render":
-        ...
+        output_dir = (
+            args.output_dir
+            if args.output_dir is not None
+            else os.path.join(os.path.dirname(os.path.dirname(wd)), "benchmark_results", args.prefix)
+        )
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        env = Environment(loader=FileSystemLoader(wd), autoescape=select_autoescape())
+        template = env.get_template("template.j2")
+        subjects = defaultdict(list)
+        for k in cache_dict.keys():
+            subjects[parse_target(k)[0]].append(k)
+        for fn, keys in subjects.items():
+            with open(os.path.join(output_dir, f"{get_container_type_str(fn)}.md"), "w") as fout:
+                fout.write(template.render(data=[cache_dict[k] for k in sorted(keys)]))
     else:
         parser.print_help()
