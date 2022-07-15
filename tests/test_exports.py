@@ -6,7 +6,7 @@ from sqlitecollections import factory
 
 
 class ImportFactories(TestCase):
-    def assert_is_factory_class(self, x: object) -> None:
+    def assert_is_factory_class(self, x: type) -> None:
         self.assertTrue(issubclass(x, factory.FactoryBase))
 
     def test_list_factory_is_accessible(self) -> None:
