@@ -33,7 +33,7 @@ With factory:
 
 ```
 import sqlite3
-from sqlitecollections import factory
+import sqlitecollections as sc
 
 conn = sqlite3.connect("path/to/file.db")
 
@@ -43,7 +43,7 @@ def encode(x: str) -> bytes:
 def decode(x: bytes) -> str:
     return x.decode("utf-8")
 
-list_ = factory.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
+list_ = sc.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
 
 l1 = list_(["Alice", "Bob", "Carol"])
 l2 = list_(["Dave"])
@@ -56,7 +56,7 @@ If you want to specify table names of containers from a factory, you can do that
 
 ```
 import sqlite3
-from sqlitecollections import factory
+import sqlitecollections as sc
 
 conn = sqlite3.connect("path/to/file.db")
 
@@ -66,7 +66,7 @@ def encode(x: str) -> bytes:
 def decode(x: bytes) -> str:
     return x.decode("utf-8")
 
-list_ = factory.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
+list_ = sc.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
 
 l1 = list_["first_table_name"](["Alice", "Bob", "Carol"])
 
