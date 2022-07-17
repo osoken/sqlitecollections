@@ -6,14 +6,14 @@ import uuid
 import warnings
 from collections.abc import Hashable
 from types import GeneratorType
-from typing import Any
+from typing import Any, Optional, Union, cast
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
 if sys.version_info >= (3, 9):
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable, Sequence
 else:
-    from typing import Callable
+    from typing import Callable, Iterable, Sequence
 
 from sqlitecollections import base
 
@@ -37,9 +37,12 @@ class SqlTestCase(TestCase):
     import sqlite3
 
     def assert_sql_result_equals(self, conn: sqlite3.Connection, sql: str, expected: Any) -> None:
+        return self.assertEqual(self.get_sql_result(conn, sql), expected)
+
+    def get_sql_result(self, conn: sqlite3.Connection, sql: str) -> Sequence[Any]:
         cur = conn.cursor()
         cur.execute(sql)
-        return self.assertEqual(list(cur), expected)
+        return list(cur)
 
     def get_fixture(self, conn: sqlite3.Connection, *fixture_names: str) -> None:
         wd = os.path.dirname(os.path.abspath(__file__))
@@ -75,6 +78,38 @@ class ConcreteSqliteCollectionDatabaseDriver(base._SqliteCollectionBaseDatabaseD
 
 class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
     _driver_class = ConcreteSqliteCollectionDatabaseDriver
+
+    def __init__(
+        self,
+        __data: Optional[Any] = None,
+        connection: Optional[Union[str, sqlite3.Connection]] = None,
+        table_name: Optional[str] = None,
+        serializer: Optional[Callable[[Any], bytes]] = None,
+        deserializer: Optional[Callable[[bytes], Any]] = None,
+        persist: bool = True,
+    ) -> None:
+        if (
+            isinstance(__data, ConcreteSqliteCollectionClass)
+            and __data.connection == connection
+            and __data.serializer == serializer
+            and __data.deserializer == deserializer
+        ):
+            super(ConcreteSqliteCollectionClass, self).__init__(
+                connection=connection,
+                table_name=table_name,
+                serializer=serializer,
+                deserializer=deserializer,
+                persist=persist,
+                reference_table_name=__data.table_name,
+            )
+        else:
+            super(ConcreteSqliteCollectionClass, self).__init__(
+                connection=connection,
+                table_name=table_name,
+                serializer=serializer,
+                deserializer=deserializer,
+                persist=persist,
+            )
 
     def add(self, value: bytes) -> None:
         cur = self.connection.cursor()
@@ -283,6 +318,25 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             memory_db,
             "SELECT 1 FROM ConcreteSqliteCollectionClass_4da9535864e740e7b88831e14e1c1d09",
             [],
+        )
+
+    def test_init_with_reference_table(self) -> None:
+        import random
+
+        memory_db = sqlite3.connect(":memory:")
+        sut = ConcreteSqliteCollectionClass(connection=memory_db, table_name="items")
+        for _ in range(100):
+            sut.add(str(random.randint(0, 1000)).encode("utf-8"))
+        actual = ConcreteSqliteCollectionClass(
+            sut,
+            connection=sut.connection,
+            table_name="copied",
+            serializer=sut.serializer,
+            deserializer=sut.deserializer,
+        )
+        self.assertEqual(
+            self.get_sql_result(memory_db, "SELECT idx, value FROM items ORDER BY idx"),
+            self.get_sql_result(memory_db, "SELECT idx, value FROM copied ORDER BY idx"),
         )
 
     def test_change_table_name(self) -> None:
