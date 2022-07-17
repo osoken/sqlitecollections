@@ -129,9 +129,14 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         )
 
     @classmethod
-    def initialize_table(cls, table_name: str, container_type: str, cur: sqlite3.Cursor) -> None:
+    def initialize_table(
+        cls, table_name: str, container_type: str, reference_table_name: Union[None, str], cur: sqlite3.Cursor
+    ) -> None:
         if not cls.is_table_initialized(table_name, container_type, cur):
-            cls.do_create_table(table_name, container_type, cur)
+            if reference_table_name is None:
+                cls.do_create_table(table_name, container_type, cur)
+            else:
+                cls.do_create_table_with_reference_table(table_name, reference_table_name, cur)
             cls.do_tidy_table_metadata(table_name, container_type, cur)
 
     @classmethod
@@ -165,6 +170,12 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     @abstractmethod
     def do_create_table(cls, table_name: str, container_type_name: str, cur: sqlite3.Cursor) -> None:
         ...
+
+    @classmethod
+    def do_create_table_with_reference_table(
+        cls, table_name: str, reference_table_name: str, cur: sqlite3.Cursor
+    ) -> None:
+        cur.execute(f"CREATE TABLE {table_name} AS SELECT * FROM {reference_table_name}")
 
     @classmethod
     def drop_table(cls, table_name: str, container_type_name: str, cur: sqlite3.Cursor) -> None:
@@ -276,6 +287,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
+        reference_table_name: Optional[str] = None,
     ):
         super(SqliteCollectionBase, self).__init__()
         self._serializer = self._default_serializer if serializer is None else serializer
@@ -287,7 +299,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             if table_name is None
             else sanitize_table_name(table_name, self.container_type_name)
         )
-        self._initialize()
+        self._initialize(reference_table_name=reference_table_name)
 
     def __del__(self) -> None:
         if hasattr(self, "persist") and not self.persist:
@@ -295,10 +307,10 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             self._driver_class.drop_table(self.table_name, self.container_type_name, cur)
             self.connection.commit()
 
-    def _initialize(self) -> None:
+    def _initialize(self, reference_table_name: Optional[str] = None) -> None:
         cur = self.connection.cursor()
         self._driver_class.initialize_metadata_table(cur)
-        self._driver_class.initialize_table(self.table_name, self.container_type_name, cur)
+        self._driver_class.initialize_table(self.table_name, self.container_type_name, reference_table_name, cur)
         self.connection.commit()
 
     @property
