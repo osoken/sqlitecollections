@@ -203,22 +203,43 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
         value_deserializer: Optional[Callable[[bytes], VT]] = None,
         persist: bool = True,
     ) -> None:
-        super(_Dict, self).__init__(
-            connection=connection,
-            table_name=table_name,
-            serializer=key_serializer,
-            deserializer=key_deserializer,
-            persist=persist,
-        )
-        self._value_serializer = (
-            value_serializer if value_serializer is not None else cast(Callable[[VT], bytes], self.key_serializer)
-        )
-        self._value_deserializer = (
-            value_deserializer if value_deserializer is not None else cast(Callable[[bytes], VT], self.key_deserializer)
-        )
-        if __data is not None:
-            self.clear()
-            self.update(__data)
+        if (
+            isinstance(__data, self.__class__)
+            and __data.connection == connection
+            and __data.key_serializer == key_serializer
+            and __data.key_deserializer == key_deserializer
+            and __data.value_deserializer == value_deserializer
+            and __data.value_serializer == value_serializer
+        ):
+            super(_Dict, self).__init__(
+                connection=connection,
+                table_name=table_name,
+                serializer=key_serializer,
+                deserializer=key_deserializer,
+                persist=persist,
+                reference_table_name=__data.table_name,
+            )
+            self._value_serializer = value_serializer
+            self._value_deserializer = value_deserializer
+        else:
+            super(_Dict, self).__init__(
+                connection=connection,
+                table_name=table_name,
+                serializer=key_serializer,
+                deserializer=key_deserializer,
+                persist=persist,
+            )
+            self._value_serializer = (
+                value_serializer if value_serializer is not None else cast(Callable[[VT], bytes], self.key_serializer)
+            )
+            self._value_deserializer = (
+                value_deserializer
+                if value_deserializer is not None
+                else cast(Callable[[bytes], VT], self.key_deserializer)
+            )
+            if __data is not None:
+                self.clear()
+                self.update(__data)
 
     @property
     def key_serializer(self) -> Callable[[KT], bytes]:
