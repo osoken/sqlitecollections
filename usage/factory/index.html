@@ -635,7 +635,7 @@ l3 = sc.List[str]([&quot;Erin&quot;], connection=conn, serializer=encode, deseri
 </code></pre></div>
 <p>With factory:</p>
 <div class="highlight"><pre><span></span><code>import sqlite3
-from sqlitecollections import factory
+import sqlitecollections as sc
 
 conn = sqlite3.connect(&quot;path/to/file.db&quot;)
 
@@ -645,7 +645,7 @@ def encode(x: str) -&gt; bytes:
 def decode(x: bytes) -&gt; str:
     return x.decode(&quot;utf-8&quot;)
 
-list_ = factory.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
+list_ = sc.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
 
 l1 = list_([&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;])
 l2 = list_([&quot;Dave&quot;])
@@ -654,7 +654,7 @@ l3 = list_([&quot;Erin&quot;])
 <h3 id="specifying-a-table-name">Specifying a table name</h3>
 <p>If you want to specify table names of containers from a factory, you can do that as follows:</p>
 <div class="highlight"><pre><span></span><code>import sqlite3
-from sqlitecollections import factory
+import sqlitecollections as sc
 
 conn = sqlite3.connect(&quot;path/to/file.db&quot;)
 
@@ -664,7 +664,7 @@ def encode(x: str) -&gt; bytes:
 def decode(x: bytes) -&gt; str:
     return x.decode(&quot;utf-8&quot;)
 
-list_ = factory.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
+list_ = sc.ListFactory[str](connection=conn, serializer=encode, deserializer=decode)
 
 l1 = list_[&quot;first_table_name&quot;]([&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;])
 
