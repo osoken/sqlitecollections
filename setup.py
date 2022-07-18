@@ -28,6 +28,13 @@ setup(
     install_requires=[],
     extras_require={
         "dev": ["flake8", "pytest", "black", "mypy==0.931", "tox", "isort"],
-        "docs": ["mkdocs", "mkdocs-material", "mdx_include", "mkdocs-macros-plugin", "memory_profiler"],
+        "docs": [
+            "mkdocs",
+            "mkdocs-material",
+            "markdown-include",
+            "mkdocs-include-markdown-plugin",
+            "mkdocs-macros-plugin",
+            "memory_profiler",
+        ],
     },
 )

@@ -6,6 +6,11 @@ import sqlitecollections as sc
 wd = os.path.dirname(os.path.abspath(__file__))
 
 
+def read_content(fn):
+    with open(os.path.join(wd, fn), mode="r", encoding="utf-8") as fin:
+        return fin.read()
+
+
 def define_env(env):
     env.variables["package_version"] = sc.__version__
 
@@ -13,11 +18,11 @@ def define_env(env):
         f"""
 === "{p}"
     === "dict"
-        {{!benchmark_results/{p}/dict.md!}}
+        {read_content(f"benchmark_results/{p}/dict.md")}
     === "list"
-        {{!benchmark_results/{p}/list.md!}}
+        {read_content(f"benchmark_results/{p}/list.md")}
     === "set"
-        {{!benchmark_results/{p}/set.md!}}
+        {read_content(f"benchmark_results/{p}/set.md")}
 """
         for p in sorted(
             (os.listdir(os.path.join(wd, "benchmark_results"))), key=lambda x: int(re.sub(r"[^0-9]", "", x) + "0")

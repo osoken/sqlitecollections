@@ -2,6 +2,7 @@
 
 Documentation for version: `{{ package_version }}`
 
-{!../README.md[ln:3-]!}
-
-
+{%
+  include-markdown "../README.md"
+  start="# sqlitecollections"
+%}
