@@ -19,6 +19,7 @@ theme:
 repo_name: osoken/sqlitecollections
 repo_url: https://github.com/osoken/sqlitecollections
 plugins:
+  - include-markdown
   - search
   - macros:
       module_name: docs/main
@@ -26,8 +27,6 @@ markdown_extensions:
   - pymdownx.highlight:
       linenums: false
   - pymdownx.superfences
-  - mdx_include:
-      base_path: docs
   - pymdownx.tabbed:
       alternate_style: true
 
