@@ -222,16 +222,31 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
     ) -> None:
-        super(List, self).__init__(
-            connection=connection,
-            table_name=table_name,
-            serializer=serializer,
-            deserializer=deserializer,
-            persist=persist,
-        )
-        if __data is not None:
-            self.clear()
-            self.extend(__data)
+        if (
+            isinstance(__data, self.__class__)
+            and __data.connection == connection
+            and __data.serializer == serializer
+            and __data.deserializer == deserializer
+        ):
+            super(List, self).__init__(
+                connection=connection,
+                table_name=table_name,
+                serializer=serializer,
+                deserializer=deserializer,
+                persist=persist,
+                reference_table_name=__data.table_name,
+            )
+        else:
+            super(List, self).__init__(
+                connection=connection,
+                table_name=table_name,
+                serializer=serializer,
+                deserializer=deserializer,
+                persist=persist,
+            )
+            if __data is not None:
+                self.clear()
+                self.extend(__data)
 
     def __delitem__(self, i: Union[int, slice]) -> None:
         cur = self.connection.cursor()
