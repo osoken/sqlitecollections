@@ -48,6 +48,7 @@ if __name__ == "__main__":
 
     parser = ArgumentParser()
     parser.add_argument("--prefix", default="benchmarks")
+    parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--result-cache")
 
     subcommand_parser = parser.add_subparsers(dest="subcommand")
@@ -122,8 +123,12 @@ if __name__ == "__main__":
                     builtin_benchmark_class(timeout=args.timeout, debug=args.debug),
                     sqlitecollections_benchmark_class(timeout=args.timeout, debug=args.debug),
                 )
-                cache_dict[f"{fn}::{benchmark_name}"] = comp().dict()
-                print(".", end="")
+                res = comp()
+                cache_dict[f"{fn}::{benchmark_name}"] = res.dict()
+                if args.verbose:
+                    print(f"{fn}::{benchmark_name}: {res.dict()}")
+                else:
+                    print(".", end="")
                 printed = True
             if printed:
                 print("")
