@@ -149,16 +149,31 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
     ) -> None:
-        super(Set, self).__init__(
-            connection=connection,
-            table_name=table_name,
-            serializer=serializer,
-            deserializer=deserializer,
-            persist=persist,
-        )
-        if __data is not None:
-            self.clear()
-            self.update(__data)
+        if (
+            isinstance(__data, self.__class__)
+            and __data.connection == connection
+            and __data.serializer == serializer
+            and __data.deserializer == deserializer
+        ):
+            super(Set, self).__init__(
+                connection=connection,
+                table_name=table_name,
+                serializer=serializer,
+                deserializer=deserializer,
+                persist=persist,
+                reference_table_name=__data.table_name,
+            )
+        else:
+            super(Set, self).__init__(
+                connection=connection,
+                table_name=table_name,
+                serializer=serializer,
+                deserializer=deserializer,
+                persist=persist,
+            )
+            if __data is not None:
+                self.clear()
+                self.update(__data)
 
     def __contains__(self, value: object) -> bool:
         cur = self.connection.cursor()
