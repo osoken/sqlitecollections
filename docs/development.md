@@ -62,6 +62,34 @@ mkdocs serve
 
 In that case, you can check the result on `http://127.0.0.1:8000`.
 
+### Benchmarks
+
+We have our own benchmark package.
+
+To setup, run the following commands:
+
+```
+pip install -e docs/scbenchmarker
+```
+
+Benchmarking is done in two steps:
+
+Step 1: Run all benchmarks
+
+```
+python -m scbenchmarker --prefix=[prefix] benchmarking
+```
+
+Step 2: Render the results to markdown:
+
+```
+python -m scbenchmarker --prefix=[prefix] render
+```
+
+Results are stored in `docs/benchmark_results/[prefix]/`.
+
+You can check the result on `http://127.0.0.1:8000/benchmark/`.
+
 ## Compatibility policy
 
 We aim to implement containers that are as compatible as possible with the built-in containers, but we have a few implementations that intentionally behave differently.
