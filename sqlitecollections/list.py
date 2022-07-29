@@ -169,6 +169,21 @@ class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
         )
 
     @classmethod
+    def translate_index(cls, table_name: str, cur: sqlite3.Cursor, index_from: int = 0) -> None:
+        l = cls.get_max_index_plus_one(table_name, cur)
+        cur.execute(f"UPDATE {table_name} SET item_index = item_index - {l} WHERE item_index >= ?", (index_from,))
+
+    @classmethod
+    def undo_translate_index(cls, table_name: str, cur: sqlite3.Cursor) -> None:
+        sz = cls.get_count(table_name, cur)
+        cur.execute(f"UPDATE {table_name} SET item_index = {sz} + item_index WHERE 0 > item_index")
+
+    @classmethod
+    def get_count(cls, table_name: str, cur: sqlite3.Cursor) -> int:
+        cur.execute(f"SELECT COUNT(1) FROM {table_name}")
+        return cast(int, list(cur)[0][0])
+
+    @classmethod
     def iter_serialized_value(cls, table_name: str, cur: sqlite3.Cursor) -> Iterable[bytes]:
         cur.execute(f"SELECT serialized_value FROM {table_name} ORDER BY item_index")
         for d in cur:
@@ -323,8 +338,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         if i.step is None or i.step == 1:
             offset = min(max(0 if i.start is None else (i.start if i.start >= 0 else l + i.start), 0), l)
             del self[i]
+            self._driver_class.translate_index(self.table_name, cur, offset)
             for idx, d in enumerate(v):
-                self.insert(offset + idx, d)
+                self._driver_class.add_record_by_serialized_value_and_index(
+                    self.table_name, cur, self.serialize(d), offset + idx
+                )
+            self._driver_class.undo_translate_index(self.table_name, cur)
             self.connection.commit()
         else:
             try:
