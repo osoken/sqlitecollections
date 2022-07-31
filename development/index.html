@@ -499,6 +499,53 @@
     Building documents
   </a>
   
+    <nav class="md-nav" aria-label="Building documents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#benchmarks" class="md-nav__link">
+    Benchmarks
+  </a>
+  
+    <nav class="md-nav" aria-label="Benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-the-benchmark-package" class="md-nav__link">
+    Setup the benchmark package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-all-benchmarks-and-render-the-results" class="md-nav__link">
+    Run all benchmarks and render the results
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verbose-mode" class="md-nav__link">
+    Verbose mode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-individual-benchmarks" class="md-nav__link">
+    Run individual benchmarks
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -569,6 +616,53 @@
     Building documents
   </a>
   
+    <nav class="md-nav" aria-label="Building documents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#benchmarks" class="md-nav__link">
+    Benchmarks
+  </a>
+  
+    <nav class="md-nav" aria-label="Benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-the-benchmark-package" class="md-nav__link">
+    Setup the benchmark package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-all-benchmarks-and-render-the-results" class="md-nav__link">
+    Run all benchmarks and render the results
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verbose-mode" class="md-nav__link">
+    Verbose mode
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-individual-benchmarks" class="md-nav__link">
+    Run individual benchmarks
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -637,6 +731,34 @@ pip install -e .[docs]
 <div class="highlight"><pre><span></span><code>mkdocs serve
 </code></pre></div>
 <p>In that case, you can check the result on <code>http://127.0.0.1:8000</code>.</p>
+<h3 id="benchmarks">Benchmarks</h3>
+<p>We have our own benchmark package.</p>
+<h4 id="setup-the-benchmark-package">Setup the benchmark package</h4>
+<p>To setup, run the following commands:</p>
+<div class="highlight"><pre><span></span><code>pip install docs/scbenchmarker
+</code></pre></div>
+<h4 id="run-all-benchmarks-and-render-the-results">Run all benchmarks and render the results</h4>
+<p>Benchmarking is done in two steps:</p>
+<p>Step 1: Run all benchmarks</p>
+<div class="highlight"><pre><span></span><code>python -m scbenchmarker --prefix=[prefix] benchmarking
+</code></pre></div>
+<p>Step 2: Render the results to markdown:</p>
+<div class="highlight"><pre><span></span><code>python -m scbenchmarker --prefix=[prefix] render
+</code></pre></div>
+<p>Results are stored in <code>docs/benchmark_results/[prefix]/</code>.</p>
+<p>You can check the results on <code>http://127.0.0.1:8000/benchmark/</code>.</p>
+<h4 id="verbose-mode">Verbose mode</h4>
+<div class="highlight"><pre><span></span><code>python -m scbenchmarker --verbose --prefix=[prefix] benchmarking
+</code></pre></div>
+<p>An example output is as follows:</p>
+<div class="highlight"><pre><span></span><code>benchmark_dict.py::BenchmarkSetitemAddNewItem: {&#39;subject&#39;: &#39;`__setitem__` (add new item)&#39;, &#39;one&#39;: {&#39;name&#39;: &#39;`dict`&#39;, &#39;timing&#39;: 0.0026721060276031494, &#39;memory&#39;: 0.00390625}, &#39;another&#39;: {&#39;name&#39;: &#39;`sqlitecollections.Dict`&#39;, &#39;timing&#39;: 0.006042510271072388, &#39;memory&#39;: 0.00390625}, &#39;ratio&#39;: {&#39;timing&#39;: 2.2613287828598834, &#39;memory&#39;: 1.0}}
+</code></pre></div>
+<h4 id="run-individual-benchmarks">Run individual benchmarks</h4>
+<p>You can also run individual benchmarks.</p>
+<div class="highlight"><pre><span></span><code>python -m scbenchmarker --prefix=[prefix] benchmarking [benchmark script]::[benchmark name]
+</code></pre></div>
+<p>This command runs only a single benchmark.
+Together with the verbose mode, this is convenient for improving a single method and checking benchmarks frequently.</p>
 <h2 id="compatibility-policy">Compatibility policy</h2>
 <p>We aim to implement containers that are as compatible as possible with the built-in containers, but we have a few implementations that intentionally behave differently.</p>
 <ul>
