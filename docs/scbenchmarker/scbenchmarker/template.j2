@@ -1,14 +1,14 @@
 
         timing
 
-        | subject | `builtin` | `sqlitecollections` | ratio |
-        | :------ | --------: | ------------------: | ----: |
-        {% for d in data %}| {{ d["subject"] }} | {{ d["one"]["timing"] | round(5) }} | {{ d["another"]["timing"] | round(5) }} | {{ d["ratio"]["timing"] | round(5) }} |
+        | subject | `builtin` | `sqlitecollections` | ratio | class |
+        | :------ | --------: | ------------------: | ----: | :---- |
+        {% for d in data %}| {{ d["subject"] }} | {{ d["one"]["timing"] | round(5) }} | {{ d["another"]["timing"] | round(5) }} | {{ d["ratio"]["timing"] | round(5) }} | `{{ d["class"] }}` |
         {% endfor %}
 
         approximate memory usage
 
-        | subject | `builtin` | `sqlitecollections` | ratio |
-        | :------ | --------: | ------------------: | ----: |
-        {% for d in data %}| {{ d["subject"] }} | {{ d["one"]["memory"] | round(5) }} | {{ d["another"]["memory"] | round(5) }} | {{ d["ratio"]["memory"] | round(5) }} |
+        | subject | `builtin` | `sqlitecollections` | ratio | class |
+        | :------ | --------: | ------------------: | ----: | :---- |
+        {% for d in data %}| {{ d["subject"] }} | {{ d["one"]["memory"] | round(5) }} | {{ d["another"]["memory"] | round(5) }} | {{ d["ratio"]["memory"] | round(5) }} | `{{ d["class"] }}` |
         {% endfor %}
