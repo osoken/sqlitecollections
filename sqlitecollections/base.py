@@ -3,7 +3,7 @@ import sys
 import warnings
 from abc import ABCMeta, abstractmethod
 from collections.abc import Hashable
-from enum import Enum
+from enum import Enum, auto
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
 from types import TracebackType
@@ -87,6 +87,11 @@ class TemporaryTableContext(ContextManager[str]):
     ) -> None:
         self._cursor.execute(f"DROP TABLE {self._table_name}")
         return None
+
+
+class SerializationStrategy(Enum):
+    WHOLE_TABLE = auto()
+    ONLY_FILE_NAME = auto()
 
 
 class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
