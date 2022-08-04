@@ -11,9 +11,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import Callable, Sequence, Iterable
 
-from test_base import SqlTestCase
-
 import sqlitecollections as sc
+
+from test_base import SqlTestCase
 
 
 class ListTestCase(SqlTestCase):
@@ -1030,4 +1030,26 @@ class ListTestCase(SqlTestCase):
         self.assert_db_state_equals(
             memory_db,
             generate_expected([(1, 3), (2, 2), (7, 2), (5, 1), (8, 1), (4, 1), (9, 0), (3, 0), (0, 0), (6, 0)]),
+        )
+
+    def test_pickle(self) -> None:
+        import os
+        import pickle
+
+        wd = os.path.dirname(os.path.abspath(__file__))
+
+        db = sqlite3.connect(os.path.join(wd, "fixtures", "list", "pickle.db"))
+        sut = sc.List[str](connection=db, table_name="items")
+        actual = pickle.dumps(sut)
+        loaded = pickle.loads(actual)
+        self.assert_db_state_equals(
+            loaded.connection,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 4),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 5),
+            ],
         )
