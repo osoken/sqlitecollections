@@ -195,6 +195,14 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         cur.execute("UPDATE metadata SET table_name=? WHERE table_name=?", (new_table_name, table_name))
         cur.execute(f"ALTER TABLE {table_name} RENAME TO {new_table_name}")
 
+    @classmethod
+    def get_metadata_record(cls, table_name: str, cur: sqlite3.Cursor) -> Tuple[str, str, str]:
+        cur.execute(
+            "SELECT table_name, schema_version, container_type FROM metadata WHERE table_name = ?", (table_name,)
+        )
+        _ = list(cur)
+        return _[0]
+
 
 class MetadataItem(Hashable):
     def __init__(self, table_name: str, schema_version: str, container_type: str):
