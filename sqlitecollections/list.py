@@ -5,9 +5,16 @@ from itertools import count, repeat
 from typing import Any, Optional, Tuple, Union, cast, overload
 
 if sys.version_info >= (3, 9):
-    from collections.abc import Callable, Iterable, Iterator, MutableSequence
+    from collections.abc import (
+        Callable,
+        Iterable,
+        Iterator,
+        Mapping,
+        MutableSequence,
+        Sequence,
+    )
 else:
-    from typing import Callable, Iterable, MutableSequence, Iterator
+    from typing import Callable, Iterable, MutableSequence, Iterator, Sequence, Mapping
 
 from .base import SqliteCollectionBase, T, _SqliteCollectionBaseDatabaseDriver
 
@@ -223,6 +230,11 @@ class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
         l = cls.get_max_index_plus_one(table_name, cur)
         cur.execute(f"UPDATE {table_name} SET item_index = -1 - item_index")
         cur.execute(f"UPDATE {table_name} SET item_index = item_index + ?", (l,))
+
+    @classmethod
+    def dump_serialized_records(cls, table_name: str, cur: sqlite3.Cursor) -> Sequence[Tuple[bytes, int]]:
+        cur.execute(f"SELECT serialized_value, item_index FROM {table_name}")
+        return list(cur)
 
 
 class List(SqliteCollectionBase[T], MutableSequence[T]):
