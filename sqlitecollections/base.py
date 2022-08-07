@@ -196,7 +196,7 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         cur.execute(f"ALTER TABLE {table_name} RENAME TO {new_table_name}")
 
     @classmethod
-    def get_metadata_record(cls, table_name: str, cur: sqlite3.Cursor) -> Tuple[str, str, str]:
+    def dump_metadata_record_by_table_name(cls, table_name: str, cur: sqlite3.Cursor) -> Tuple[str, str, str]:
         cur.execute(
             "SELECT table_name, schema_version, container_type FROM metadata WHERE table_name = ?", (table_name,)
         )
