@@ -11,9 +11,9 @@ if sys.version_info >= (3, 9):
 else:
     from typing import Callable, Sequence, Iterable
 
-import sqlitecollections as sc
-
 from test_base import SqlTestCase
+
+import sqlitecollections as sc
 
 
 class ListTestCase(SqlTestCase):
