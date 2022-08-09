@@ -1039,7 +1039,10 @@ class ListTestCase(SqlTestCase):
         wd = os.path.dirname(os.path.abspath(__file__))
 
         db = sqlite3.connect(os.path.join(wd, "fixtures", "list", "pickle.db"))
-        sut = sc.List[str](connection=db, table_name="items")
+        if sys.version_info < (3, 7):
+            sut = sc.List(connection=db, table_name="items")  # type: ignore
+        else:
+            sut = sc.List[str](connection=db, table_name="items")
         actual = pickle.dumps(sut)
         loaded = pickle.loads(actual)
         self.assert_db_state_equals(
