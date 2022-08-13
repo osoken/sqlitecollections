@@ -762,8 +762,9 @@ class DictTestCase(DictAndViewTestCase):
             sut = sc.Dict[str, int](connection=db, table_name="items")
         actual = pickle.dumps(sut)
         loaded = pickle.loads(actual)
-        self.assert_db_state_equals(
+        self.assert_sql_result_equals(
             loaded.connection,
+            f"SELECT serialized_key, serialized_value, item_order FROM {sut.table_name}",
             [
                 (
                     sc.base.SqliteCollectionBase._default_serializer("a"),
