@@ -1,13 +1,20 @@
 import sqlite3
 import sys
 import warnings
-from typing import AbstractSet, Any, Optional, Union, cast
+from typing import AbstractSet, Any, Optional, Tuple, Union, cast
 from uuid import uuid4
 
 if sys.version_info >= (3, 9):
-    from collections.abc import Callable, Iterable, Iterator, MutableSet
+    from collections.abc import (
+        Callable,
+        Iterable,
+        Iterator,
+        Mapping,
+        MutableSet,
+        Sequence,
+    )
 else:
-    from typing import Iterable, Iterator, MutableSet, Callable
+    from typing import Iterable, Iterator, MutableSet, Callable, Mapping, Sequence
 
 from .base import (
     _S,
@@ -16,6 +23,7 @@ from .base import (
     T,
     TemporaryTableContext,
     _SqliteCollectionBaseDatabaseDriver,
+    create_tempfile_connection,
     is_hashable,
 )
 
@@ -135,6 +143,18 @@ class _SetDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
                 else:
                     cls.upsert(temp_table_name, cur2, d)
             return is_proper and cls.get_count(temp_table_name, cur2) == cls.get_count(table_name, cur2)
+
+    @classmethod
+    def dump_serialized_records(cls, table_name: str, cur: sqlite3.Cursor) -> Sequence[Tuple[bytes]]:
+        cur.execute(f"SELECT serialized_value FROM {table_name}")
+        return list(cur)
+
+    @classmethod
+    def load_serialized_records(
+        cls, table_name: str, cur: sqlite3.Cursor, serialized_records: Iterable[Tuple[bytes]]
+    ) -> None:
+        for d in serialized_records:
+            cur.execute(f"INSERT INTO {table_name} (serialized_value) VALUES (?)", d)
 
 
 class Set(SqliteCollectionBase[T], MutableSet[T]):
@@ -356,3 +376,24 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
     def __ior__(self, s: AbstractSet[_S]) -> "Set[Union[_T, T]]":
         self.update(cast(Iterable[T], s))
         return cast(Set[Union[_T, T]], self)
+
+    def __getstate__(self) -> Mapping[str, Any]:
+        state = self.__dict__.copy()
+        del state["_connection"]
+        cur = self.connection.cursor()
+        state["metadata"] = self._driver_class.dump_metadata_record_by_table_name(self.table_name, cur)
+        state["records"] = self._driver_class.dump_serialized_records(self.table_name, cur)
+        return state
+
+    def __setstate__(self, state: Mapping[str, Any]) -> None:
+        self.__dict__.update(
+            dict(
+                filter(lambda d: d[0] not in ("metadata", "records"), state.items()),
+                _connection=create_tempfile_connection(),
+            )
+        )
+        cur = self._connection.cursor()
+        self._driver_class.load_metadata_record(cur, state["metadata"])
+        self._connection.commit()
+        self._driver_class.load_serialized_records(self.table_name, cur, state["records"])
+        self._connection.commit()
