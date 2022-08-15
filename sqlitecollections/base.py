@@ -3,7 +3,7 @@ import sys
 import warnings
 from abc import ABCMeta, abstractmethod
 from collections.abc import Hashable
-from enum import Enum
+from enum import Enum, auto
 from pickle import dumps, loads
 from tempfile import NamedTemporaryFile
 from types import TracebackType
@@ -89,6 +89,11 @@ class TemporaryTableContext(ContextManager[str]):
         return None
 
 
+class SerializationStrategy(Enum):
+    WHOLE_TABLE = auto()
+    ONLY_FILE_NAME = auto()
+
+
 class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     if sys.version_info >= (3, 9):
 
@@ -161,9 +166,19 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
 
     @classmethod
     def do_tidy_table_metadata(cls, table_name: str, container_type_name: str, cur: sqlite3.Cursor) -> None:
+        cls.insert_metadata_record(table_name, cls.schema_version, container_type_name, cur)
+
+    @classmethod
+    def insert_metadata_record(
+        cls,
+        table_name: str,
+        schema_version: Union[str, Callable[[], str]],
+        container_type_name: str,
+        cur: sqlite3.Cursor,
+    ) -> None:
         cur.execute(
             "INSERT INTO metadata (table_name, schema_version, container_type) VALUES (?, ?, ?)",
-            (table_name, cls.schema_version, container_type_name),
+            (table_name, schema_version, container_type_name),
         )
 
     @classmethod
@@ -189,6 +204,21 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     def alter_table_name(cls, table_name: str, new_table_name: str, cur: sqlite3.Cursor) -> None:
         cur.execute("UPDATE metadata SET table_name=? WHERE table_name=?", (new_table_name, table_name))
         cur.execute(f"ALTER TABLE {table_name} RENAME TO {new_table_name}")
+
+    @classmethod
+    def dump_metadata_record_by_table_name(cls, table_name: str, cur: sqlite3.Cursor) -> Tuple[str, str, str]:
+        cur.execute(
+            "SELECT table_name, schema_version, container_type FROM metadata WHERE table_name = ?", (table_name,)
+        )
+        _ = list(cur)
+        return cast(Tuple[str, str, str], _[0])
+
+    @classmethod
+    def load_metadata_record(cls, cur: sqlite3.Cursor, metadata_record: Tuple[str, str, str]) -> None:
+        if not cls.is_metadata_table_initialized(cur):
+            cls.do_initialize_metadata_table(cur)
+        cls.insert_metadata_record(metadata_record[0], metadata_record[1], metadata_record[2], cur)
+        cls.do_create_table(metadata_record[0], metadata_record[2], cur)
 
 
 class MetadataItem(Hashable):

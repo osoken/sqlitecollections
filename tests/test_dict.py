@@ -749,6 +749,46 @@ class DictTestCase(DictAndViewTestCase):
         del actual
         self.assert_items_table_only(memory_db)
 
+    def test_pickle(self) -> None:
+        import os
+        import pickle
+
+        wd = os.path.dirname(os.path.abspath(__file__))
+
+        db = sqlite3.connect(os.path.join(wd, "fixtures", "dict", "pickle.db"))
+        if sys.version_info < (3, 7):
+            sut = sc.Dict(connection=db, table_name="items")  # type: ignore
+        else:
+            sut = sc.Dict[str, int](connection=db, table_name="items")
+        actual = pickle.dumps(sut)
+        loaded = pickle.loads(actual)
+        self.assert_sql_result_equals(
+            loaded.connection,
+            f"SELECT serialized_key, serialized_value, item_order FROM {sut.table_name}",
+            [
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("a"),
+                    sc.base.SqliteCollectionBase._default_serializer(0),
+                    0,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("b"),
+                    sc.base.SqliteCollectionBase._default_serializer(1),
+                    1,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("c"),
+                    sc.base.SqliteCollectionBase._default_serializer(2),
+                    2,
+                ),
+                (
+                    sc.base.SqliteCollectionBase._default_serializer("d"),
+                    sc.base.SqliteCollectionBase._default_serializer(3),
+                    3,
+                ),
+            ],
+        )
+
 
 class KeysViewTestCase(DictAndViewTestCase):
     def test_len(self) -> None:

@@ -867,3 +867,25 @@ class SetTestCase(SqlTestCase):
             [],
         )
         self.assert_items_table_only(memory_db)
+
+    def test_pickle(self) -> None:
+        import os
+        import pickle
+
+        wd = os.path.dirname(os.path.abspath(__file__))
+
+        db = sqlite3.connect(os.path.join(wd, "fixtures", "set", "pickle.db"))
+        if sys.version_info < (3, 7):
+            sut = sc.Set(connection=db, table_name="items")  # type: ignore
+        else:
+            sut = sc.Set[str](connection=db, table_name="items")
+        actual = pickle.dumps(sut)
+        loaded = pickle.loads(actual)
+        self.assert_db_state_equals(
+            loaded.connection,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"),),
+                (sc.base.SqliteCollectionBase._default_serializer("b"),),
+                (sc.base.SqliteCollectionBase._default_serializer("c"),),
+            ],
+        )

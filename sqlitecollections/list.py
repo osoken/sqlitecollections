@@ -5,11 +5,23 @@ from itertools import count, repeat
 from typing import Any, Optional, Tuple, Union, cast, overload
 
 if sys.version_info >= (3, 9):
-    from collections.abc import Callable, Iterable, Iterator, MutableSequence
+    from collections.abc import (
+        Callable,
+        Iterable,
+        Iterator,
+        Mapping,
+        MutableSequence,
+        Sequence,
+    )
 else:
-    from typing import Callable, Iterable, MutableSequence, Iterator
+    from typing import Callable, Iterable, MutableSequence, Iterator, Sequence, Mapping
 
-from .base import SqliteCollectionBase, T, _SqliteCollectionBaseDatabaseDriver
+from .base import (
+    SqliteCollectionBase,
+    T,
+    _SqliteCollectionBaseDatabaseDriver,
+    create_tempfile_connection,
+)
 
 
 def _generate_indices_from_slice(l: int, s: slice) -> Iterator[int]:
@@ -223,6 +235,18 @@ class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
         l = cls.get_max_index_plus_one(table_name, cur)
         cur.execute(f"UPDATE {table_name} SET item_index = -1 - item_index")
         cur.execute(f"UPDATE {table_name} SET item_index = item_index + ?", (l,))
+
+    @classmethod
+    def dump_serialized_records(cls, table_name: str, cur: sqlite3.Cursor) -> Sequence[Tuple[bytes, int]]:
+        cur.execute(f"SELECT serialized_value, item_index FROM {table_name}")
+        return list(cur)
+
+    @classmethod
+    def load_serialized_records(
+        cls, table_name: str, cur: sqlite3.Cursor, serialized_records: Iterable[Tuple[bytes, int]]
+    ) -> None:
+        for d in serialized_records:
+            cur.execute(f"INSERT INTO {table_name} (serialized_value, item_index) VALUES (?, ?)", d)
 
 
 class List(SqliteCollectionBase[T], MutableSequence[T]):
@@ -498,3 +522,24 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         self._driver_class.tidy_indices(self.table_name, cur, cur2, index)
         self.connection.commit()
         return None
+
+    def __getstate__(self) -> Mapping[str, Any]:
+        state = self.__dict__.copy()
+        del state["_connection"]
+        cur = self.connection.cursor()
+        state["metadata"] = self._driver_class.dump_metadata_record_by_table_name(self.table_name, cur)
+        state["records"] = self._driver_class.dump_serialized_records(self.table_name, cur)
+        return state
+
+    def __setstate__(self, state: Mapping[str, Any]) -> None:
+        self.__dict__.update(
+            dict(
+                filter(lambda d: d[0] not in ("metadata", "records"), state.items()),
+                _connection=create_tempfile_connection(),
+            )
+        )
+        cur = self._connection.cursor()
+        self._driver_class.load_metadata_record(cur, state["metadata"])
+        self._connection.commit()
+        self._driver_class.load_serialized_records(self.table_name, cur, state["records"])
+        self._connection.commit()

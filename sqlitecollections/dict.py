@@ -23,11 +23,21 @@ if sys.version_info >= (3, 9):
         Mapping,
         MutableMapping,
         Reversible,
+        Sequence,
         Set,
         Sized,
     )
 else:
-    from typing import Callable, Iterable, Iterator, Mapping, MutableMapping, Set, Sized
+    from typing import (
+        Callable,
+        Iterable,
+        Iterator,
+        Mapping,
+        MutableMapping,
+        Sequence,
+        Set,
+        Sized,
+    )
 
     if sys.version_info >= (3, 8):
         from typing import Reversible
@@ -51,6 +61,7 @@ from .base import (
     SqliteCollectionBase,
     T,
     _SqliteCollectionBaseDatabaseDriver,
+    create_tempfile_connection,
     is_hashable,
 )
 from .set import Set as sc_Set
@@ -187,6 +198,18 @@ class _DictDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
         cur.execute(f"SELECT serialized_key, serialized_value FROM {table_name} ORDER BY item_order")
         for res in cur:
             yield (cast(bytes, res[0]), cast(bytes, res[1]))
+
+    @classmethod
+    def dump_serialized_records(cls, table_name: str, cur: sqlite3.Cursor) -> Sequence[Tuple[bytes, bytes, int]]:
+        cur.execute(f"SELECT serialized_key, serialized_value, item_order FROM {table_name}")
+        return list(cur)
+
+    @classmethod
+    def load_serialized_records(
+        cls, table_name: str, cur: sqlite3.Cursor, serialized_records: Iterable[Tuple[bytes, int]]
+    ) -> None:
+        for d in serialized_records:
+            cur.execute(f"INSERT INTO {table_name} (serialized_key, serialized_value, item_order) VALUES (?, ?, ?)", d)
 
 
 class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
@@ -431,6 +454,27 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
 
     def items(self) -> "ItemsView[KT, VT]":
         return ItemsView[KT, VT](cast(Dict[KT, VT], self))
+
+    def __getstate__(self) -> Mapping[str, Any]:
+        state = self.__dict__.copy()
+        del state["_connection"]
+        cur = self.connection.cursor()
+        state["metadata"] = self._driver_class.dump_metadata_record_by_table_name(self.table_name, cur)
+        state["records"] = self._driver_class.dump_serialized_records(self.table_name, cur)
+        return state
+
+    def __setstate__(self, state: Mapping[str, Any]) -> None:
+        self.__dict__.update(
+            dict(
+                filter(lambda d: d[0] not in ("metadata", "records"), state.items()),
+                _connection=create_tempfile_connection(),
+            )
+        )
+        cur = self._connection.cursor()
+        self._driver_class.load_metadata_record(cur, state["metadata"])
+        self._connection.commit()
+        self._driver_class.load_serialized_records(self.table_name, cur, state["records"])
+        self._connection.commit()
 
 
 if sys.version_info >= (3, 8):
