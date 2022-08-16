@@ -220,6 +220,11 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         cls.insert_metadata_record(metadata_record[0], metadata_record[1], metadata_record[2], cur)
         cls.do_create_table(metadata_record[0], metadata_record[2], cur)
 
+    @classmethod
+    def get_db_filename(cls, cur: sqlite3.Cursor) -> str:
+        cur.execute("select file from pragma_database_list where name='main'")
+        return list(cur)[0][0]
+
 
 class MetadataItem(Hashable):
     def __init__(self, table_name: str, schema_version: str, container_type: str):
