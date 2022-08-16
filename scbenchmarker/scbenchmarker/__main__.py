@@ -124,7 +124,7 @@ if __name__ == "__main__":
                     sqlitecollections_benchmark_class(timeout=args.timeout, debug=args.debug),
                 )
                 res = comp()
-                cache_dict[f"{fn}::{benchmark_name}"] = res.dict()
+                cache_dict[f"{fn}::{benchmark_name}"] = dict(res.dict(), **{"class": benchmark_name})
                 if args.verbose:
                     print(f"{fn}::{benchmark_name}: {res.dict()}")
                 else:
