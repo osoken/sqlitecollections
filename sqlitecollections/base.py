@@ -223,7 +223,7 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
     @classmethod
     def get_db_filename(cls, cur: sqlite3.Cursor) -> str:
         cur.execute("select file from pragma_database_list where name='main'")
-        return list(cur)[0][0]
+        return cast(str, list(cur)[0][0])
 
 
 class MetadataItem(Hashable):
