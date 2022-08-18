@@ -89,9 +89,9 @@ class TemporaryTableContext(ContextManager[str]):
         return None
 
 
-class SerializationStrategy(Enum):
-    WHOLE_TABLE = auto()
-    ONLY_FILE_NAME = auto()
+class PicklingStrategy(str, Enum):
+    whole_table = "whole_table"
+    only_file_name = "only_file_name"
 
 
 class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
