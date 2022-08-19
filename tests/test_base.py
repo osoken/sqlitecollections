@@ -87,6 +87,7 @@ class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
         serializer: Optional[Callable[[Any], bytes]] = None,
         deserializer: Optional[Callable[[bytes], Any]] = None,
         persist: bool = True,
+        pickling_strategy: base.PicklingStrategy = base.PicklingStrategy.whole_table,
     ) -> None:
         if (
             isinstance(__data, ConcreteSqliteCollectionClass)
@@ -100,6 +101,7 @@ class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
                 serializer=serializer,
                 deserializer=deserializer,
                 persist=persist,
+                pickling_strategy=pickling_strategy,
                 reference_table_name=__data.table_name,
             )
         else:
@@ -109,6 +111,7 @@ class ConcreteSqliteCollectionClass(base.SqliteCollectionBase[Any]):
                 serializer=serializer,
                 deserializer=deserializer,
                 persist=persist,
+                pickling_strategy=pickling_strategy,
             )
 
     def add(self, value: bytes) -> None:
