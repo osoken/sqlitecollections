@@ -323,6 +323,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
         reference_table_name: Optional[str] = None,
+        pickling_strategy: PicklingStrategy = PicklingStrategy.whole_table,
     ):
         super(SqliteCollectionBase, self).__init__()
         self._serializer = self._default_serializer if serializer is None else serializer
@@ -335,6 +336,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             else sanitize_table_name(table_name, self.container_type_name)
         )
         self._initialize(reference_table_name=reference_table_name)
+        self._pickling_strategy = pickling_strategy
 
     def __del__(self) -> None:
         if hasattr(self, "persist") and not self.persist:
