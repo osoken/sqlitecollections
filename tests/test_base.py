@@ -254,6 +254,7 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             "SELECT 1 FROM ConcreteSqliteCollectionClass_4da95_sanitized",
             [],
         )
+        self.assertEqual(sut.pickling_strategy, base.PicklingStrategy.whole_table)
         create_random_name.assert_called_once_with(sut.container_type_name)
         sanitize_table_name.assert_called_once_with(create_random_name.return_value, sut.container_type_name)
 
@@ -266,12 +267,14 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
         serializer = MagicMock(spec=Callable[[Any], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Any])
         persist = False
+        pickling_strategy = base.PicklingStrategy.only_file_name
         sut = ConcreteSqliteCollectionClass(
             connection="connection",
             table_name="tablename",
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
+            pickling_strategy=pickling_strategy,
         )
         tidy_connection.assert_called_once_with("connection")
         self.assertEqual(sut.connection, memory_db)
@@ -297,7 +300,9 @@ class SqliteCollectionsBaseTestCase(SqlTestCase):
             "SELECT 1 FROM sanitized_tablename",
             [],
         )
+        self.assertEqual(sut.pickling_strategy, pickling_strategy)
         sanize_table_name.assert_called_once_with("tablename", sut.container_type_name)
+
         warn.assert_not_called()
 
     @patch(

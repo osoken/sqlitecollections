@@ -351,6 +351,10 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         self.connection.commit()
 
     @property
+    def pickling_strategy(self) -> PicklingStrategy:
+        return self._pickling_strategy
+
+    @property
     def persist(self) -> bool:
         return self._persist
 
