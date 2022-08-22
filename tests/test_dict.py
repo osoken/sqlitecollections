@@ -14,6 +14,7 @@ else:
 from test_base import SqlTestCase
 
 import sqlitecollections as sc
+from sqlitecollections.base import PicklingStrategy
 
 
 class DictAndViewTestCase(SqlTestCase):
@@ -70,6 +71,7 @@ class DictTestCase(DictAndViewTestCase):
         key_serializer = MagicMock(spec=Callable[[Hashable], bytes])
         key_deserializer = MagicMock(spec=Callable[[bytes], Hashable])
         persist = False
+        pickling_strategy = PicklingStrategy.whole_table
         sut = sc.Dict[Hashable, Any](
             connection=memory_db,
             table_name=table_name,
@@ -78,6 +80,7 @@ class DictTestCase(DictAndViewTestCase):
             key_serializer=key_serializer,
             key_deserializer=key_deserializer,
             persist=persist,
+            pickling_strategy=pickling_strategy,
         )
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
@@ -85,6 +88,7 @@ class DictTestCase(DictAndViewTestCase):
             serializer=key_serializer,
             deserializer=key_deserializer,
             persist=persist,
+            pickling_strategy=pickling_strategy,
         )
         self.assertEqual(sut.value_serializer, value_serializer)
         self.assertEqual(sut.value_deserializer, value_deserializer)

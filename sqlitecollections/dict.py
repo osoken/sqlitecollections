@@ -58,6 +58,7 @@ from .base import (
     _T,
     KT,
     VT,
+    PicklingStrategy,
     SqliteCollectionBase,
     T,
     _SqliteCollectionBaseDatabaseDriver,
@@ -225,6 +226,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
         value_serializer: Optional[Callable[[VT], bytes]] = None,
         value_deserializer: Optional[Callable[[bytes], VT]] = None,
         persist: bool = True,
+        pickling_strategy: PicklingStrategy = PicklingStrategy.whole_table,
     ) -> None:
         if (
             isinstance(__data, self.__class__)
@@ -240,6 +242,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
                 serializer=key_serializer,
                 deserializer=key_deserializer,
                 persist=persist,
+                pickling_strategy=pickling_strategy,
                 reference_table_name=__data.table_name,
             )
             self._value_serializer = value_serializer
@@ -250,6 +253,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
                 table_name=table_name,
                 serializer=key_serializer,
                 deserializer=key_deserializer,
+                pickling_strategy=pickling_strategy,
                 persist=persist,
             )
             self._value_serializer = (
