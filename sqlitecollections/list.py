@@ -17,6 +17,7 @@ else:
     from typing import Callable, Iterable, MutableSequence, Iterator, Sequence, Mapping
 
 from .base import (
+    PicklingStrategy,
     SqliteCollectionBase,
     T,
     _SqliteCollectionBaseDatabaseDriver,
@@ -260,6 +261,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
+        pickling_strategy: PicklingStrategy = PicklingStrategy.whole_table,
     ) -> None:
         if (
             isinstance(__data, self.__class__)
@@ -273,6 +275,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
                 serializer=serializer,
                 deserializer=deserializer,
                 persist=persist,
+                pickling_strategy=pickling_strategy,
                 reference_table_name=__data.table_name,
             )
         else:
@@ -282,6 +285,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
                 serializer=serializer,
                 deserializer=deserializer,
                 persist=persist,
+                pickling_strategy=pickling_strategy,
             )
             if __data is not None:
                 self.clear()
