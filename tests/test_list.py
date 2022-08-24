@@ -6,6 +6,8 @@ from itertools import product
 from typing import Any, Tuple, Union
 from unittest.mock import MagicMock, patch
 
+from sqlitecollections.base import PicklingStrategy
+
 if sys.version_info >= (3, 9):
     from collections.abc import Callable, Iterable, Sequence
 else:
@@ -49,6 +51,7 @@ class ListTestCase(SqlTestCase):
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
+            pickling_strategy=PicklingStrategy.only_file_name,
         )
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
@@ -56,6 +59,7 @@ class ListTestCase(SqlTestCase):
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
+            pickling_strategy=PicklingStrategy.only_file_name,
         )
 
     def test_initialize(self) -> None:
