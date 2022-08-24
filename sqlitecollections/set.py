@@ -19,6 +19,7 @@ else:
 from .base import (
     _S,
     _T,
+    PicklingStrategy,
     SqliteCollectionBase,
     T,
     TemporaryTableContext,
@@ -168,6 +169,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         serializer: Optional[Callable[[T], bytes]] = None,
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
+        pickling_strategy: PicklingStrategy = PicklingStrategy.whole_table,
     ) -> None:
         if (
             isinstance(__data, self.__class__)
@@ -181,6 +183,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
                 serializer=serializer,
                 deserializer=deserializer,
                 persist=persist,
+                pickling_strategy=pickling_strategy,
                 reference_table_name=__data.table_name,
             )
         else:
@@ -190,6 +193,7 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
                 serializer=serializer,
                 deserializer=deserializer,
                 persist=persist,
+                pickling_strategy=pickling_strategy,
             )
             if __data is not None:
                 self.clear()
