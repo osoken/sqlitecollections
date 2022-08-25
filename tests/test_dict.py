@@ -761,9 +761,9 @@ class DictTestCase(DictAndViewTestCase):
 
         db = sqlite3.connect(os.path.join(wd, "fixtures", "dict", "pickle.db"))
         if sys.version_info < (3, 7):
-            sut = sc.Dict(connection=db, table_name="items")  # type: ignore
+            sut = sc.Dict(connection=db, table_name="items", pickling_strategy=PicklingStrategy.whole_table)  # type: ignore
         else:
-            sut = sc.Dict[str, int](connection=db, table_name="items")
+            sut = sc.Dict[str, int](connection=db, table_name="items", pickling_strategy=PicklingStrategy.whole_table)
         actual = pickle.dumps(sut)
         loaded = pickle.loads(actual)
         self.assert_sql_result_equals(
