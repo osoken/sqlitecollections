@@ -797,7 +797,7 @@ class DictTestCase(DictAndViewTestCase):
 
         wd = os.path.dirname(os.path.abspath(__file__))
 
-        db = sqlite3.connect(os.path.join(wd, "fixtures", "dict", "pickle.db"))
+        db = sqlite3.connect(os.path.relpath(os.path.join(wd, "fixtures", "dict", "pickle.db")))
         if sys.version_info < (3, 7):
             sut = sc.Dict(connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)  # type: ignore
         else:
@@ -836,6 +836,23 @@ class DictTestCase(DictAndViewTestCase):
             sut._driver_class.get_db_filename(sut.connection.cursor()),
             loaded._driver_class.get_db_filename(loaded.connection.cursor()),
         )
+
+    @patch("sqlitecollections.dict.tidy_connection")
+    def test_pickle_with_only_file_name_strategy_serializes_the_relpath(self, tidy_connection: MagicMock) -> None:
+
+        wd = os.path.dirname(os.path.abspath(__file__))
+        relpath = os.path.relpath(os.path.join(wd, "fixtures", "dict", "pickle.db"))
+        db = sqlite3.connect(relpath)
+        tidy_connection.return_value = db
+
+        if sys.version_info < (3, 7):
+            sut = sc.Dict(connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)  # type: ignore
+        else:
+            sut = sc.Dict[str, int](
+                connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name
+            )
+        _ = pickle.loads(pickle.dumps(sut))
+        tidy_connection.assert_called_once_with(relpath)
 
 
 class KeysViewTestCase(DictAndViewTestCase):

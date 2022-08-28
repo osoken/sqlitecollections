@@ -1,4 +1,5 @@
 import itertools
+import os
 import sqlite3
 import sys
 import warnings
@@ -468,7 +469,7 @@ class _Dict(SqliteCollectionBase[KT], MutableMapping[KT, VT], Generic[KT, VT]):
             state["metadata"] = self._driver_class.dump_metadata_record_by_table_name(self.table_name, cur)
             state["records"] = self._driver_class.dump_serialized_records(self.table_name, cur)
         else:
-            state["db_file_name"] = self._driver_class.get_db_filename(cur)
+            state["db_file_name"] = os.path.relpath(self._driver_class.get_db_filename(cur))
         return state
 
     def __setstate__(self, state: Mapping[str, Any]) -> None:
