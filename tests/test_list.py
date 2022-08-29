@@ -1036,7 +1036,7 @@ class ListTestCase(SqlTestCase):
             generate_expected([(1, 3), (2, 2), (7, 2), (5, 1), (8, 1), (4, 1), (9, 0), (3, 0), (0, 0), (6, 0)]),
         )
 
-    def test_pickle(self) -> None:
+    def test_pickle_with_whole_table_strategy(self) -> None:
         import os
         import pickle
 
