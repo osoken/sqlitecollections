@@ -1,3 +1,4 @@
+import os
 import pickle
 import sqlite3
 import sys
@@ -1037,8 +1038,6 @@ class ListTestCase(SqlTestCase):
         )
 
     def test_pickle_with_whole_table_strategy(self) -> None:
-        import os
-        import pickle
 
         wd = os.path.dirname(os.path.abspath(__file__))
 
@@ -1059,4 +1058,30 @@ class ListTestCase(SqlTestCase):
                 (sc.base.SqliteCollectionBase._default_serializer("b"), 4),
                 (sc.base.SqliteCollectionBase._default_serializer("c"), 5),
             ],
+        )
+
+    def test_pickle_with_only_file_name_strategy(self) -> None:
+        wd = os.path.dirname(os.path.abspath(__file__))
+
+        db = sqlite3.connect(os.path.join(wd, "fixtures", "list", "pickle.db"))
+        if sys.version_info < (3, 7):
+            sut = sc.List(connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)  # type: ignore
+        else:
+            sut = sc.List[str](connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)
+        actual = pickle.dumps(sut)
+        loaded = pickle.loads(actual)
+        self.assert_db_state_equals(
+            loaded.connection,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 0),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 1),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 2),
+                (sc.base.SqliteCollectionBase._default_serializer("a"), 3),
+                (sc.base.SqliteCollectionBase._default_serializer("b"), 4),
+                (sc.base.SqliteCollectionBase._default_serializer("c"), 5),
+            ],
+        )
+        self.assertEqual(
+            sut._driver_class.get_db_filename(sut.connection.cursor()),
+            loaded._driver_class.get_db_filename(loaded.connection.cursor()),
         )
