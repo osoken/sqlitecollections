@@ -1085,3 +1085,17 @@ class ListTestCase(SqlTestCase):
             sut._driver_class.get_db_filename(sut.connection.cursor()),
             loaded._driver_class.get_db_filename(loaded.connection.cursor()),
         )
+
+    @patch("sqlitecollections.list.tidy_connection")
+    def test_pickle_with_only_file_name_strategy_serializes_the_relpath(self, tidy_connection: MagicMock) -> None:
+        wd = os.path.dirname(os.path.abspath(__file__))
+        relpath = os.path.relpath(os.path.join(wd, "fixtures", "list", "pickle.db"))
+        db = sqlite3.connect(relpath)
+        tidy_connection.return_value = db
+
+        if sys.version_info < (3, 7):
+            sut = sc.List(connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)  # type: ignore
+        else:
+            sut = sc.List[str](connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)
+        _ = pickle.loads(pickle.dumps(sut))
+        tidy_connection.assert_called_once_with(relpath)
