@@ -872,7 +872,7 @@ class SetTestCase(SqlTestCase):
         )
         self.assert_items_table_only(memory_db)
 
-    def test_pickle(self) -> None:
+    def test_pickle_with_whole_table_strategy(self) -> None:
         import os
         import pickle
 
