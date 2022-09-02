@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import sys
 import warnings
@@ -26,6 +27,7 @@ from .base import (
     _SqliteCollectionBaseDatabaseDriver,
     create_tempfile_connection,
     is_hashable,
+    tidy_connection,
 )
 
 
@@ -385,19 +387,30 @@ class Set(SqliteCollectionBase[T], MutableSet[T]):
         state = self.__dict__.copy()
         del state["_connection"]
         cur = self.connection.cursor()
-        state["metadata"] = self._driver_class.dump_metadata_record_by_table_name(self.table_name, cur)
-        state["records"] = self._driver_class.dump_serialized_records(self.table_name, cur)
+        if self.pickling_strategy == PicklingStrategy.whole_table:
+            state["metadata"] = self._driver_class.dump_metadata_record_by_table_name(self.table_name, cur)
+            state["records"] = self._driver_class.dump_serialized_records(self.table_name, cur)
+        else:
+            state["db_file_name"] = os.path.relpath(self._driver_class.get_db_filename(cur))
         return state
 
     def __setstate__(self, state: Mapping[str, Any]) -> None:
-        self.__dict__.update(
-            dict(
-                filter(lambda d: d[0] not in ("metadata", "records"), state.items()),
-                _connection=create_tempfile_connection(),
+        if state["_pickling_strategy"] == PicklingStrategy.whole_table:
+            self.__dict__.update(
+                dict(
+                    filter(lambda d: d[0] not in ("metadata", "records"), state.items()),
+                    _connection=create_tempfile_connection(),
+                )
             )
-        )
-        cur = self._connection.cursor()
-        self._driver_class.load_metadata_record(cur, state["metadata"])
-        self._connection.commit()
-        self._driver_class.load_serialized_records(self.table_name, cur, state["records"])
-        self._connection.commit()
+            cur = self._connection.cursor()
+            self._driver_class.load_metadata_record(cur, state["metadata"])
+            self._connection.commit()
+            self._driver_class.load_serialized_records(self.table_name, cur, state["records"])
+            self._connection.commit()
+        else:
+            self.__dict__.update(
+                dict(
+                    filter(lambda d: d[0] not in ("db_file_name",), state.items()),
+                    _connection=tidy_connection(state["db_file_name"]),
+                )
+            )
