@@ -1,3 +1,4 @@
+import os
 import pickle
 import sqlite3
 import sys
@@ -873,8 +874,6 @@ class SetTestCase(SqlTestCase):
         self.assert_items_table_only(memory_db)
 
     def test_pickle_with_whole_table_strategy(self) -> None:
-        import os
-        import pickle
 
         wd = os.path.dirname(os.path.abspath(__file__))
 
