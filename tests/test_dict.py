@@ -854,6 +854,16 @@ class DictTestCase(DictAndViewTestCase):
         _ = pickle.loads(pickle.dumps(sut))
         tidy_connection.assert_called_once_with(relpath)
 
+    def test_pickle_with_only_file_name_strategy_raises_error_when_connection_is_on_memory(self) -> None:
+        if sys.version_info < (3, 7):
+            sut = sc.Dict(connection=":memory:", table_name="items", pickling_strategy=PicklingStrategy.only_file_name)  # type: ignore
+        else:
+            sut = sc.Dict[str, int](
+                connection=":memory:", table_name="items", pickling_strategy=PicklingStrategy.only_file_name
+            )
+        with self.assertRaisesRegex(ValueError, r"no path specified"):
+            _ = pickle.dumps(sut)
+
 
 class KeysViewTestCase(DictAndViewTestCase):
     def test_len(self) -> None:
