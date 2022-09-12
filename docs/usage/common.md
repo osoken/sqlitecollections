@@ -1,4 +1,6 @@
-# Metadata
+# Common features
+
+# PicklingStrategy
 
 # MetadataItem
 
