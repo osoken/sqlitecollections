@@ -2,6 +2,13 @@
 
 # PicklingStrategy
 
+`PicklingStrategy` specifies the way how pickle serializes the sqlitecollection containers.
+Currently following two methods are supported:
+
+## `PicklingStrategy.whole_table`
+
+## `PicklingStrategy.only_file_name`
+
 # MetadataItem
 
 ## `MetadataItem(...)`
