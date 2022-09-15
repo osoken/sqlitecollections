@@ -7,10 +7,13 @@ Currently following two methods are supported:
 
 ## `PicklingStrategy.whole_table`
 
-Resulting pickle contains all the records in the collection.
+The resulting pickle contains all the records in the collection.
 It dumps all the records into temporary sqlite3 database file when it is loaded.
 
 ## `PicklingStrategy.only_file_name`
+
+The resulting pickle contains only the file path of the sqlite3 database file.
+The file path is a relative path returned by `os.path.relpath`, so it must be loaded with the same structure.
 
 # MetadataItem
 
