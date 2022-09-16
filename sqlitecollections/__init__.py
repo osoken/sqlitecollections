@@ -5,9 +5,10 @@ __email__ = "osoken.devel@outlook.jp"
 __package_name__ = "sqlitecollections"
 
 
+from .base import PicklingStrategy
 from .dict import Dict
 from .factory import DictFactory, ListFactory, SetFactory
 from .list import List
 from .set import Set
 
-__all__ = ["Dict", "List", "Set", "ListFactory", "DictFactory", "SetFactory"]
+__all__ = ["Dict", "List", "Set", "ListFactory", "DictFactory", "SetFactory", "PicklingStrategy"]

@@ -1,3 +1,4 @@
+import os
 import pickle
 import sqlite3
 import sys
@@ -5,6 +6,8 @@ import warnings
 from collections.abc import Hashable
 from typing import Any
 from unittest.mock import MagicMock, patch
+
+from sqlitecollections.base import PicklingStrategy
 
 if sys.version_info >= (3, 9):
     from collections.abc import Callable
@@ -49,6 +52,7 @@ class SetTestCase(SqlTestCase):
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
+            pickling_strategy=PicklingStrategy.only_file_name,
         )
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
@@ -56,6 +60,7 @@ class SetTestCase(SqlTestCase):
             serializer=serializer,
             deserializer=deserializer,
             persist=persist,
+            pickling_strategy=PicklingStrategy.only_file_name,
         )
 
     def test_initialize(self) -> None:
@@ -868,10 +873,7 @@ class SetTestCase(SqlTestCase):
         )
         self.assert_items_table_only(memory_db)
 
-    def test_pickle(self) -> None:
-        import os
-        import pickle
-
+    def test_pickle_with_whole_table_strategy(self) -> None:
         wd = os.path.dirname(os.path.abspath(__file__))
 
         db = sqlite3.connect(os.path.join(wd, "fixtures", "set", "pickle.db"))
@@ -889,3 +891,50 @@ class SetTestCase(SqlTestCase):
                 (sc.base.SqliteCollectionBase._default_serializer("c"),),
             ],
         )
+
+    def test_pickle_with_only_file_name_strategy(self) -> None:
+        wd = os.path.dirname(os.path.abspath(__file__))
+
+        db = sqlite3.connect(os.path.join(wd, "fixtures", "set", "pickle.db"))
+        if sys.version_info < (3, 7):
+            sut = sc.Set(connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)  # type: ignore
+        else:
+            sut = sc.Set[str](connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)
+        actual = pickle.dumps(sut)
+        loaded = pickle.loads(actual)
+        self.assert_db_state_equals(
+            loaded.connection,
+            [
+                (sc.base.SqliteCollectionBase._default_serializer("a"),),
+                (sc.base.SqliteCollectionBase._default_serializer("b"),),
+                (sc.base.SqliteCollectionBase._default_serializer("c"),),
+            ],
+        )
+        self.assertEqual(
+            sut._driver_class.get_db_filename(sut.connection.cursor()),
+            loaded._driver_class.get_db_filename(loaded.connection.cursor()),
+        )
+
+    @patch("sqlitecollections.set.tidy_connection")
+    def test_pickle_with_only_file_name_strategy_serializes_the_relpath(self, tidy_connection: MagicMock) -> None:
+        wd = os.path.dirname(os.path.abspath(__file__))
+        relpath = os.path.relpath(os.path.join(wd, "fixtures", "set", "pickle.db"))
+        db = sqlite3.connect(relpath)
+        tidy_connection.return_value = db
+
+        if sys.version_info < (3, 7):
+            sut = sc.Set(connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)  # type: ignore
+        else:
+            sut = sc.Set[str](connection=db, table_name="items", pickling_strategy=PicklingStrategy.only_file_name)
+        _ = pickle.loads(pickle.dumps(sut))
+        tidy_connection.assert_called_once_with(relpath)
+
+    def test_pickle_with_only_file_name_strategy_raises_error_when_connection_is_on_memory(self) -> None:
+        if sys.version_info < (3, 7):
+            sut = sc.Set(connection=":memory:", table_name="items", pickling_strategy=PicklingStrategy.only_file_name)  # type: ignore
+        else:
+            sut = sc.Set[str](
+                connection=":memory:", table_name="items", pickling_strategy=PicklingStrategy.only_file_name
+            )
+        with self.assertRaisesRegex(ValueError, r"no path specified"):
+            _ = pickle.dumps(sut)

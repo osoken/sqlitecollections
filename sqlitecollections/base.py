@@ -89,9 +89,9 @@ class TemporaryTableContext(ContextManager[str]):
         return None
 
 
-class SerializationStrategy(Enum):
-    WHOLE_TABLE = auto()
-    ONLY_FILE_NAME = auto()
+class PicklingStrategy(str, Enum):
+    whole_table = "whole_table"
+    only_file_name = "only_file_name"
 
 
 class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
@@ -220,6 +220,11 @@ class _SqliteCollectionBaseDatabaseDriver(metaclass=ABCMeta):
         cls.insert_metadata_record(metadata_record[0], metadata_record[1], metadata_record[2], cur)
         cls.do_create_table(metadata_record[0], metadata_record[2], cur)
 
+    @classmethod
+    def get_db_filename(cls, cur: sqlite3.Cursor) -> str:
+        cur.execute("select file from pragma_database_list where name='main'")
+        return cast(str, list(cur)[0][0])
+
 
 class MetadataItem(Hashable):
     def __init__(self, table_name: str, schema_version: str, container_type: str):
@@ -318,6 +323,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
         reference_table_name: Optional[str] = None,
+        pickling_strategy: PicklingStrategy = PicklingStrategy.whole_table,
     ):
         super(SqliteCollectionBase, self).__init__()
         self._serializer = self._default_serializer if serializer is None else serializer
@@ -330,6 +336,7 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
             else sanitize_table_name(table_name, self.container_type_name)
         )
         self._initialize(reference_table_name=reference_table_name)
+        self._pickling_strategy = pickling_strategy
 
     def __del__(self) -> None:
         if hasattr(self, "persist") and not self.persist:
@@ -342,6 +349,10 @@ class SqliteCollectionBase(Generic[T], metaclass=ABCMeta):
         self._driver_class.initialize_metadata_table(cur)
         self._driver_class.initialize_table(self.table_name, self.container_type_name, reference_table_name, cur)
         self.connection.commit()
+
+    @property
+    def pickling_strategy(self) -> PicklingStrategy:
+        return self._pickling_strategy
 
     @property
     def persist(self) -> bool:
