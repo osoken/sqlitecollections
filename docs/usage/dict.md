@@ -22,7 +22,7 @@ Constructor.
 - `value_serializer`: `Callable[[VT], bytes]`, optional, default=`None`; Function to serialize value. If `None`, `key_serializer` is used.
 - `value_deserializer`: `Callable[[bytes], VT]`, optional, default=`None`; Function to deserialize value. If `None`, `key_deserializer` is used.
 - `persist`: `bool`, optional, default=`True`; If `True`, table won't be deleted even when the object is deleted. If `False`, the table is deleted when this object is deleted.
-- `pickling_strategy`: `PicklingStrategy`, optional, default=`PicklingStrategy.whole_table`; Flag to control pickling method.
+- `pickling_strategy`: `PicklingStrategy`, optional, default=`PicklingStrategy.whole_table`; Flag to control pickling method. See [`PicklingStrategy`](common.md#picklingstrategy) for more details.
 
 ---
 
