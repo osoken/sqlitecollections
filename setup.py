@@ -24,6 +24,7 @@ setup(
     long_description=__long_description__,
     long_description_content_type="text/markdown",
     packages=[__package_name__],
+    package_data={__package_name__: ["py.typed"]},
     project_urls={'Documentation': "https://osoken.github.io/sqlitecollections/"},
     install_requires=[],
     extras_require={
