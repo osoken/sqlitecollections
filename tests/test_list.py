@@ -1000,9 +1000,10 @@ class ListTestCase(SqlTestCase):
             ],
         )
 
+    def _generate_sort_expected(self, l: Sequence[Tuple[int, int]]) -> Sequence[Tuple[bytes, int]]:
+        return [(sc.base.SqliteCollectionBase._default_serializer(d), i) for i, d in enumerate(l)]
+
     def test_sort(self) -> None:
-        def generate_expected(l: Sequence[Tuple[int, int]]) -> Sequence[Tuple[bytes, int]]:
-            return [(sc.base.SqliteCollectionBase._default_serializer(d), i) for i, d in enumerate(l)]
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
@@ -1010,7 +1011,9 @@ class ListTestCase(SqlTestCase):
         sut.sort()
         self.assert_db_state_equals(
             memory_db,
-            generate_expected([(0, 0), (1, 3), (2, 2), (3, 0), (4, 1), (5, 1), (6, 0), (7, 2), (8, 1), (9, 0)]),
+            self._generate_sort_expected(
+                [(0, 0), (1, 3), (2, 2), (3, 0), (4, 1), (5, 1), (6, 0), (7, 2), (8, 1), (9, 0)]
+            ),
         )
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
@@ -1018,7 +1021,9 @@ class ListTestCase(SqlTestCase):
         sut.sort(key=lambda x: x[1])
         self.assert_db_state_equals(
             memory_db,
-            generate_expected([(9, 0), (3, 0), (0, 0), (6, 0), (5, 1), (8, 1), (4, 1), (2, 2), (7, 2), (1, 3)]),
+            self._generate_sort_expected(
+                [(9, 0), (3, 0), (0, 0), (6, 0), (5, 1), (8, 1), (4, 1), (2, 2), (7, 2), (1, 3)]
+            ),
         )
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
@@ -1026,7 +1031,9 @@ class ListTestCase(SqlTestCase):
         sut.sort(reverse=True)
         self.assert_db_state_equals(
             memory_db,
-            generate_expected([(9, 0), (8, 1), (7, 2), (6, 0), (5, 1), (4, 1), (3, 0), (2, 2), (1, 3), (0, 0)]),
+            self._generate_sort_expected(
+                [(9, 0), (8, 1), (7, 2), (6, 0), (5, 1), (4, 1), (3, 0), (2, 2), (1, 3), (0, 0)]
+            ),
         )
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
@@ -1034,7 +1041,9 @@ class ListTestCase(SqlTestCase):
         sut.sort(key=lambda x: x[1], reverse=True)
         self.assert_db_state_equals(
             memory_db,
-            generate_expected([(1, 3), (2, 2), (7, 2), (5, 1), (8, 1), (4, 1), (9, 0), (3, 0), (0, 0), (6, 0)]),
+            self._generate_sort_expected(
+                [(1, 3), (2, 2), (7, 2), (5, 1), (8, 1), (4, 1), (9, 0), (3, 0), (0, 0), (6, 0)]
+            ),
         )
 
     def test_pickle_with_whole_table_strategy(self) -> None:
