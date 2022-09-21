@@ -1,3 +1,4 @@
+import math
 import os
 import pickle
 import sqlite3
@@ -1007,7 +1008,14 @@ class ListTestCase(SqlTestCase):
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items")
+        deserialized_count = 0
+
+        def deserialize_with_counter(x: bytes) -> Tuple[int, int]:
+            nonlocal deserialized_count
+            deserialized_count += 1
+            return sc.List[Tuple[int, int]]._default_deserializer(x)
+
+        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items", deserializer=deserialize_with_counter)
         sut.sort()
         self.assert_db_state_equals(
             memory_db,
@@ -1015,9 +1023,12 @@ class ListTestCase(SqlTestCase):
                 [(0, 0), (1, 3), (2, 2), (3, 0), (4, 1), (5, 1), (6, 0), (7, 2), (8, 1), (9, 0)]
             ),
         )
+        self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
+
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items")
+        deserialized_count = 0
+        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items", deserializer=deserialize_with_counter)
         sut.sort(key=lambda x: x[1])
         self.assert_db_state_equals(
             memory_db,
@@ -1025,9 +1036,12 @@ class ListTestCase(SqlTestCase):
                 [(9, 0), (3, 0), (0, 0), (6, 0), (5, 1), (8, 1), (4, 1), (2, 2), (7, 2), (1, 3)]
             ),
         )
+        self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
+
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items")
+        deserialized_count = 0
+        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items", deserializer=deserialize_with_counter)
         sut.sort(reverse=True)
         self.assert_db_state_equals(
             memory_db,
@@ -1035,9 +1049,12 @@ class ListTestCase(SqlTestCase):
                 [(9, 0), (8, 1), (7, 2), (6, 0), (5, 1), (4, 1), (3, 0), (2, 2), (1, 3), (0, 0)]
             ),
         )
+        self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
+
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items")
+        deserialized_count = 0
+        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items", deserializer=deserialize_with_counter)
         sut.sort(key=lambda x: x[1], reverse=True)
         self.assert_db_state_equals(
             memory_db,
@@ -1045,6 +1062,7 @@ class ListTestCase(SqlTestCase):
                 [(1, 3), (2, 2), (7, 2), (5, 1), (8, 1), (4, 1), (9, 0), (3, 0), (0, 0), (6, 0)]
             ),
         )
+        self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
 
     def test_pickle_with_whole_table_strategy(self) -> None:
 
