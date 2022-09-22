@@ -251,6 +251,12 @@ class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
         for d in serialized_records:
             cur.execute(f"INSERT INTO {table_name} (serialized_value, item_index) VALUES (?, ?)", d)
 
+    @classmethod
+    def swap_indices(cls, table_name: str, cur: sqlite3.Cursor, idx1: int, idx2: int) -> None:
+        cur.execute(f"UPDATE {table_name} SET item_index = -1 WHERE item_index = ?", (idx1,))
+        cur.execute(f"UPDATE {table_name} SET item_index = ? WHERE item_index = ?", (idx1, idx2))
+        cur.execute(f"UPDATE {table_name} SET item_index = ? WHERE item_index = -1", (idx2,))
+
 
 class List(SqliteCollectionBase[T], MutableSequence[T]):
     _driver_class = _ListDatabaseDriver
