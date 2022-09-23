@@ -519,6 +519,40 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         self._driver_class.remap_index(self.table_name, cur, [i[1] for i in buf])
         self.connection.commit()
 
+    def __sort_sub(self, reverse: bool, key: Optional[Callable[[T], Any]], idx0: int, idx1: int) -> None:
+        ...
+
+    def __sort3(self, reverse: bool, key: Optional[Callable[[T], Any]], idx: int) -> None:
+        a = key(self[idx])
+        b = key(self[idx + 1])
+        c = key(self[idx + 2])
+        cur = self.connection.cursor()
+        if not reverse:
+            if a > b:
+                self._driver_class.swap_indices(self.table_name, cur, idx, idx + 1)
+                a, b = b, a
+            if a > c:
+                self._driver_class.swap_indices(self.table_name, cur, idx, idx + 2)
+                a, c = c, a
+            if b > c:
+                self._driver_class.swap_indices(self.table_name, cur, idx + 1, idx + 2)
+        else:
+            if b < c:
+                self._driver_class.swap_indices(self.table_name, cur, idx + 1, idx + 2)
+                b, c = c, b
+            if a < c:
+                self._driver_class.swap_indices(self.table_name, cur, idx, idx + 2)
+                a, c = c, a
+            if a < b:
+                self._driver_class.swap_indices(self.table_name, cur, idx, idx + 1)
+
+    def __sort2(self, reverse: bool, key: Optional[Callable[[T], Any]], idx: int) -> None:
+        a = key(self[idx])
+        b = key(self[idx + 1])
+        cur = self.connection.cursor()
+        if (reverse and a < b) or (not reverse and a > b):
+            self._driver_class.swap_indices(self.table_name, cur, idx, idx + 1)
+
     def reverse(self) -> None:
         cur = self.connection.cursor()
         self._driver_class.reverse_indices(self.table_name, cur)
