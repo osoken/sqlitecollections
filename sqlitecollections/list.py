@@ -179,9 +179,9 @@ class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     def remap_index(cls, table_name: str, cur: sqlite3.Cursor, indices_map: Iterable[int]) -> None:
         l = cls.get_max_index_plus_one(table_name, cur)
         cur.execute(f"UPDATE {table_name} SET item_index = item_index - ?", (l,))
-        cur.execute(
-            f"UPDATE {table_name} SET item_index = CASE item_index {' '.join(['WHEN ? THEN ?' for _ in range(l)])} END",
-            sum(((j - l, i) for i, j in enumerate(indices_map)), tuple()),
+        cur.executemany(
+            f"UPDATE {table_name} SET item_index = ? WHERE item_index = ?",
+            ((i, j - l) for i, j in enumerate(indices_map)),
         )
 
     @classmethod
@@ -522,8 +522,14 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
 
     def sort(self, reverse: bool = False, key: Optional[Callable[[T], Any]] = None) -> None:
         key_ = (lambda x: x) if key is None else key
-        self.__sort_sub(reverse, key_, 0, len(self))
+        # self.__sort_sub(reverse, key_, 0, len(self))
+        self.__sort_indices(reverse=reverse, key=key_)
         self.connection.commit()
+
+    def __sort_indices(self, reverse: bool, key: Callable[[T], Any]) -> None:
+        indices = list(range(len(self)))
+        indices.sort(key=lambda i: key(self[i]), reverse=reverse)  # type: ignore
+        self._driver_class.remap_index(self.table_name, self.connection.cursor(), indices)
 
     def __sort_sub(self, reverse: bool, key: Callable[[T], Any], idx0: int, idx1: int) -> None:
         sz = idx1 - idx0
