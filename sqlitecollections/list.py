@@ -1,3 +1,4 @@
+import math
 import os
 import sqlite3
 import sys
@@ -178,9 +179,9 @@ class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     def remap_index(cls, table_name: str, cur: sqlite3.Cursor, indices_map: Iterable[int]) -> None:
         l = cls.get_max_index_plus_one(table_name, cur)
         cur.execute(f"UPDATE {table_name} SET item_index = item_index - ?", (l,))
-        cur.execute(
-            f"UPDATE {table_name} SET item_index = CASE item_index {' '.join(['WHEN ? THEN ?' for _ in range(l)])} END",
-            sum(((j - l, i) for i, j in enumerate(indices_map)), tuple()),
+        cur.executemany(
+            f"UPDATE {table_name} SET item_index = ? WHERE item_index = ?",
+            ((i, j - l) for i, j in enumerate(indices_map)),
         )
 
     @classmethod
@@ -250,6 +251,23 @@ class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
     ) -> None:
         for d in serialized_records:
             cur.execute(f"INSERT INTO {table_name} (serialized_value, item_index) VALUES (?, ?)", d)
+
+    @classmethod
+    def swap_indices(cls, table_name: str, cur: sqlite3.Cursor, idx1: int, idx2: int) -> None:
+        cur.execute(f"UPDATE {table_name} SET item_index = -1 WHERE item_index = ?", (idx1,))
+        cur.execute(f"UPDATE {table_name} SET item_index = ? WHERE item_index = ?", (idx1, idx2))
+        cur.execute(f"UPDATE {table_name} SET item_index = ? WHERE item_index = -1", (idx2,))
+
+    @classmethod
+    def increase_indices_in_range(cls, table_name: str, cur: sqlite3.Cursor, start: int, end: int, value: int) -> None:
+        cur.execute(
+            f"UPDATE {table_name} SET item_index = item_index + ? WHERE item_index >= ? AND item_index < ?",
+            (value, start, end),
+        )
+
+    @classmethod
+    def set_index_by_index(cls, table_name: str, cur: sqlite3.Cursor, old_index: int, new_index: int) -> None:
+        cur.execute(f"UPDATE {table_name} SET item_index = ? WHERE item_index = ?", (new_index, old_index))
 
 
 class List(SqliteCollectionBase[T], MutableSequence[T]):
@@ -504,14 +522,99 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
 
     def sort(self, reverse: bool = False, key: Optional[Callable[[T], Any]] = None) -> None:
         key_ = (lambda x: x) if key is None else key
-        cur = self.connection.cursor()
-        buf = [
-            (key_(self.deserialize(v)), i)
-            for i, v in enumerate(self._driver_class.iter_serialized_value(self.table_name, cur))
-        ]
-        buf.sort(key=lambda x: x[0], reverse=reverse)  # type: ignore
-        self._driver_class.remap_index(self.table_name, cur, [i[1] for i in buf])
+        # self.__sort_sub(reverse, key_, 0, len(self))
+        self.__sort_indices(reverse=reverse, key=key_)
         self.connection.commit()
+
+    def __sort_indices(self, reverse: bool, key: Callable[[T], Any]) -> None:
+        indices = list(range(len(self)))
+        indices.sort(key=lambda i: key(self[i]), reverse=reverse)  # type: ignore
+        self._driver_class.remap_index(self.table_name, self.connection.cursor(), indices)
+
+    def __sort_sub(self, reverse: bool, key: Callable[[T], Any], idx0: int, idx1: int) -> None:
+        sz = idx1 - idx0
+        if sz <= 3:
+            if sz == 3:
+                self.__sort3(reverse, key, idx0)
+            elif sz == 2:
+                self.__sort2(reverse, key, idx0)
+        else:
+            cur = self.connection.cursor()
+            mid = idx0 + math.ceil(sz / 2)
+            self.__sort_sub(reverse, key, idx0, mid)
+            self.__sort_sub(reverse, key, mid, idx1)
+            l = len(self)
+            self._driver_class.increase_indices_in_range(self.table_name, cur, idx0, mid, l)
+            p = idx0
+            i0 = idx0 + l
+            i1 = mid
+            k0 = key(self[i0])
+            k1 = key(self[i1])
+            if reverse:
+                while True:
+                    if k0 < k1:
+                        self._driver_class.set_index_by_index(self.table_name, cur, i1, p)
+                        p += 1
+                        i1 += 1
+                        if i1 == idx1:
+                            self._driver_class.increase_indices_in_range(self.table_name, cur, i0, mid + l, p - i0)
+                            break
+                        k1 = key(self[i1])
+                    else:
+                        self._driver_class.set_index_by_index(self.table_name, cur, i0, p)
+                        p += 1
+                        i0 += 1
+                        if i0 == mid + l:
+                            break
+                        k0 = key(self[i0])
+            else:
+                while True:
+                    if k0 > k1:
+                        self._driver_class.set_index_by_index(self.table_name, cur, i1, p)
+                        p += 1
+                        i1 += 1
+                        if i1 == idx1:
+                            self._driver_class.increase_indices_in_range(self.table_name, cur, i0, mid + l, p - i0)
+                            break
+                        k1 = key(self[i1])
+                    else:
+                        self._driver_class.set_index_by_index(self.table_name, cur, i0, p)
+                        p += 1
+                        i0 += 1
+                        if i0 == mid + l:
+                            break
+                        k0 = key(self[i0])
+
+    def __sort3(self, reverse: bool, key: Callable[[T], Any], idx: int) -> None:
+        a = key(self[idx])
+        b = key(self[idx + 1])
+        c = key(self[idx + 2])
+        cur = self.connection.cursor()
+        if not reverse:
+            if a > b:
+                self._driver_class.swap_indices(self.table_name, cur, idx, idx + 1)
+                a, b = b, a
+            if a > c:
+                self._driver_class.swap_indices(self.table_name, cur, idx, idx + 2)
+                a, c = c, a
+            if b > c:
+                self._driver_class.swap_indices(self.table_name, cur, idx + 1, idx + 2)
+        else:
+            if a < b:
+                self._driver_class.swap_indices(self.table_name, cur, idx, idx + 1)
+                a, b = b, a
+            if a < c:
+                self._driver_class.swap_indices(self.table_name, cur, idx, idx + 2)
+                a, c = c, a
+            if b < c:
+                self._driver_class.swap_indices(self.table_name, cur, idx + 1, idx + 2)
+
+    def __sort2(self, reverse: bool, key: Callable[[T], Any], idx: int) -> None:
+        a = key(self[idx])
+        b = key(self[idx + 1])
+        cur = self.connection.cursor()
+        if (reverse and a < b) or (not reverse and a > b):
+            self._driver_class.swap_indices(self.table_name, cur, idx, idx + 1)
 
     def reverse(self) -> None:
         cur = self.connection.cursor()
