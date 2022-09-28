@@ -3,6 +3,7 @@ import os
 import sqlite3
 import sys
 import warnings
+from enum import Enum
 from itertools import count, repeat
 from typing import Any, Optional, Tuple, Union, cast, overload
 
@@ -83,6 +84,12 @@ def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]) -> Iterable[Tuple[An
             iter1_unused_count = sum(d[0] for d in zip(repeat(1), iter1)) + int(iter1_is_active)
             iter2_unused_count = sum(d[0] for d in zip(repeat(1), iter2)) + int(iter2_is_active)
             raise DifferentLengthDetected(element_count + iter1_unused_count, element_count + iter2_unused_count)
+
+
+class SortingStrategy(str, Enum):
+    fastest = "fastest"
+    balance = "balance"
+    memory_saving = "memory_saving"
 
 
 class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
