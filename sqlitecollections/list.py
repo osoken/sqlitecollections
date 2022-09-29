@@ -289,6 +289,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
         pickling_strategy: PicklingStrategy = PicklingStrategy.whole_table,
+        sorting_strategy: SortingStrategy = SortingStrategy.balance,
     ) -> None:
         if (
             isinstance(__data, self.__class__)
@@ -317,6 +318,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             if __data is not None:
                 self.clear()
                 self.extend(__data)
+        self._sorting_strategy = sorting_strategy
 
     def __delitem__(self, i: Union[int, slice]) -> None:
         cur = self.connection.cursor()

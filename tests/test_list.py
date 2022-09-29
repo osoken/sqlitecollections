@@ -9,6 +9,7 @@ from typing import Any, Tuple, Union
 from unittest.mock import MagicMock, patch
 
 from sqlitecollections.base import PicklingStrategy
+from sqlitecollections.list import SortingStrategy
 
 if sys.version_info >= (3, 9):
     from collections.abc import Callable, Iterable, Sequence
@@ -47,6 +48,7 @@ class ListTestCase(SqlTestCase):
         serializer = MagicMock(spec=Callable[[Any], bytes])
         deserializer = MagicMock(spec=Callable[[bytes], Any])
         persist = False
+        sorting_strategy = SortingStrategy.fastest
         sut = sc.List[Any](
             connection=memory_db,
             table_name=table_name,
@@ -54,6 +56,7 @@ class ListTestCase(SqlTestCase):
             deserializer=deserializer,
             persist=persist,
             pickling_strategy=PicklingStrategy.only_file_name,
+            sorting_strategy=sorting_strategy,
         )
         SqliteCollectionBase_init.assert_called_once_with(
             connection=memory_db,
