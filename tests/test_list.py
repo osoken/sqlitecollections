@@ -121,6 +121,14 @@ class ListTestCase(SqlTestCase):
         with self.assertRaisesRegex(IndexError, "list index out of range"):
             _ = sut[-4]
 
+    def test_property_sorting_strategy(self) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql")
+        sut = sc.List[str](connection=memory_db, table_name="items", sorting_strategy=SortingStrategy.fastest)
+        self.assertEqual(sut.sorting_strategy, SortingStrategy.fastest)
+        del sut._sorting_strategy
+        self.assertEqual(sut.sorting_strategy, SortingStrategy.balance)
+
     def test_getitem_slice(self) -> None:
 
         memory_db = sqlite3.connect(":memory:")

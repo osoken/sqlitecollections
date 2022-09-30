@@ -320,6 +320,12 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
                 self.extend(__data)
         self._sorting_strategy = sorting_strategy
 
+    @property
+    def sorting_strategy(self) -> SortingStrategy:
+        if hasattr(self, "_sorting_strategy"):
+            return self._sorting_strategy
+        return SortingStrategy.balance
+
     def __delitem__(self, i: Union[int, slice]) -> None:
         cur = self.connection.cursor()
         cur2 = self.connection.cursor()
