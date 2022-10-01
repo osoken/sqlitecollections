@@ -1015,7 +1015,7 @@ class ListTestCase(SqlTestCase):
     def _generate_sort_expected(self, l: Sequence[Tuple[int, int]]) -> Sequence[Tuple[bytes, int]]:
         return [(sc.base.SqliteCollectionBase._default_serializer(d), i) for i, d in enumerate(l)]
 
-    def test_sort_balance_sorts_elements(self) -> None:
+    def test_sort_balanced_sorts_elements(self) -> None:
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
@@ -1079,6 +1079,18 @@ class ListTestCase(SqlTestCase):
             ),
         )
         self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
+
+    @patch("sqlitecollections.list.List._sort_indices")
+    def test_sort_balanced_calls_sort_indices(self, _sort_indices: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
+        sut = sc.List[Tuple[int, int]](
+            connection=memory_db,
+            table_name="items",
+            sorting_strategy=SortingStrategy.balance,
+        )
+        sut.sort()
+        _sort_indices.assert_called()
 
     def test_pickle_with_whole_table_strategy(self) -> None:
 

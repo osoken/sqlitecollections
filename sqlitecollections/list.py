@@ -538,10 +538,10 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
     def sort(self, reverse: bool = False, key: Optional[Callable[[T], Any]] = None) -> None:
         key_ = (lambda x: x) if key is None else key
         # self.__sort_sub(reverse, key_, 0, len(self))
-        self.__sort_indices(reverse=reverse, key=key_)
+        self._sort_indices(reverse=reverse, key=key_)
         self.connection.commit()
 
-    def __sort_indices(self, reverse: bool, key: Callable[[T], Any]) -> None:
+    def _sort_indices(self, reverse: bool, key: Callable[[T], Any]) -> None:
         indices = list(range(len(self)))
         indices.sort(key=lambda i: key(self[i]), reverse=reverse)  # type: ignore
         self._driver_class.remap_index(self.table_name, self.connection.cursor(), indices)
