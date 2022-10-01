@@ -1015,7 +1015,7 @@ class ListTestCase(SqlTestCase):
     def _generate_sort_expected(self, l: Sequence[Tuple[int, int]]) -> Sequence[Tuple[bytes, int]]:
         return [(sc.base.SqliteCollectionBase._default_serializer(d), i) for i, d in enumerate(l)]
 
-    def test_sort(self) -> None:
+    def test_sort_balance_sorts_elements(self) -> None:
 
         memory_db = sqlite3.connect(":memory:")
         self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
@@ -1026,7 +1026,12 @@ class ListTestCase(SqlTestCase):
             deserialized_count += 1
             return sc.List[Tuple[int, int]]._default_deserializer(x)
 
-        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items", deserializer=deserialize_with_counter)
+        sut = sc.List[Tuple[int, int]](
+            connection=memory_db,
+            table_name="items",
+            deserializer=deserialize_with_counter,
+            sorting_strategy=SortingStrategy.balance,
+        )
         sut.sort()
         self.assert_db_state_equals(
             memory_db,
