@@ -1015,70 +1015,85 @@ class ListTestCase(SqlTestCase):
     def _generate_sort_expected(self, l: Sequence[Tuple[int, int]]) -> Sequence[Tuple[bytes, int]]:
         return [(sc.base.SqliteCollectionBase._default_serializer(d), i) for i, d in enumerate(l)]
 
-    def test_sort_balanced_sorts_elements(self) -> None:
+    def test_sort(self) -> None:
+        for s in (SortingStrategy.balance, SortingStrategy.fastest, SortingStrategy.memory_saving):
+            memory_db = sqlite3.connect(":memory:")
+            self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
+            deserialized_count = 0
 
-        memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        deserialized_count = 0
+            def deserialize_with_counter(x: bytes) -> Tuple[int, int]:
+                nonlocal deserialized_count
+                deserialized_count += 1
+                return sc.List[Tuple[int, int]]._default_deserializer(x)
 
-        def deserialize_with_counter(x: bytes) -> Tuple[int, int]:
-            nonlocal deserialized_count
-            deserialized_count += 1
-            return sc.List[Tuple[int, int]]._default_deserializer(x)
+            sut = sc.List[Tuple[int, int]](
+                connection=memory_db,
+                table_name="items",
+                deserializer=deserialize_with_counter,
+                sorting_strategy=s,
+            )
+            sut.sort()
+            self.assert_db_state_equals(
+                memory_db,
+                self._generate_sort_expected(
+                    [(0, 0), (1, 3), (2, 2), (3, 0), (4, 1), (5, 1), (6, 0), (7, 2), (8, 1), (9, 0)]
+                ),
+            )
+            self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
 
-        sut = sc.List[Tuple[int, int]](
-            connection=memory_db,
-            table_name="items",
-            deserializer=deserialize_with_counter,
-            sorting_strategy=SortingStrategy.balance,
-        )
-        sut.sort()
-        self.assert_db_state_equals(
-            memory_db,
-            self._generate_sort_expected(
-                [(0, 0), (1, 3), (2, 2), (3, 0), (4, 1), (5, 1), (6, 0), (7, 2), (8, 1), (9, 0)]
-            ),
-        )
-        self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
+            memory_db = sqlite3.connect(":memory:")
+            self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
+            deserialized_count = 0
+            sut = sc.List[Tuple[int, int]](
+                connection=memory_db,
+                table_name="items",
+                deserializer=deserialize_with_counter,
+                sorting_strategy=s,
+            )
+            sut.sort(key=lambda x: x[1])
+            self.assert_db_state_equals(
+                memory_db,
+                self._generate_sort_expected(
+                    [(9, 0), (3, 0), (0, 0), (6, 0), (5, 1), (8, 1), (4, 1), (2, 2), (7, 2), (1, 3)]
+                ),
+            )
+            self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
 
-        memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        deserialized_count = 0
-        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items", deserializer=deserialize_with_counter)
-        sut.sort(key=lambda x: x[1])
-        self.assert_db_state_equals(
-            memory_db,
-            self._generate_sort_expected(
-                [(9, 0), (3, 0), (0, 0), (6, 0), (5, 1), (8, 1), (4, 1), (2, 2), (7, 2), (1, 3)]
-            ),
-        )
-        self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
+            memory_db = sqlite3.connect(":memory:")
+            self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
+            deserialized_count = 0
+            sut = sc.List[Tuple[int, int]](
+                connection=memory_db,
+                table_name="items",
+                deserializer=deserialize_with_counter,
+                sorting_strategy=s,
+            )
+            sut.sort(reverse=True)
+            self.assert_db_state_equals(
+                memory_db,
+                self._generate_sort_expected(
+                    [(9, 0), (8, 1), (7, 2), (6, 0), (5, 1), (4, 1), (3, 0), (2, 2), (1, 3), (0, 0)]
+                ),
+            )
+            self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
 
-        memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        deserialized_count = 0
-        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items", deserializer=deserialize_with_counter)
-        sut.sort(reverse=True)
-        self.assert_db_state_equals(
-            memory_db,
-            self._generate_sort_expected(
-                [(9, 0), (8, 1), (7, 2), (6, 0), (5, 1), (4, 1), (3, 0), (2, 2), (1, 3), (0, 0)]
-            ),
-        )
-        self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
-
-        memory_db = sqlite3.connect(":memory:")
-        self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
-        deserialized_count = 0
-        sut = sc.List[Tuple[int, int]](connection=memory_db, table_name="items", deserializer=deserialize_with_counter)
-        sut.sort(key=lambda x: x[1], reverse=True)
-        self.assert_db_state_equals(
-            memory_db,
-            self._generate_sort_expected(
-                [(1, 3), (2, 2), (7, 2), (5, 1), (8, 1), (4, 1), (9, 0), (3, 0), (0, 0), (6, 0)]
-            ),
-        )
-        self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
+            memory_db = sqlite3.connect(":memory:")
+            self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
+            deserialized_count = 0
+            sut = sc.List[Tuple[int, int]](
+                connection=memory_db,
+                table_name="items",
+                deserializer=deserialize_with_counter,
+                sorting_strategy=s,
+            )
+            sut.sort(key=lambda x: x[1], reverse=True)
+            self.assert_db_state_equals(
+                memory_db,
+                self._generate_sort_expected(
+                    [(1, 3), (2, 2), (7, 2), (5, 1), (8, 1), (4, 1), (9, 0), (3, 0), (0, 0), (6, 0)]
+                ),
+            )
+            self.assertLessEqual(deserialized_count, math.log2(len(sut)) * len(sut))
 
     @patch("sqlitecollections.list.List._sort_indices")
     def test_sort_balanced_calls_sort_indices(self, _sort_indices: MagicMock) -> None:
