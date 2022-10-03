@@ -1107,6 +1107,18 @@ class ListTestCase(SqlTestCase):
         sut.sort()
         _sort_indices.assert_called()
 
+    @patch("sqlitecollections.list.List._sort_cached_keys")
+    def test_sort_fastest_calls_sort_cached_keys(self, _sort_cached_keys: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
+        sut = sc.List[Tuple[int, int]](
+            connection=memory_db,
+            table_name="items",
+            sorting_strategy=SortingStrategy.fastest,
+        )
+        sut.sort()
+        _sort_cached_keys.assert_called()
+
     def test_pickle_with_whole_table_strategy(self) -> None:
 
         wd = os.path.dirname(os.path.abspath(__file__))

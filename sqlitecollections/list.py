@@ -537,14 +537,22 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
 
     def sort(self, reverse: bool = False, key: Optional[Callable[[T], Any]] = None) -> None:
         key_ = (lambda x: x) if key is None else key
-        # self.__sort_sub(reverse, key_, 0, len(self))
-        self._sort_indices(reverse=reverse, key=key_)
+        if self.sorting_strategy == SortingStrategy.fastest:
+            self._sort_cached_keys(reverse=reverse, key=key_)
+        else:
+            # self.__sort_sub(reverse, key_, 0, len(self))
+            self._sort_indices(reverse=reverse, key=key_)
         self.connection.commit()
 
     def _sort_indices(self, reverse: bool, key: Callable[[T], Any]) -> None:
         indices = list(range(len(self)))
         indices.sort(key=lambda i: key(self[i]), reverse=reverse)  # type: ignore
         self._driver_class.remap_index(self.table_name, self.connection.cursor(), indices)
+
+    def _sort_cached_keys(self, reverse: bool, key: Callable[[T], Any]) -> None:
+        key_cache = [(key(v), i) for i, v in enumerate(self)]
+        key_cache.sort(key=lambda t: t[0], reverse=reverse)  # type: ignore
+        self._driver_class.remap_index(self.table_name, self.connection.cursor(), [t[1] for t in key_cache])
 
     def __sort_sub(self, reverse: bool, key: Callable[[T], Any], idx0: int, idx1: int) -> None:
         sz = idx1 - idx0
