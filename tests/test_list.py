@@ -1119,6 +1119,18 @@ class ListTestCase(SqlTestCase):
         sut.sort()
         _sort_cached_keys.assert_called()
 
+    @patch("sqlitecollections.list.List._merge_sort")
+    def test_sort_memory_saving_calls_merge_sort(self, _merge_sort: MagicMock) -> None:
+        memory_db = sqlite3.connect(":memory:")
+        self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
+        sut = sc.List[Tuple[int, int]](
+            connection=memory_db,
+            table_name="items",
+            sorting_strategy=SortingStrategy.memory_saving,
+        )
+        sut.sort()
+        _merge_sort.assert_called()
+
     def test_pickle_with_whole_table_strategy(self) -> None:
 
         wd = os.path.dirname(os.path.abspath(__file__))

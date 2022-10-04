@@ -539,8 +539,9 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         key_ = (lambda x: x) if key is None else key
         if self.sorting_strategy == SortingStrategy.fastest:
             self._sort_cached_keys(reverse=reverse, key=key_)
+        elif self.sorting_strategy == SortingStrategy.memory_saving:
+            self._merge_sort(reverse, key_, 0, len(self))
         else:
-            # self.__sort_sub(reverse, key_, 0, len(self))
             self._sort_indices(reverse=reverse, key=key_)
         self.connection.commit()
 
@@ -554,7 +555,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         key_cache.sort(key=lambda t: t[0], reverse=reverse)  # type: ignore
         self._driver_class.remap_index(self.table_name, self.connection.cursor(), [t[1] for t in key_cache])
 
-    def __sort_sub(self, reverse: bool, key: Callable[[T], Any], idx0: int, idx1: int) -> None:
+    def _merge_sort(self, reverse: bool, key: Callable[[T], Any], idx0: int, idx1: int) -> None:
         sz = idx1 - idx0
         if sz <= 3:
             if sz == 3:
@@ -564,8 +565,8 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         else:
             cur = self.connection.cursor()
             mid = idx0 + math.ceil(sz / 2)
-            self.__sort_sub(reverse, key, idx0, mid)
-            self.__sort_sub(reverse, key, mid, idx1)
+            self._merge_sort(reverse, key, idx0, mid)
+            self._merge_sort(reverse, key, mid, idx1)
             l = len(self)
             self._driver_class.increase_indices_in_range(self.table_name, cur, idx0, mid, l)
             p = idx0
