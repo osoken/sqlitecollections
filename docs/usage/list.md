@@ -400,4 +400,14 @@ Sort the items of the list in place. The value of `reverse` can be either `True`
 
 `None`.
 
+---
+
+## `sorting_strategy`
+
+Read-only property for the sorting strategy.
+
+### Return value:
+
+`SortingStrategy`: The sorting strategy.
+
 # SortingStrategy
