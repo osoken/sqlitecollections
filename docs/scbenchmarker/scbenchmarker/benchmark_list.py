@@ -485,3 +485,7 @@ class SqliteCollectionsListBenchmarkCreateWithInitialData(
 ):
     def exec(self) -> Any:
         return sc.List[target_list_element_t](iter(target_list))
+
+
+class SqliteCollectionsListBenchmarkSortWithFastestStrategy:
+    ...
