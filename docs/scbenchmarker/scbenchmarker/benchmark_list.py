@@ -475,6 +475,12 @@ class BenchmarkSortBase(BenchmarkBase[target_list_t]):
         return all((a < b for a, b in zip(result, result[1:])))
 
 
+class BenchmarkSortFastestBase(BenchmarkSortBase):
+    @property
+    def subject(self) -> str:
+        return "`sort (fastest)`"
+
+
 class BuiltinListBenchmarkCreateWithInitialData(BuiltinListBenchmarkBase, BenchmarkCreateWithInitialDataBase):
     def exec(self) -> Any:
         return list(iter(target_list))
@@ -487,5 +493,17 @@ class SqliteCollectionsListBenchmarkCreateWithInitialData(
         return sc.List[target_list_element_t](iter(target_list))
 
 
-class SqliteCollectionsListBenchmarkSortWithFastestStrategy:
+class SqliteCollectionsListBenchmarkSortWithFastestStrategy(
+    SqliteCollectionsListBenchmarkBase, BenchmarkSortFastestBase
+):
+    def setup(self) -> None:
+        gc.collect()
+        gc.collect()
+        self._sut = self._sut_orig.copy()
+        self._sut._sorting_strategy = sc.SortingStrategy.fastest
+        gc.collect()
+        gc.collect()
+
+
+class BuiltinListBenchmarkSortWithFastestStrategy(BuiltinListBenchmarkBase, BenchmarkSortFastestBase):
     ...
