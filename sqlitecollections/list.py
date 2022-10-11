@@ -88,7 +88,7 @@ def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]) -> Iterable[Tuple[An
 
 class SortingStrategy(str, Enum):
     fastest = "fastest"
-    balance = "balance"
+    balanced = "balanced"
     memory_saving = "memory_saving"
 
 
@@ -289,7 +289,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
         pickling_strategy: PicklingStrategy = PicklingStrategy.whole_table,
-        sorting_strategy: SortingStrategy = SortingStrategy.balance,
+        sorting_strategy: SortingStrategy = SortingStrategy.balanced,
     ) -> None:
         if (
             isinstance(__data, self.__class__)
@@ -324,7 +324,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
     def sorting_strategy(self) -> SortingStrategy:
         if hasattr(self, "_sorting_strategy"):
             return self._sorting_strategy
-        return SortingStrategy.balance
+        return SortingStrategy.balanced
 
     def __delitem__(self, i: Union[int, slice]) -> None:
         cur = self.connection.cursor()

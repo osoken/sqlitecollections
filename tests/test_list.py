@@ -127,7 +127,7 @@ class ListTestCase(SqlTestCase):
         sut = sc.List[str](connection=memory_db, table_name="items", sorting_strategy=SortingStrategy.fastest)
         self.assertEqual(sut.sorting_strategy, SortingStrategy.fastest)
         del sut._sorting_strategy
-        self.assertEqual(sut.sorting_strategy, SortingStrategy.balance)
+        self.assertEqual(sut.sorting_strategy, SortingStrategy.balanced)
 
     def test_getitem_slice(self) -> None:
 
@@ -1016,7 +1016,7 @@ class ListTestCase(SqlTestCase):
         return [(sc.base.SqliteCollectionBase._default_serializer(d), i) for i, d in enumerate(l)]
 
     def test_sort(self) -> None:
-        for s in (SortingStrategy.balance, SortingStrategy.fastest, SortingStrategy.memory_saving):
+        for s in (SortingStrategy.balanced, SortingStrategy.fastest, SortingStrategy.memory_saving):
             memory_db = sqlite3.connect(":memory:")
             self.get_fixture(memory_db, "list/base.sql", "list/sort.sql")
             deserialized_count = 0
@@ -1102,7 +1102,7 @@ class ListTestCase(SqlTestCase):
         sut = sc.List[Tuple[int, int]](
             connection=memory_db,
             table_name="items",
-            sorting_strategy=SortingStrategy.balance,
+            sorting_strategy=SortingStrategy.balanced,
         )
         sut.sort()
         _sort_indices.assert_called()
