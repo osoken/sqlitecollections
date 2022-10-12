@@ -82,8 +82,8 @@ class BenchmarkBase(Generic[T], metaclass=ABCMeta):
         for i in range(self._number):
             gc.collect()
             gc.collect()
-            self.setup()
             memory_after_setup = self._get_current_memory()
+            self.setup()
 
             t1 = time.time()
             memory_during_exec, result = memory_usage(

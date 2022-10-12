@@ -481,6 +481,12 @@ class BenchmarkSortFastestBase(BenchmarkSortBase):
         return "`sort (fastest)`"
 
 
+class BenchmarkSortBalancedBase(BenchmarkSortBase):
+    @property
+    def subject(self) -> str:
+        return "`sort (balanced)`"
+
+
 class BuiltinListBenchmarkCreateWithInitialData(BuiltinListBenchmarkBase, BenchmarkCreateWithInitialDataBase):
     def exec(self) -> Any:
         return list(iter(target_list))
@@ -493,9 +499,7 @@ class SqliteCollectionsListBenchmarkCreateWithInitialData(
         return sc.List[target_list_element_t](iter(target_list))
 
 
-class SqliteCollectionsListBenchmarkSortWithFastestStrategy(
-    SqliteCollectionsListBenchmarkBase, BenchmarkSortFastestBase
-):
+class SqliteCollectionsListBenchmarkSortFastest(SqliteCollectionsListBenchmarkBase, BenchmarkSortFastestBase):
     def setup(self) -> None:
         gc.collect()
         gc.collect()
@@ -505,5 +509,19 @@ class SqliteCollectionsListBenchmarkSortWithFastestStrategy(
         gc.collect()
 
 
-class BuiltinListBenchmarkSortWithFastestStrategy(BuiltinListBenchmarkBase, BenchmarkSortFastestBase):
+class BuiltinListBenchmarkSortFastest(BuiltinListBenchmarkBase, BenchmarkSortFastestBase):
+    ...
+
+
+class SqliteCollectionsListBenchmarkSortBalanced(SqliteCollectionsListBenchmarkBase, BenchmarkSortBalancedBase):
+    def setup(self) -> None:
+        gc.collect()
+        gc.collect()
+        self._sut = self._sut_orig.copy()
+        self._sut._sorting_strategy = sc.SortingStrategy.balanced
+        gc.collect()
+        gc.collect()
+
+
+class BuiltinListBenchmarkSortBalanced(BuiltinListBenchmarkBase, BenchmarkSortBalancedBase):
     ...
