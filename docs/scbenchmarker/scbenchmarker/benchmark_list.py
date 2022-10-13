@@ -460,10 +460,10 @@ class BenchmarkRemoveBase(BenchmarkBase[target_list_t]):
         return result[idx] == target_list[idx + 1]
 
 
-class BenchmarkSortBase(BenchmarkBase[target_list_t]):
+class BenchmarkSortBalancedBase(BenchmarkBase[target_list_t]):
     @property
     def subject(self) -> str:
-        return "`sort`"
+        return "`sort` (balanced)"
 
     def exec(self) -> target_list_t:
         self._sut.sort()
@@ -475,16 +475,16 @@ class BenchmarkSortBase(BenchmarkBase[target_list_t]):
         return all((a < b for a, b in zip(result, result[1:])))
 
 
-class BenchmarkSortFastestBase(BenchmarkSortBase):
+class BenchmarkSortFastestBase(BenchmarkSortBalancedBase):
     @property
     def subject(self) -> str:
-        return "`sort (fastest)`"
+        return "`sort` (fastest)"
 
 
-class BenchmarkSortBalancedBase(BenchmarkSortBase):
+class BenchmarkSortMemorySavingBase(BenchmarkSortBalancedBase):
     @property
     def subject(self) -> str:
-        return "`sort (balanced)`"
+        return "`sort` (memory_saving)"
 
 
 class BuiltinListBenchmarkCreateWithInitialData(BuiltinListBenchmarkBase, BenchmarkCreateWithInitialDataBase):
@@ -524,4 +524,18 @@ class SqliteCollectionsListBenchmarkSortBalanced(SqliteCollectionsListBenchmarkB
 
 
 class BuiltinListBenchmarkSortBalanced(BuiltinListBenchmarkBase, BenchmarkSortBalancedBase):
+    ...
+
+
+class SqliteCollectionsListBenchmarkSortMemorySaving(SqliteCollectionsListBenchmarkBase, BenchmarkSortMemorySavingBase):
+    def setup(self) -> None:
+        gc.collect()
+        gc.collect()
+        self._sut = self._sut_orig.copy()
+        self._sut._sorting_strategy = sc.SortingStrategy.memory_saving
+        gc.collect()
+        gc.collect()
+
+
+class BuiltinListBenchmarkSortMemorySaving(BuiltinListBenchmarkBase, BenchmarkSortMemorySavingBase):
     ...
