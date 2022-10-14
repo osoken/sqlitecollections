@@ -3,6 +3,7 @@ import os
 import sqlite3
 import sys
 import warnings
+from enum import Enum
 from itertools import count, repeat
 from typing import Any, Optional, Tuple, Union, cast, overload
 
@@ -83,6 +84,12 @@ def _strict_zip(iter1: Iterable[Any], iter2: Iterable[Any]) -> Iterable[Tuple[An
             iter1_unused_count = sum(d[0] for d in zip(repeat(1), iter1)) + int(iter1_is_active)
             iter2_unused_count = sum(d[0] for d in zip(repeat(1), iter2)) + int(iter2_is_active)
             raise DifferentLengthDetected(element_count + iter1_unused_count, element_count + iter2_unused_count)
+
+
+class SortingStrategy(str, Enum):
+    fastest = "fastest"
+    balanced = "balanced"
+    memory_saving = "memory_saving"
 
 
 class _ListDatabaseDriver(_SqliteCollectionBaseDatabaseDriver):
@@ -282,6 +289,7 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         deserializer: Optional[Callable[[bytes], T]] = None,
         persist: bool = True,
         pickling_strategy: PicklingStrategy = PicklingStrategy.whole_table,
+        sorting_strategy: SortingStrategy = SortingStrategy.balanced,
     ) -> None:
         if (
             isinstance(__data, self.__class__)
@@ -310,6 +318,13 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
             if __data is not None:
                 self.clear()
                 self.extend(__data)
+        self._sorting_strategy = sorting_strategy
+
+    @property
+    def sorting_strategy(self) -> SortingStrategy:
+        if hasattr(self, "_sorting_strategy"):
+            return self._sorting_strategy
+        return SortingStrategy.balanced
 
     def __delitem__(self, i: Union[int, slice]) -> None:
         cur = self.connection.cursor()
@@ -522,16 +537,25 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
 
     def sort(self, reverse: bool = False, key: Optional[Callable[[T], Any]] = None) -> None:
         key_ = (lambda x: x) if key is None else key
-        # self.__sort_sub(reverse, key_, 0, len(self))
-        self.__sort_indices(reverse=reverse, key=key_)
+        if self.sorting_strategy == SortingStrategy.fastest:
+            self._sort_cached_keys(reverse=reverse, key=key_)
+        elif self.sorting_strategy == SortingStrategy.memory_saving:
+            self._merge_sort(reverse, key_, 0, len(self))
+        else:
+            self._sort_indices(reverse=reverse, key=key_)
         self.connection.commit()
 
-    def __sort_indices(self, reverse: bool, key: Callable[[T], Any]) -> None:
+    def _sort_indices(self, reverse: bool, key: Callable[[T], Any]) -> None:
         indices = list(range(len(self)))
         indices.sort(key=lambda i: key(self[i]), reverse=reverse)  # type: ignore
         self._driver_class.remap_index(self.table_name, self.connection.cursor(), indices)
 
-    def __sort_sub(self, reverse: bool, key: Callable[[T], Any], idx0: int, idx1: int) -> None:
+    def _sort_cached_keys(self, reverse: bool, key: Callable[[T], Any]) -> None:
+        key_cache = [(key(v), i) for i, v in enumerate(self)]
+        key_cache.sort(key=lambda t: t[0], reverse=reverse)  # type: ignore
+        self._driver_class.remap_index(self.table_name, self.connection.cursor(), [t[1] for t in key_cache])
+
+    def _merge_sort(self, reverse: bool, key: Callable[[T], Any], idx0: int, idx1: int) -> None:
         sz = idx1 - idx0
         if sz <= 3:
             if sz == 3:
@@ -541,8 +565,8 @@ class List(SqliteCollectionBase[T], MutableSequence[T]):
         else:
             cur = self.connection.cursor()
             mid = idx0 + math.ceil(sz / 2)
-            self.__sort_sub(reverse, key, idx0, mid)
-            self.__sort_sub(reverse, key, mid, idx1)
+            self._merge_sort(reverse, key, idx0, mid)
+            self._merge_sort(reverse, key, mid, idx1)
             l = len(self)
             self._driver_class.increase_indices_in_range(self.table_name, cur, idx0, mid, l)
             p = idx0

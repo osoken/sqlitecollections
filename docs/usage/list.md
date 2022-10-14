@@ -19,6 +19,7 @@ Constructor.
 - `deserializer`: `Callable[[bytes], T]`, optional, default=`None`; Function to deserialize value. If `None`, `pickle.loads` is used.
 - `persist`: `bool`, optional, default=`True`; If `True`, table won't be deleted even when the object is deleted. If `False`, the table is deleted when this object is deleted.
 - `pickling_strategy`: `PicklingStrategy`, optional, default=`PicklingStrategy.whole_table`; Flag to control pickling method. See [`PicklingStrategy`](common.md#picklingstrategy) for more details.
+- `sorting_strategy`: `SortingStrategy`, optional, defualt=`SortingStrategy.balanced`; Flat to control sorting method. See [`SortingStrategy`](#sortingstrategy) for more details.
 
 ---
 
@@ -398,3 +399,34 @@ Sort the items of the list in place. The value of `reverse` can be either `True`
 ### Return value:
 
 `None`.
+
+---
+
+## `sorting_strategy`
+
+Read-only property for the sorting strategy.
+
+### Return value:
+
+`SortingStrategy`: The sorting strategy.
+
+# SortingStrategy
+
+`Enum` to control the time-memory tradeoffs of the sorting method.
+
+## `SortingStrategy.fastest`
+
+The fastest but most memory-consuming way.
+This method dumps all tuples of sort keys (the return value of the `key` function) and indices into an on-memory list and sorts it then reorders the records with `UPDATE` statements.
+If you are sure that you have sufficient memory to hold all the sort keys (and indices), this method is the best.
+
+## `SortingStrategy.balanced`
+
+The default strategy.
+This method dumps only the indices into an on-memory list and doesn't cache all the sort keys in contrast with the `fastest` strategy.
+If you have a little memory to hold an array of indexes and the cost of computing sort keys is very low, this strategy works well.
+
+## `SortingStrategy.memory_saving`
+
+This method never caches anything during sorting.
+This method is very slow due to the frequent use of `UPDATE` statements and should only be used when memory is very limited.

@@ -8,7 +8,7 @@ __package_name__ = "sqlitecollections"
 from .base import PicklingStrategy
 from .dict import Dict
 from .factory import DictFactory, ListFactory, SetFactory
-from .list import List
+from .list import List, SortingStrategy
 from .set import Set
 
-__all__ = ["Dict", "List", "Set", "ListFactory", "DictFactory", "SetFactory", "PicklingStrategy"]
+__all__ = ["Dict", "List", "Set", "ListFactory", "DictFactory", "SetFactory", "PicklingStrategy", "SortingStrategy"]
