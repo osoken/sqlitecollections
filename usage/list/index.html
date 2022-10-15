@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.5.2">
+      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.6">
     
     
       
@@ -19,7 +19,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.9f9400aa.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.20d9efc8.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.cbb835fc.min.css">
@@ -1066,6 +1066,26 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#sorting_strategy" class="md-nav__link">
+    sorting_strategy
+  </a>
+  
+    <nav class="md-nav" aria-label="sorting_strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#return-value_27" class="md-nav__link">
+    Return value:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1996,6 +2016,26 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#sorting_strategy" class="md-nav__link">
+    sorting_strategy
+  </a>
+  
+    <nav class="md-nav" aria-label="sorting_strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#return-value_27" class="md-nav__link">
+    Return value:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2033,6 +2073,7 @@
 <li><code>deserializer</code>: <code>Callable[[bytes], T]</code>, optional, default=<code>None</code>; Function to deserialize value. If <code>None</code>, <code>pickle.loads</code> is used.</li>
 <li><code>persist</code>: <code>bool</code>, optional, default=<code>True</code>; If <code>True</code>, table won't be deleted even when the object is deleted. If <code>False</code>, the table is deleted when this object is deleted.</li>
 <li><code>pickling_strategy</code>: <code>PicklingStrategy</code>, optional, default=<code>PicklingStrategy.whole_table</code>; Flag to control pickling method. See <a href="../common/#picklingstrategy"><code>PicklingStrategy</code></a> for more details.</li>
+<li><code>sorting_strategy</code>: <code>SortingStrategy</code>, optional, defualt=<code>SortingStrategy.balanced</code>; Flat to control sorting method. See <a href="#sortingstrategy"><code>SortingStrategy</code></a> for more details.</li>
 </ul>
 <hr />
 <h2 id="x-in-s"><code>x in s</code></h2>
@@ -2278,6 +2319,24 @@ Raise <code>ValueError</code> if <code>x</code> is not in the list.</p>
 </ul>
 <h3 id="return-value_26">Return value:</h3>
 <p><code>None</code>.</p>
+<hr />
+<h2 id="sorting_strategy"><code>sorting_strategy</code></h2>
+<p>Read-only property for the sorting strategy.</p>
+<h3 id="return-value_27">Return value:</h3>
+<p><code>SortingStrategy</code>: The sorting strategy.</p>
+<h1 id="sortingstrategy">SortingStrategy</h1>
+<p><code>Enum</code> to control the time-memory tradeoffs of the sorting method.</p>
+<h2 id="sortingstrategyfastest"><code>SortingStrategy.fastest</code></h2>
+<p>The fastest but most memory-consuming way.
+This method dumps all tuples of sort keys (the return value of the <code>key</code> function) and indices into an on-memory list and sorts it then reorders the records with <code>UPDATE</code> statements.
+If you are sure that you have sufficient memory to hold all the sort keys (and indices), this method is the best.</p>
+<h2 id="sortingstrategybalanced"><code>SortingStrategy.balanced</code></h2>
+<p>The default strategy.
+This method dumps only the indices into an on-memory list and doesn't cache all the sort keys in contrast with the <code>fastest</code> strategy.
+If you have a little memory to hold an array of indexes and the cost of computing sort keys is very low, this strategy works well.</p>
+<h2 id="sortingstrategymemory_saving"><code>SortingStrategy.memory_saving</code></h2>
+<p>This method never caches anything during sorting.
+This method is very slow due to the frequent use of <code>UPDATE</code> statements and should only be used when memory is very limited.</p>
 
 
 
@@ -2351,10 +2410,10 @@ Raise <code>ValueError</code> if <code>x</code> is not in the list.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.39f04ddb.min.js"></script>
+      <script src="../../assets/javascripts/bundle.078830c0.min.js"></script>
       
     
   </body>

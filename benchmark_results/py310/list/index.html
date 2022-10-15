@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.5.2">
+      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.6">
     
     
       
@@ -19,7 +19,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.9f9400aa.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.20d9efc8.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.cbb835fc.min.css">
@@ -515,34 +515,36 @@
 
     | subject | `builtin` | `sqlitecollections` | ratio | class |
     | :------ | --------: | ------------------: | ----: | :---- |
-    | `__add__` | 0.00421 | 0.01306 | 3.10472 | `BenchmarkAdd` |
-    | `append` | 0.00429 | 0.0075 | 1.7497 | `BenchmarkAppend` |
-    | `clear` | 0.00417 | 0.00767 | 1.83904 | `BenchmarkClear` |
-    | `__contains__` | 0.00418 | 0.00425 | 1.0168 | `BenchmarkContains` |
-    | `copy` | 0.00422 | 0.01036 | 2.45516 | `BenchmarkCopy` |
-    | `count` | 0.00425 | 0.00439 | 1.03382 | `BenchmarkCount` |
-    | `__init__` | 0.00424 | 0.02327 | 5.48743 | `BenchmarkCreateWithInitialData` |
-    | `__delitem__` | 0.0043 | 0.0852 | 19.83389 | `BenchmarkDelitem` |
-    | `__delitem__` (slice) | 0.00428 | 0.16214 | 37.84187 | `BenchmarkDelitemSlice` |
-    | `__delitem__` (slice with skip) | 0.0043 | 0.16089 | 37.43782 | `BenchmarkDelitemSliceSkip` |
-    | `extend` | 0.00432 | 0.00793 | 1.83429 | `BenchmarkExtend` |
-    | `__getitem__` | 0.0043 | 0.0043 | 1.00039 | `BenchmarkGetitem` |
-    | `__getitem__` (slice) | 0.00423 | 0.09304 | 21.98622 | `BenchmarkGetitemSlice` |
-    | `__getitem__` (slice with skip) | 0.0042 | 0.01423 | 3.38923 | `BenchmarkGetitemSliceSkip` |
-    | `__iadd__` | 0.00426 | 0.00796 | 1.86822 | `BenchmarkIadd` |
-    | `__imult__` | 0.00429 | 0.24154 | 56.36278 | `BenchmarkImult` |
-    | `index` | 0.00425 | 0.00462 | 1.08799 | `BenchmarkIndex` |
-    | `index` (unsuccessful search) | 0.00435 | 0.00466 | 1.07202 | `BenchmarkIndexUnsuccessfulSearch` |
-    | `insert` | 0.00431 | 0.15912 | 36.90435 | `BenchmarkInsert` |
-    | `__len__` | 0.00421 | 0.00429 | 1.01892 | `BenchmarkLen` |
-    | `__mult__` | 0.00434 | 0.24204 | 55.71163 | `BenchmarkMult` |
-    | `__contains__` (unsuccessful search) | 0.00431 | 0.00436 | 1.0116 | `BenchmarkNotContains` |
-    | `pop` | 0.00433 | 0.08543 | 19.7167 | `BenchmarkPop` |
-    | `remove` | 0.0043 | 0.11913 | 27.71256 | `BenchmarkRemove` |
-    | `__setitem__` | 0.00436 | 0.00778 | 1.78739 | `BenchmarkSetitem` |
-    | `__setitem__` (slice) | 0.00426 | 0.16503 | 38.70222 | `BenchmarkSetitemSlice` |
-    | `__setitem__` (slice with skip) | 0.00429 | 0.01683 | 3.92496 | `BenchmarkSetitemSliceSkip` |
-    | `sort` | 0.00426 | 0.08959 | 21.01083 | `BenchmarkSort` |
+    | `__add__` | 0.00511 | 0.01221 | 2.38705 | `BenchmarkAdd` |
+    | `append` | 0.00521 | 0.00832 | 1.59789 | `BenchmarkAppend` |
+    | `clear` | 0.0052 | 0.00852 | 1.63876 | `BenchmarkClear` |
+    | `__contains__` | 0.00517 | 0.00511 | 0.98786 | `BenchmarkContains` |
+    | `copy` | 0.00524 | 0.01175 | 2.24096 | `BenchmarkCopy` |
+    | `count` | 0.00527 | 0.00505 | 0.95821 | `BenchmarkCount` |
+    | `__init__` | 0.00539 | 0.02147 | 3.98655 | `BenchmarkCreateWithInitialData` |
+    | `__delitem__` | 0.00545 | 0.0842 | 15.43589 | `BenchmarkDelitem` |
+    | `__delitem__` (slice) | 0.0053 | 0.15852 | 29.92407 | `BenchmarkDelitemSlice` |
+    | `__delitem__` (slice with skip) | 0.00526 | 0.16221 | 30.8519 | `BenchmarkDelitemSliceSkip` |
+    | `extend` | 0.0053 | 0.00874 | 1.64825 | `BenchmarkExtend` |
+    | `__getitem__` | 0.00539 | 0.00514 | 0.95462 | `BenchmarkGetitem` |
+    | `__getitem__` (slice) | 0.0054 | 0.09562 | 17.71155 | `BenchmarkGetitemSlice` |
+    | `__getitem__` (slice with skip) | 0.00535 | 0.01951 | 3.64366 | `BenchmarkGetitemSliceSkip` |
+    | `__iadd__` | 0.00553 | 0.00805 | 1.45633 | `BenchmarkIadd` |
+    | `__imult__` | 0.00538 | 0.24447 | 45.41683 | `BenchmarkImult` |
+    | `index` | 0.00543 | 0.00537 | 0.98854 | `BenchmarkIndex` |
+    | `index` (unsuccessful search) | 0.00524 | 0.00534 | 1.01886 | `BenchmarkIndexUnsuccessfulSearch` |
+    | `insert` | 0.0054 | 0.15788 | 29.23786 | `BenchmarkInsert` |
+    | `__len__` | 0.00541 | 0.00525 | 0.97129 | `BenchmarkLen` |
+    | `__mult__` | 0.00552 | 0.24363 | 44.14093 | `BenchmarkMult` |
+    | `__contains__` (unsuccessful search) | 0.00548 | 0.00515 | 0.94052 | `BenchmarkNotContains` |
+    | `pop` | 0.00542 | 0.0845 | 15.60237 | `BenchmarkPop` |
+    | `remove` | 0.0053 | 0.11804 | 22.2783 | `BenchmarkRemove` |
+    | `__setitem__` | 0.00548 | 0.0087 | 1.58804 | `BenchmarkSetitem` |
+    | `__setitem__` (slice) | 0.00547 | 0.16226 | 29.67931 | `BenchmarkSetitemSlice` |
+    | `__setitem__` (slice with skip) | 0.00545 | 0.01756 | 3.21838 | `BenchmarkSetitemSliceSkip` |
+    | `sort` (balanced) | 0.00543 | 0.33967 | 62.57391 | `BenchmarkSortBalanced` |
+    | `sort` (fastest) | 0.00535 | 0.33961 | 63.48299 | `BenchmarkSortFastest` |
+    | `sort` (memory_saving) | 0.00532 | 3.45905 | 650.05335 | `BenchmarkSortMemorySaving` |
 
 
     approximate memory usage
@@ -556,27 +558,29 @@
     | `copy` | 0.0 | 0.0 | 1.0 | `BenchmarkCopy` |
     | `count` | 0.0 | 0.0 | 1.0 | `BenchmarkCount` |
     | `__init__` | 0.0 | 0.0 | 1.0 | `BenchmarkCreateWithInitialData` |
-    | `__delitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkDelitem` |
+    | `__delitem__` | 0.0 | 0.00391 | inf | `BenchmarkDelitem` |
     | `__delitem__` (slice) | 0.0 | 0.0 | 1.0 | `BenchmarkDelitemSlice` |
     | `__delitem__` (slice with skip) | 0.0 | 0.0 | 1.0 | `BenchmarkDelitemSliceSkip` |
     | `extend` | 0.0 | 0.0 | 1.0 | `BenchmarkExtend` |
     | `__getitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkGetitem` |
-    | `__getitem__` (slice) | 0.0 | 0.0 | 1.0 | `BenchmarkGetitemSlice` |
+    | `__getitem__` (slice) | 0.0 | 0.00391 | inf | `BenchmarkGetitemSlice` |
     | `__getitem__` (slice with skip) | 0.0 | 0.0 | 1.0 | `BenchmarkGetitemSliceSkip` |
     | `__iadd__` | 0.0 | 0.0 | 1.0 | `BenchmarkIadd` |
     | `__imult__` | 0.0 | 0.0 | 1.0 | `BenchmarkImult` |
     | `index` | 0.0 | 0.0 | 1.0 | `BenchmarkIndex` |
     | `index` (unsuccessful search) | 0.0 | 0.0 | 1.0 | `BenchmarkIndexUnsuccessfulSearch` |
-    | `insert` | 0.0 | 0.0 | 1.0 | `BenchmarkInsert` |
+    | `insert` | 0.0 | 0.00391 | inf | `BenchmarkInsert` |
     | `__len__` | 0.0 | 0.0 | 1.0 | `BenchmarkLen` |
     | `__mult__` | 0.0 | 0.0 | 1.0 | `BenchmarkMult` |
     | `__contains__` (unsuccessful search) | 0.0 | 0.0 | 1.0 | `BenchmarkNotContains` |
-    | `pop` | 0.0 | 0.0 | 1.0 | `BenchmarkPop` |
+    | `pop` | 0.0 | 0.00391 | inf | `BenchmarkPop` |
     | `remove` | 0.0 | 0.0 | 1.0 | `BenchmarkRemove` |
     | `__setitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkSetitem` |
-    | `__setitem__` (slice) | 0.0 | 0.0 | 1.0 | `BenchmarkSetitemSlice` |
+    | `__setitem__` (slice) | 0.0 | 0.00391 | inf | `BenchmarkSetitemSlice` |
     | `__setitem__` (slice with skip) | 0.0 | 0.0 | 1.0 | `BenchmarkSetitemSliceSkip` |
-    | `sort` | 0.0 | 0.65625 | inf | `BenchmarkSort` |
+    | `sort` (balanced) | 0.0 | 0.14844 | inf | `BenchmarkSortBalanced` |
+    | `sort` (fastest) | 0.0 | 0.12891 | inf | `BenchmarkSortFastest` |
+    | `sort` (memory_saving) | 0.0 | 0.0 | 1.0 | `BenchmarkSortMemorySaving` |
 </code></pre></div>
 
 
@@ -615,10 +619,10 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.39f04ddb.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.078830c0.min.js"></script>
       
     
   </body>
