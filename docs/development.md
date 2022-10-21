@@ -2,7 +2,7 @@
 
 ## Tests, type checking and linting locally
 
-To run tests, type checking and linting locally, you'll need to have **python 3.6**, **3.7**, **3.8**, **3.9** and **3.10** installed.
+To run tests, type checking and linting locally, you'll need to have **python 3.6**, **3.7**, **3.8**, **3.9**, **3.10** and **3.11** installed.
 We use `tox` to run tests and type checking on all the supported python versions.
 You can set up the development environment with the following commands:
 
@@ -30,6 +30,7 @@ __________________ summary __________________
   py38: commands succeeded
   py39: commands succeeded
   py310: commands succeeded
+  py311: commands succeeded
   congratulations :)
 ```
 
