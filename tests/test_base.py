@@ -129,11 +129,14 @@ class MetadataItemTestCase(TestCase):
         self.assertEqual(sut.table_name, table_name)
         self.assertEqual(sut.container_type, container_type)
         self.assertEqual(sut.schema_version, schema_version)
-        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+        expected_regex = "can't set attribute"
+        if sys.version_info > (3, 11):
+            expected_regex = "property '[a-z_]+' of 'MetadataItem' object has no setter"
+        with self.assertRaisesRegex(AttributeError, expected_regex):
             sut.table_name = "new_table_name"  # type: ignore
-        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+        with self.assertRaisesRegex(AttributeError, expected_regex):
             sut.container_type = "AnotherContainer"  # type: ignore
-        with self.assertRaisesRegex(AttributeError, "can't set attribute"):
+        with self.assertRaisesRegex(AttributeError, expected_regex):
             sut.schema_version = "0.1.1"  # type: ignore
 
     def test_metadata_item_is_hashable(self) -> None:

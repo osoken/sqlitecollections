@@ -544,7 +544,7 @@ class MappingView(Sized):
     if sys.version_info > (3, 10):
 
         @property
-        def mapping(self) -> MappingProxyType:
+        def mapping(self) -> MappingProxyType[Any, Any]:
             return MappingProxyType(self._mapping)
 
 
