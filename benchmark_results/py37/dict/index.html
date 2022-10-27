@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.6">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
     
     
       
@@ -515,58 +515,58 @@
 
     | subject | `builtin` | `sqlitecollections` | ratio | class |
     | :------ | --------: | ------------------: | ----: | :---- |
-    | `clear` | 0.00367 | 0.00691 | 1.87955 | `BenchmarkClear` |
-    | `__contains__` | 0.00369 | 0.00383 | 1.03797 | `BenchmarkContains` |
-    | `copy` | 0.0038 | 0.00921 | 2.4212 | `BenchmarkCopy` |
-    | `__delitem__` | 0.00364 | 0.00601 | 1.65226 | `BenchmarkDelitem` |
-    | `get` | 0.00352 | 0.00378 | 1.07159 | `BenchmarkGet` |
-    | `get (unsuccessful search)` | 0.00356 | 0.00382 | 1.07377 | `BenchmarkGetDefault` |
-    | `__getitem__` | 0.00365 | 0.00383 | 1.0498 | `BenchmarkGetitem` |
-    | `__init__` | 0.00389 | 0.04382 | 11.26927 | `BenchmarkInit` |
-    | `items` | 0.00398 | 0.01224 | 3.07247 | `BenchmarkItems` |
-    | `__iter__` | 0.00366 | 0.00824 | 2.25197 | `BenchmarkIter` |
-    | `keys` | 0.00375 | 0.00837 | 2.23448 | `BenchmarkKeys` |
-    | `__len__` | 0.00387 | 0.00382 | 0.98733 | `BenchmarkLen` |
-    | `__contains__` (unsuccessful search) | 0.00371 | 0.00386 | 1.04157 | `BenchmarkNotContains` |
-    | `pop` | 0.00392 | 0.00698 | 1.77823 | `BenchmarkPop` |
-    | `pop (unsuccessful search)` | 0.00395 | 0.00565 | 1.42935 | `BenchmarkPopDefault` |
-    | `popitem` | 0.00397 | 0.00736 | 1.85462 | `BenchmarkPopitem` |
-    | `setdefault` | 0.00387 | 0.00547 | 1.41434 | `BenchmarkSetdefault` |
-    | `setdefault (unsuccessful search)` | 0.00382 | 0.00593 | 1.5511 | `BenchmarkSetdefaultAddItem` |
-    | `__setitem__` (add new item) | 0.00379 | 0.00689 | 1.81874 | `BenchmarkSetitemAddNewItem` |
-    | `__setitem__` (replace) | 0.00384 | 0.00642 | 1.67208 | `BenchmarkSetitemReplace` |
-    | `update` | 0.00394 | 0.00638 | 1.61989 | `BenchmarkUpdate` |
-    | `update` (many) | 0.00456 | 0.56238 | 123.41597 | `BenchmarkUpdateMany` |
-    | `values` | 0.00362 | 0.00815 | 2.24966 | `BenchmarkValues` |
+    | `clear` | 0.00415 | 0.00598 | 1.44073 | `BenchmarkClear` |
+    | `__contains__` | 0.00401 | 0.00417 | 1.03971 | `BenchmarkContains` |
+    | `copy` | 0.00404 | 0.0081 | 2.00357 | `BenchmarkCopy` |
+    | `__delitem__` | 0.00408 | 0.00625 | 1.52987 | `BenchmarkDelitem` |
+    | `get` | 0.00407 | 0.00408 | 1.0029 | `BenchmarkGet` |
+    | `get (unsuccessful search)` | 0.00411 | 0.00411 | 1.0011 | `BenchmarkGetDefault` |
+    | `__getitem__` | 0.00398 | 0.00414 | 1.03966 | `BenchmarkGetitem` |
+    | `__init__` | 0.00415 | 0.04236 | 10.20978 | `BenchmarkInit` |
+    | `items` | 0.00443 | 0.01245 | 2.80834 | `BenchmarkItems` |
+    | `__iter__` | 0.00423 | 0.00846 | 2.00154 | `BenchmarkIter` |
+    | `keys` | 0.00404 | 0.00837 | 2.0694 | `BenchmarkKeys` |
+    | `__len__` | 0.00396 | 0.00408 | 1.02966 | `BenchmarkLen` |
+    | `__contains__` (unsuccessful search) | 0.00397 | 0.00418 | 1.05403 | `BenchmarkNotContains` |
+    | `pop` | 0.00419 | 0.0067 | 1.60009 | `BenchmarkPop` |
+    | `pop (unsuccessful search)` | 0.00413 | 0.00555 | 1.34593 | `BenchmarkPopDefault` |
+    | `popitem` | 0.00405 | 0.00687 | 1.69731 | `BenchmarkPopitem` |
+    | `setdefault` | 0.00415 | 0.00558 | 1.34466 | `BenchmarkSetdefault` |
+    | `setdefault (unsuccessful search)` | 0.0041 | 0.006 | 1.46098 | `BenchmarkSetdefaultAddItem` |
+    | `__setitem__` (add new item) | 0.00408 | 0.00673 | 1.65015 | `BenchmarkSetitemAddNewItem` |
+    | `__setitem__` (replace) | 0.00424 | 0.00661 | 1.55939 | `BenchmarkSetitemReplace` |
+    | `update` | 0.00427 | 0.00669 | 1.56924 | `BenchmarkUpdate` |
+    | `update` (many) | 0.00512 | 0.55734 | 108.82583 | `BenchmarkUpdateMany` |
+    | `values` | 0.004 | 0.00827 | 2.06529 | `BenchmarkValues` |
 
 
     approximate memory usage
 
     | subject | `builtin` | `sqlitecollections` | ratio | class |
     | :------ | --------: | ------------------: | ----: | :---- |
-    | `clear` | 0.00391 | 0.0 | 0.0 | `BenchmarkClear` |
+    | `clear` | 0.0 | 0.0 | 1.0 | `BenchmarkClear` |
     | `__contains__` | 0.0 | 0.0 | 1.0 | `BenchmarkContains` |
-    | `copy` | 0.05469 | 0.0 | 0.0 | `BenchmarkCopy` |
+    | `copy` | 0.05859 | 0.0 | 0.0 | `BenchmarkCopy` |
     | `__delitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkDelitem` |
     | `get` | 0.0 | 0.0 | 1.0 | `BenchmarkGet` |
     | `get (unsuccessful search)` | 0.0 | 0.0 | 1.0 | `BenchmarkGetDefault` |
     | `__getitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkGetitem` |
-    | `__init__` | 0.0 | 0.0 | 1.0 | `BenchmarkInit` |
-    | `items` | 0.125 | 0.24219 | 1.9375 | `BenchmarkItems` |
-    | `__iter__` | 0.0 | 0.125 | inf | `BenchmarkIter` |
-    | `keys` | 0.0 | 0.03516 | inf | `BenchmarkKeys` |
+    | `__init__` | 0.04297 | 0.01562 | 0.36364 | `BenchmarkInit` |
+    | `items` | 0.125 | 0.125 | 1.0 | `BenchmarkItems` |
+    | `__iter__` | 0.0 | 0.0 | 1.0 | `BenchmarkIter` |
+    | `keys` | 0.0 | 0.0 | 1.0 | `BenchmarkKeys` |
     | `__len__` | 0.0 | 0.0 | 1.0 | `BenchmarkLen` |
     | `__contains__` (unsuccessful search) | 0.0 | 0.0 | 1.0 | `BenchmarkNotContains` |
     | `pop` | 0.0 | 0.0 | 1.0 | `BenchmarkPop` |
-    | `pop (unsuccessful search)` | 0.00391 | 0.0 | 0.0 | `BenchmarkPopDefault` |
+    | `pop (unsuccessful search)` | 0.0 | 0.0 | 1.0 | `BenchmarkPopDefault` |
     | `popitem` | 0.0 | 0.0 | 1.0 | `BenchmarkPopitem` |
-    | `setdefault` | 0.00391 | 0.0 | 0.0 | `BenchmarkSetdefault` |
+    | `setdefault` | 0.0 | 0.0 | 1.0 | `BenchmarkSetdefault` |
     | `setdefault (unsuccessful search)` | 0.0 | 0.0 | 1.0 | `BenchmarkSetdefaultAddItem` |
-    | `__setitem__` (add new item) | 0.00391 | 0.0 | 0.0 | `BenchmarkSetitemAddNewItem` |
+    | `__setitem__` (add new item) | 0.0 | 0.0 | 1.0 | `BenchmarkSetitemAddNewItem` |
     | `__setitem__` (replace) | 0.0 | 0.0 | 1.0 | `BenchmarkSetitemReplace` |
     | `update` | 0.0 | 0.0 | 1.0 | `BenchmarkUpdate` |
-    | `update` (many) | 0.14062 | 0.0 | 0.0 | `BenchmarkUpdateMany` |
-    | `values` | 0.125 | 0.0 | 0.0 | `BenchmarkValues` |
+    | `update` (many) | 0.0 | 0.0 | 1.0 | `BenchmarkUpdateMany` |
+    | `values` | 0.0 | 0.0 | 1.0 | `BenchmarkValues` |
 </code></pre></div>
 
 
@@ -605,10 +605,10 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.078830c0.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.8492ddcf.min.js"></script>
       
     
   </body>

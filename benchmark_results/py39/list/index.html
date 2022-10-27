@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.6">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
     
     
       
@@ -515,36 +515,36 @@
 
     | subject | `builtin` | `sqlitecollections` | ratio | class |
     | :------ | --------: | ------------------: | ----: | :---- |
-    | `__add__` | 0.00423 | 0.00967 | 2.28968 | `BenchmarkAdd` |
-    | `append` | 0.00407 | 0.00658 | 1.61538 | `BenchmarkAppend` |
-    | `clear` | 0.00408 | 0.00656 | 1.60742 | `BenchmarkClear` |
-    | `__contains__` | 0.00399 | 0.00412 | 1.03278 | `BenchmarkContains` |
-    | `copy` | 0.00404 | 0.00911 | 2.25452 | `BenchmarkCopy` |
-    | `count` | 0.00396 | 0.00411 | 1.03603 | `BenchmarkCount` |
-    | `__init__` | 0.00391 | 0.01937 | 4.95083 | `BenchmarkCreateWithInitialData` |
-    | `__delitem__` | 0.00406 | 0.08031 | 19.78619 | `BenchmarkDelitem` |
-    | `__delitem__` (slice) | 0.00381 | 0.15115 | 39.62802 | `BenchmarkDelitemSlice` |
-    | `__delitem__` (slice with skip) | 0.00381 | 0.15214 | 39.91421 | `BenchmarkDelitemSliceSkip` |
-    | `extend` | 0.00409 | 0.00684 | 1.67145 | `BenchmarkExtend` |
-    | `__getitem__` | 0.00404 | 0.00417 | 1.02984 | `BenchmarkGetitem` |
-    | `__getitem__` (slice) | 0.00385 | 0.08573 | 22.28991 | `BenchmarkGetitemSlice` |
-    | `__getitem__` (slice with skip) | 0.00389 | 0.0117 | 3.00993 | `BenchmarkGetitemSliceSkip` |
-    | `__iadd__` | 0.00389 | 0.00667 | 1.71539 | `BenchmarkIadd` |
-    | `__imult__` | 0.00414 | 0.22942 | 55.35269 | `BenchmarkImult` |
-    | `index` | 0.00387 | 0.00414 | 1.07057 | `BenchmarkIndex` |
-    | `index` (unsuccessful search) | 0.0039 | 0.00418 | 1.07193 | `BenchmarkIndexUnsuccessfulSearch` |
-    | `insert` | 0.00402 | 0.14891 | 37.01124 | `BenchmarkInsert` |
-    | `__len__` | 0.00397 | 0.00423 | 1.06645 | `BenchmarkLen` |
-    | `__mult__` | 0.00406 | 0.23117 | 56.91445 | `BenchmarkMult` |
-    | `__contains__` (unsuccessful search) | 0.00403 | 0.00405 | 1.00496 | `BenchmarkNotContains` |
-    | `pop` | 0.00418 | 0.07908 | 18.91765 | `BenchmarkPop` |
-    | `remove` | 0.00401 | 0.11244 | 28.046 | `BenchmarkRemove` |
-    | `__setitem__` | 0.00404 | 0.00672 | 1.66376 | `BenchmarkSetitem` |
-    | `__setitem__` (slice) | 0.00402 | 0.15336 | 38.18834 | `BenchmarkSetitemSlice` |
-    | `__setitem__` (slice with skip) | 0.00403 | 0.01528 | 3.78836 | `BenchmarkSetitemSliceSkip` |
-    | `sort` (balanced) | 0.0041 | 0.33064 | 80.58365 | `BenchmarkSortBalanced` |
-    | `sort` (fastest) | 0.00381 | 0.33542 | 87.93598 | `BenchmarkSortFastest` |
-    | `sort` (memory_saving) | 0.00389 | 3.81063 | 978.5303 | `BenchmarkSortMemorySaving` |
+    | `__add__` | 0.00545 | 0.01293 | 2.37167 | `BenchmarkAdd` |
+    | `append` | 0.00537 | 0.0083 | 1.54517 | `BenchmarkAppend` |
+    | `clear` | 0.00552 | 0.00863 | 1.56424 | `BenchmarkClear` |
+    | `__contains__` | 0.00547 | 0.00532 | 0.972 | `BenchmarkContains` |
+    | `copy` | 0.00548 | 0.01071 | 1.95257 | `BenchmarkCopy` |
+    | `count` | 0.00553 | 0.00531 | 0.96043 | `BenchmarkCount` |
+    | `__init__` | 0.00558 | 0.02198 | 3.93622 | `BenchmarkCreateWithInitialData` |
+    | `__delitem__` | 0.00545 | 0.08419 | 15.44657 | `BenchmarkDelitem` |
+    | `__delitem__` (slice) | 0.00555 | 0.16119 | 29.05676 | `BenchmarkDelitemSlice` |
+    | `__delitem__` (slice with skip) | 0.00542 | 0.16181 | 29.87835 | `BenchmarkDelitemSliceSkip` |
+    | `extend` | 0.00558 | 0.00809 | 1.4518 | `BenchmarkExtend` |
+    | `__getitem__` | 0.00565 | 0.00536 | 0.94928 | `BenchmarkGetitem` |
+    | `__getitem__` (slice) | 0.00546 | 0.0928 | 16.98143 | `BenchmarkGetitemSlice` |
+    | `__getitem__` (slice with skip) | 0.00554 | 0.01369 | 2.47056 | `BenchmarkGetitemSliceSkip` |
+    | `__iadd__` | 0.00548 | 0.00807 | 1.47361 | `BenchmarkIadd` |
+    | `__imult__` | 0.00545 | 0.24048 | 44.1031 | `BenchmarkImult` |
+    | `index` | 0.00556 | 0.00544 | 0.97863 | `BenchmarkIndex` |
+    | `index` (unsuccessful search) | 0.00551 | 0.00569 | 1.03166 | `BenchmarkIndexUnsuccessfulSearch` |
+    | `insert` | 0.00562 | 0.15866 | 28.23257 | `BenchmarkInsert` |
+    | `__len__` | 0.00552 | 0.00523 | 0.94775 | `BenchmarkLen` |
+    | `__mult__` | 0.00545 | 0.24582 | 45.10767 | `BenchmarkMult` |
+    | `__contains__` (unsuccessful search) | 0.00552 | 0.00529 | 0.95764 | `BenchmarkNotContains` |
+    | `pop` | 0.00601 | 0.08457 | 14.07374 | `BenchmarkPop` |
+    | `remove` | 0.00581 | 0.12075 | 20.76642 | `BenchmarkRemove` |
+    | `__setitem__` | 0.0056 | 0.0082 | 1.46575 | `BenchmarkSetitem` |
+    | `__setitem__` (slice) | 0.00557 | 0.16401 | 29.42012 | `BenchmarkSetitemSlice` |
+    | `__setitem__` (slice with skip) | 0.00548 | 0.01726 | 3.14904 | `BenchmarkSetitemSliceSkip` |
+    | `sort` (balanced) | 0.00568 | 0.34154 | 60.13294 | `BenchmarkSortBalanced` |
+    | `sort` (fastest) | 0.00578 | 0.34473 | 59.64903 | `BenchmarkSortFastest` |
+    | `sort` (memory_saving) | 0.0058 | 3.50546 | 604.88314 | `BenchmarkSortMemorySaving` |
 
 
     approximate memory usage
@@ -558,12 +558,12 @@
     | `copy` | 0.0 | 0.0 | 1.0 | `BenchmarkCopy` |
     | `count` | 0.0 | 0.0 | 1.0 | `BenchmarkCount` |
     | `__init__` | 0.0 | 0.0 | 1.0 | `BenchmarkCreateWithInitialData` |
-    | `__delitem__` | 0.0 | 0.00391 | inf | `BenchmarkDelitem` |
+    | `__delitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkDelitem` |
     | `__delitem__` (slice) | 0.0 | 0.0 | 1.0 | `BenchmarkDelitemSlice` |
     | `__delitem__` (slice with skip) | 0.0 | 0.0 | 1.0 | `BenchmarkDelitemSliceSkip` |
     | `extend` | 0.0 | 0.0 | 1.0 | `BenchmarkExtend` |
     | `__getitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkGetitem` |
-    | `__getitem__` (slice) | 0.0 | 0.00391 | inf | `BenchmarkGetitemSlice` |
+    | `__getitem__` (slice) | 0.0 | 0.0 | 1.0 | `BenchmarkGetitemSlice` |
     | `__getitem__` (slice with skip) | 0.0 | 0.0 | 1.0 | `BenchmarkGetitemSliceSkip` |
     | `__iadd__` | 0.0 | 0.0 | 1.0 | `BenchmarkIadd` |
     | `__imult__` | 0.0 | 0.0 | 1.0 | `BenchmarkImult` |
@@ -573,12 +573,12 @@
     | `__len__` | 0.0 | 0.0 | 1.0 | `BenchmarkLen` |
     | `__mult__` | 0.0 | 0.0 | 1.0 | `BenchmarkMult` |
     | `__contains__` (unsuccessful search) | 0.0 | 0.0 | 1.0 | `BenchmarkNotContains` |
-    | `pop` | 0.0 | 0.00391 | inf | `BenchmarkPop` |
+    | `pop` | 0.0 | 0.0 | 1.0 | `BenchmarkPop` |
     | `remove` | 0.0 | 0.0 | 1.0 | `BenchmarkRemove` |
     | `__setitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkSetitem` |
-    | `__setitem__` (slice) | 0.0 | 0.00391 | inf | `BenchmarkSetitemSlice` |
-    | `__setitem__` (slice with skip) | 0.00391 | 0.0 | 0.0 | `BenchmarkSetitemSliceSkip` |
-    | `sort` (balanced) | 0.0 | 0.14844 | inf | `BenchmarkSortBalanced` |
+    | `__setitem__` (slice) | 0.0 | 0.0 | 1.0 | `BenchmarkSetitemSlice` |
+    | `__setitem__` (slice with skip) | 0.0 | 0.0 | 1.0 | `BenchmarkSetitemSliceSkip` |
+    | `sort` (balanced) | 0.0 | 0.12891 | inf | `BenchmarkSortBalanced` |
     | `sort` (fastest) | 0.0 | 0.12109 | inf | `BenchmarkSortFastest` |
     | `sort` (memory_saving) | 0.0 | 0.0 | 1.0 | `BenchmarkSortMemorySaving` |
 </code></pre></div>
@@ -619,10 +619,10 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.078830c0.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.8492ddcf.min.js"></script>
       
     
   </body>

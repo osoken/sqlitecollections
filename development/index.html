@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.6">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
     
     
       
@@ -696,7 +696,7 @@
 
 <h1 id="development">Development</h1>
 <h2 id="tests-type-checking-and-linting-locally">Tests, type checking and linting locally</h2>
-<p>To run tests, type checking and linting locally, you'll need to have <strong>python 3.6</strong>, <strong>3.7</strong>, <strong>3.8</strong>, <strong>3.9</strong> and <strong>3.10</strong> installed.
+<p>To run tests, type checking and linting locally, you'll need to have <strong>python 3.6</strong>, <strong>3.7</strong>, <strong>3.8</strong>, <strong>3.9</strong>, <strong>3.10</strong> and <strong>3.11</strong> installed.
 We use <code>tox</code> to run tests and type checking on all the supported python versions.
 You can set up the development environment with the following commands:</p>
 <div class="highlight"><pre><span></span><code>git clone git@github.com:osoken/sqlitecollections.git
@@ -705,7 +705,7 @@ python -m venv .venv
 source ./.venv/bin/activate
 pip install -e .[dev]
 </code></pre></div>
-<p>Then, run tests is as easy as:</p>
+<p>Then, just type the following command to run the test:</p>
 <div class="highlight"><pre><span></span><code>tox
 </code></pre></div>
 <p>After a while, you'll see the following message at the bottom of the long logs from <code>pytest</code> and others.</p>
@@ -716,6 +716,7 @@ pip install -e .[dev]
   py38: commands succeeded
   py39: commands succeeded
   py310: commands succeeded
+  py311: commands succeeded
   congratulations :)
 </code></pre></div>
 <h2 id="building-documents">Building documents</h2>
@@ -857,10 +858,10 @@ Together with the verbose mode, this is convenient for improving a single method
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.078830c0.min.js"></script>
+      <script src="../assets/javascripts/bundle.8492ddcf.min.js"></script>
       
     
   </body>

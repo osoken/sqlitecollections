@@ -11,7 +11,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.6">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
     
     
       
@@ -515,34 +515,34 @@
 
     | subject | `builtin` | `sqlitecollections` | ratio | class |
     | :------ | --------: | ------------------: | ----: | :---- |
-    | `clear` | 0.00404 | 0.00665 | 1.64693 | `BenchmarkClear` |
-    | `__contains__` | 0.00397 | 0.00412 | 1.03597 | `BenchmarkContains` |
-    | `copy` | 0.00393 | 0.00883 | 2.24387 | `BenchmarkCopy` |
-    | `__delitem__` | 0.00391 | 0.00642 | 1.64177 | `BenchmarkDelitem` |
-    | `get` | 0.00381 | 0.00422 | 1.10963 | `BenchmarkGet` |
-    | `get (unsuccessful search)` | 0.00408 | 0.00416 | 1.02128 | `BenchmarkGetDefault` |
-    | `__getitem__` | 0.00408 | 0.00407 | 0.99702 | `BenchmarkGetitem` |
-    | `__init__` | 0.00408 | 0.03845 | 9.41793 | `BenchmarkInit` |
-    | `__ior__` | 0.00415 | 0.00698 | 1.68105 | `BenchmarkIor` |
-    | `__ior__` (many) | 0.00525 | 0.55852 | 106.4524 | `BenchmarkIorMany` |
-    | `items` | 0.00435 | 0.01049 | 2.4117 | `BenchmarkItems` |
-    | `__iter__` | 0.00378 | 0.0077 | 2.03845 | `BenchmarkIter` |
-    | `keys` | 0.00399 | 0.00782 | 1.96085 | `BenchmarkKeys` |
-    | `__len__` | 0.00381 | 0.00403 | 1.05614 | `BenchmarkLen` |
-    | `__contains__` (unsuccessful search) | 0.00418 | 0.00417 | 0.99836 | `BenchmarkNotContains` |
-    | `__or__` | 0.00429 | 0.01132 | 2.64027 | `BenchmarkOr` |
-    | `__or__` (many) | 0.00554 | 0.56439 | 101.85498 | `BenchmarkOrMany` |
-    | `pop` | 0.00446 | 0.00754 | 1.68908 | `BenchmarkPop` |
-    | `pop (unsuccessful search)` | 0.00446 | 0.00599 | 1.34425 | `BenchmarkPopDefault` |
-    | `popitem` | 0.00444 | 0.00777 | 1.75082 | `BenchmarkPopitem` |
-    | `reversed` | 0.00395 | 0.00762 | 1.9307 | `BenchmarkReversed` |
-    | `setdefault` | 0.00439 | 0.00604 | 1.37404 | `BenchmarkSetdefault` |
-    | `setdefault (unsuccessful search)` | 0.00425 | 0.00623 | 1.46848 | `BenchmarkSetdefaultAddItem` |
-    | `__setitem__` (add new item) | 0.00426 | 0.00723 | 1.69723 | `BenchmarkSetitemAddNewItem` |
-    | `__setitem__` (replace) | 0.00431 | 0.00729 | 1.68979 | `BenchmarkSetitemReplace` |
-    | `update` | 0.00444 | 0.00723 | 1.62792 | `BenchmarkUpdate` |
-    | `update` (many) | 0.00535 | 0.55885 | 104.5231 | `BenchmarkUpdateMany` |
-    | `values` | 0.00436 | 0.00789 | 1.81157 | `BenchmarkValues` |
+    | `clear` | 0.00529 | 0.00813 | 1.53562 | `BenchmarkClear` |
+    | `__contains__` | 0.00531 | 0.00519 | 0.9763 | `BenchmarkContains` |
+    | `copy` | 0.0054 | 0.01147 | 2.12417 | `BenchmarkCopy` |
+    | `__delitem__` | 0.00539 | 0.00901 | 1.67102 | `BenchmarkDelitem` |
+    | `get` | 0.00534 | 0.00544 | 1.01798 | `BenchmarkGet` |
+    | `get (unsuccessful search)` | 0.00546 | 0.0061 | 1.11627 | `BenchmarkGetDefault` |
+    | `__getitem__` | 0.00542 | 0.00546 | 1.00565 | `BenchmarkGetitem` |
+    | `__init__` | 0.00566 | 0.04314 | 7.62605 | `BenchmarkInit` |
+    | `__ior__` | 0.00537 | 0.00929 | 1.72847 | `BenchmarkIor` |
+    | `__ior__` (many) | 0.00672 | 0.59071 | 87.86536 | `BenchmarkIorMany` |
+    | `items` | 0.00588 | 0.01271 | 2.16055 | `BenchmarkItems` |
+    | `__iter__` | 0.00567 | 0.00903 | 1.59149 | `BenchmarkIter` |
+    | `keys` | 0.00528 | 0.00904 | 1.71253 | `BenchmarkKeys` |
+    | `__len__` | 0.00533 | 0.0051 | 0.95666 | `BenchmarkLen` |
+    | `__contains__` (unsuccessful search) | 0.00537 | 0.00513 | 0.95458 | `BenchmarkNotContains` |
+    | `__or__` | 0.00529 | 0.04052 | 7.66303 | `BenchmarkOr` |
+    | `__or__` (many) | 0.00651 | 0.69573 | 106.83618 | `BenchmarkOrMany` |
+    | `pop` | 0.00532 | 0.00808 | 1.52008 | `BenchmarkPop` |
+    | `pop (unsuccessful search)` | 0.00537 | 0.0068 | 1.26569 | `BenchmarkPopDefault` |
+    | `popitem` | 0.00555 | 0.00867 | 1.56145 | `BenchmarkPopitem` |
+    | `reversed` | 0.00526 | 0.00901 | 1.71182 | `BenchmarkReversed` |
+    | `setdefault` | 0.00539 | 0.00695 | 1.28893 | `BenchmarkSetdefault` |
+    | `setdefault (unsuccessful search)` | 0.00541 | 0.00722 | 1.33343 | `BenchmarkSetdefaultAddItem` |
+    | `__setitem__` (add new item) | 0.00543 | 0.00818 | 1.50767 | `BenchmarkSetitemAddNewItem` |
+    | `__setitem__` (replace) | 0.00552 | 0.0082 | 1.48469 | `BenchmarkSetitemReplace` |
+    | `update` | 0.00601 | 0.0086 | 1.43107 | `BenchmarkUpdate` |
+    | `update` (many) | 0.00658 | 0.58181 | 88.43353 | `BenchmarkUpdateMany` |
+    | `values` | 0.00532 | 0.00852 | 1.60012 | `BenchmarkValues` |
 
 
     approximate memory usage
@@ -558,8 +558,8 @@
     | `__getitem__` | 0.0 | 0.0 | 1.0 | `BenchmarkGetitem` |
     | `__init__` | 0.0 | 0.0 | 1.0 | `BenchmarkInit` |
     | `__ior__` | 0.0 | 0.0 | 1.0 | `BenchmarkIor` |
-    | `__ior__` (many) | 0.17969 | 0.0 | 0.0 | `BenchmarkIorMany` |
-    | `items` | 0.0 | 0.17188 | inf | `BenchmarkItems` |
+    | `__ior__` (many) | 0.12891 | 0.0 | 0.0 | `BenchmarkIorMany` |
+    | `items` | 0.0 | 0.16406 | inf | `BenchmarkItems` |
     | `__iter__` | 0.0 | 0.0 | 1.0 | `BenchmarkIter` |
     | `keys` | 0.0 | 0.0 | 1.0 | `BenchmarkKeys` |
     | `__len__` | 0.0 | 0.0 | 1.0 | `BenchmarkLen` |
@@ -615,10 +615,10 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.5bf1dace.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.078830c0.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.8492ddcf.min.js"></script>
       
     
   </body>
