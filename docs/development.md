@@ -14,7 +14,7 @@ source ./.venv/bin/activate
 pip install -e .[dev]
 ```
 
-Then, run tests is as easy as:
+Then, just type the following command to run the test:
 
 ```
 tox
